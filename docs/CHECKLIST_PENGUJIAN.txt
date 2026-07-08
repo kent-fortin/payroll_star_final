@@ -1,0 +1,17 @@
+CHECKLIST PENGUJIAN APLIKASI
+
+1. Login admin dan pimpinan.
+2. Tambah jabatan: kode harus otomatis JBTxxx.
+3. Tambah karyawan: NIP harus otomatis SSLxxx.
+4. Tambah rekap absensi: bulan harus berupa pilihan.
+5. Ajukan edit absensi sebagai admin.
+6. Login pimpinan dan setujui/tolak edit absensi.
+7. Preview payroll: lembur = jam x Rp15.000; alpha = hari x Rp25.000.
+8. Simpan payroll setelah preview.
+9. Tandai payroll Sudah Dibayar dan cek tanggal pembayaran.
+10. Cetak rincian gaji dari menu Proses Payroll.
+11. Cek laporan filter 1 bulan, 2 bulan terakhir, dan 1 tahun terakhir.
+12. Pastikan grafik, jumlah sudah/belum digaji, dan total nominal tampil.
+13. Cetak laporan.
+14. Tes forgot password mode uji coba memakai username/email/no WhatsApp.
+15. Pastikan menu tunjangan, potongan, dan slip gaji tidak ada.
