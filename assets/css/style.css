@@ -671,14 +671,40 @@ h1, h2, h3, h4, h5, h6 {
 /* ============================================= */
 /*   Responsive                                  */
 /* ============================================= */
+.sidebar-backdrop {
+  display: none;
+}
 @media (max-width: 991.98px) {
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  .sidebar-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+  }
   .sidebar {
-    position: static;
-    width: 100%;
-    height: auto;
-    min-height: unset;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    z-index: 1050;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
     border-radius: 0;
-    padding: 1rem 1.25rem;
+  }
+  .sidebar.show {
+    transform: translateX(0);
   }
   .app-wrapper { flex-direction: column; }
   .page-content { padding: 1rem; }

@@ -29,8 +29,9 @@ function nav_item(string $label, string $href, string $currentPath, string $icon
 <body>
 <div class="app-wrapper">
 
+    <div class="sidebar-backdrop"></div>
     <!-- SIDEBAR -->
-    <aside class="sidebar no-print d-none d-lg-flex">
+    <aside class="sidebar no-print">
         <!-- Brand -->
         <div class="sidebar-brand">
             <img src="<?= asset('img/logo.png') ?>" alt="Logo" class="logo-mini">
@@ -72,16 +73,23 @@ function nav_item(string $label, string $href, string $currentPath, string $icon
     <div class="main-content">
         <!-- Topbar -->
         <header class="topbar no-print">
-            <div class="d-flex align-items-center gap-3">
-                <img src="<?= asset('img/logo.png') ?>" alt="Logo" class="brand-logo">
-                <div>
-                    <h1 class="topbar-title">Payroll PT Star Samudera Logistik</h1>
-                    <div class="topbar-sub">Jl. Kapten Sumarsono No.32, Sunggal, Deli Serdang, Sumatera Utara</div>
+            <div class="d-flex align-items-center gap-2 gap-md-3 flex-grow-1" style="min-width: 0;">
+                <button type="button" class="btn btn-light d-lg-none flex-shrink-0" id="sidebarToggle">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <img src="<?= asset('img/logo.png') ?>" alt="Logo" class="brand-logo d-none d-sm-block flex-shrink-0">
+                <div class="text-truncate">
+                    <h1 class="topbar-title text-truncate mb-0 d-none d-md-block">Payroll PT Star Samudera Logistik</h1>
+                    <h1 class="topbar-title text-truncate mb-0 d-md-none">Payroll System</h1>
+                    <div class="topbar-sub d-none d-md-block text-truncate">Jl. Kapten Sumarsono No.32, Sunggal, Deli Serdang, Sumatera Utara</div>
                 </div>
             </div>
-            <div class="topbar-user">
-                <div class="topbar-user-label">Login sebagai</div>
-                <div class="topbar-user-name"><?= e($_SESSION['nama'] ?? '') ?> <span class="topbar-role">(<?= e($_SESSION['role'] ?? '') ?>)</span></div>
+            <div class="topbar-user text-end flex-shrink-0 ms-2" style="max-width: 45%;">
+                <div class="topbar-user-label d-none d-sm-block">Login sebagai</div>
+                <div class="topbar-user-name text-truncate">
+                    <span class="d-none d-sm-inline"><?= e($_SESSION['nama'] ?? '') ?></span>
+                    <span class="topbar-role">(<?= e($_SESSION['role'] ?? '') ?>)</span>
+                </div>
             </div>
         </header>
 

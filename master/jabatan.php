@@ -7,7 +7,7 @@ if (isset($_GET['edit'])) {
     $result = mysqli_query($conn, "SELECT * FROM jabatan WHERE id_jabatan=$id LIMIT 1");
     $edit = $result ? mysqli_fetch_assoc($result) : null;
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['toggle_status'])) {
     $id = (int)($_POST['id_jabatan'] ?? 0);
     $nama = trim($_POST['nama_jabatan'] ?? '');
     $gaji = (float)($_POST['gaji_pokok'] ?? 0);
@@ -46,7 +46,7 @@ if (isset($_POST['toggle_status'])) {
     $password_pimpinan = $_POST['password_pimpinan'] ?? '';
     
     // Cari password pimpinan di database
-    $qPimpinan = mysqli_query($conn, "SELECT password FROM user WHERE role='Pimpinan' LIMIT 1");
+    $qPimpinan = mysqli_query($conn, "SELECT password FROM users WHERE role='pimpinan' LIMIT 1");
     $pimpinan = mysqli_fetch_assoc($qPimpinan);
     
     if ($pimpinan && password_verify($password_pimpinan, $pimpinan['password'])) {

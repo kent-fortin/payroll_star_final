@@ -111,6 +111,12 @@ $(document).ready(function () {
             if (result.isConfirmed) window.location.href = link;
         });
     });
+
+    // ── Sidebar Toggle Mobile ────────────────────────────────────
+    $('#sidebarToggle, .sidebar-backdrop').on('click', function() {
+        $('.sidebar').toggleClass('show');
+        $('.sidebar-backdrop').toggleClass('show');
+    });
 });
 </script>
 </body>

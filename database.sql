@@ -87,6 +87,7 @@ CREATE TABLE payroll (
     jam_lembur INT NOT NULL DEFAULT 0,
     tarif_lembur DECIMAL(12,2) NOT NULL DEFAULT 15000,
     total_lembur DECIMAL(12,2) NOT NULL DEFAULT 0,
+    total_tunjangan DECIMAL(12,2) NOT NULL DEFAULT 0,
     jumlah_alpha INT NOT NULL DEFAULT 0,
     tarif_alpha DECIMAL(12,2) NOT NULL DEFAULT 25000,
     total_potongan_alpha DECIMAL(12,2) NOT NULL DEFAULT 0,
