@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../config/koneksi.php';
 require_login();
 if (is_admin()) {
-    redirect('dashboard.php');
+    redirect('dashboard_admin.php');
 }
 require_once __DIR__ . '/../layout/header.php';
 

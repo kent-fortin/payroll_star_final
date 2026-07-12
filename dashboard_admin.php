@@ -19,9 +19,9 @@ $paid = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) total,COALESCE(S
 <div class="row g-4">
 <div class="col-lg-8"><div class="card content-card shadow-sm p-4"><h2 class="h4 mb-3">Alur Sistem</h2>
 <div class="row g-3">
-<div class="col-md-6"><a class="btn btn-outline-primary w-100 py-3" href="<?= url('master/absensi.php') ?>">1. Catat Rekap Absensi Bulanan</a></div>
-<div class="col-md-6"><a class="btn btn-outline-primary w-100 py-3" href="<?= url('transaksi/payroll.php') ?>">2. Preview dan Proses Payroll</a></div>
-<div class="col-md-6"><a class="btn btn-outline-primary w-100 py-3" href="<?= url('laporan/laporan.php') ?>">3. Kelola Laporan Gaji</a></div>
+<div class="col-md-6"><a class="btn btn-outline-primary w-100 py-3" href="<?= url('master/absensi.php') ?>">1. Catat Rekap Absensi</a></div>
+<div class="col-md-6"><a class="btn btn-outline-primary w-100 py-3" href="<?= url('master/lembur.php') ?>">2. Input Data Lembur</a></div>
+<div class="col-md-6"><a class="btn btn-outline-primary w-100 py-3" href="<?= url('transaksi/payroll.php') ?>">3. Proses Payroll</a></div>
 <div class="col-md-6"><a class="btn btn-outline-primary w-100 py-3" href="<?= url('master/karyawan.php') ?>">Kelola Data Karyawan</a></div>
 </div></div></div>
 <div class="col-lg-4"><div class="card content-card shadow-sm p-4"><h2 class="h4 mb-3">Rumus Payroll</h2><div class="formula-box small">
