@@ -145,9 +145,9 @@ if($data): while($row=mysqli_fetch_assoc($data)):
   <td><strong class="text-success"><?= rupiah($nilai) ?></strong></td>
   <td>
     <a class="btn btn-sm btn-warning" href="?edit=<?= $row['id_lembur'] ?>">Edit</a>
-    <form class="d-inline" method="post" onsubmit="return confirm('Hapus data lembur ini?')">
+    <form class="d-inline hapus-form" method="post" data-confirm="Hapus data lembur ini?">
       <input type="hidden" name="id_lembur" value="<?= $row['id_lembur'] ?>">
-      <button name="hapus" class="btn btn-sm btn-danger">Hapus</button>
+      <button name="hapus" type="button" class="btn btn-sm btn-danger btn-hapus">Hapus</button>
     </form>
   </td>
 </tr>

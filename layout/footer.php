@@ -90,6 +90,28 @@ $(document).ready(function () {
         }
     });
 
+    // ── SweetAlert2 Confirm (tombol Hapus dengan data-confirm) ───
+    // Menggunakan event delegation agar bekerja di dalam DataTable
+    $(document).on('click', '.btn-hapus', function (e) {
+        e.preventDefault();
+        var form = $(this).closest('.hapus-form');
+        var msg  = form.data('confirm') || 'Apakah Anda yakin ingin menghapus data ini?';
+        Swal.fire({
+            title: 'Konfirmasi Hapus',
+            text: msg,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                form[0].submit();
+            }
+        });
+    });
+
     // ── SweetAlert2 Confirm (anchor onclick) ─────────────────────
     $('a[onclick*="confirm"]').on('click', function (e) {
         e.preventDefault();
