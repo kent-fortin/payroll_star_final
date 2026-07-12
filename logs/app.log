@@ -278,3 +278,17 @@
 [2026-07-08 13:48:27] Database connection failed: php_network_getaddresses: getaddrinfo for sql312.infinityfree.com failed: No such host is known. 
 [2026-07-08 13:48:27] Database connection failed: php_network_getaddresses: getaddrinfo for sql312.infinityfree.com failed: No such host is known. 
 [2026-07-08 13:48:27] Database connection failed: php_network_getaddresses: getaddrinfo for sql312.infinityfree.com failed: No such host is known. 
+[2026-07-09 05:00:29] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:00:33] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:00:41] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:00:45] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:00:49] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:00:53] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:01:02] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:01:06] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:03:44] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:03:58] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:04:03] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:04:22] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:04:26] Database connection failed: No connection could be made because the target machine actively refused it
+[2026-07-09 05:04:43] Database connection failed: No connection could be made because the target machine actively refused it

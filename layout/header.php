@@ -12,6 +12,11 @@ function nav_item(string $label, string $href, string $currentPath, string $icon
          . '<i class="bi bi-' . $icon . '"></i> ' . e($label)
          . '</a>';
 }
+
+function nav_heading(string $label): string
+{
+    return '<div class="sidebar-heading">' . e($label) . '</div>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -43,16 +48,35 @@ function nav_item(string $label, string $href, string $currentPath, string $icon
 
         <!-- Navigation -->
         <nav class="sidebar-nav">
+
+            <!-- Dashboard (semua role) -->
             <?= nav_item('Dashboard', is_admin() ? 'dashboard_admin.php' : 'dashboard_pimpinan.php', $currentPath, 'speedometer2') ?>
+
             <?php if (is_admin()): ?>
-                <?= nav_item('Data Jabatan', 'master/jabatan.php', $currentPath, 'tag') ?>
-                <?= nav_item('Data Karyawan', 'master/karyawan.php', $currentPath, 'people') ?>
-                <?= nav_item('Rekap Absensi', 'master/absensi.php', $currentPath, 'calendar-check') ?>
+
+                <!-- MASTER DATA -->
+                <?= nav_heading('Master Data') ?>
+                <?= nav_item('Data Karyawan', 'master/karyawan.php', $currentPath, 'people-fill') ?>
+                <?= nav_item('Data Jabatan', 'master/jabatan.php', $currentPath, 'tag-fill') ?>
+
+                <!-- TRANSAKSI -->
+                <?= nav_heading('Transaksi') ?>
+                <?= nav_item('Rekap Absensi', 'master/absensi.php', $currentPath, 'calendar-check-fill') ?>
+                <?= nav_item('Data Lembur', 'master/lembur.php', $currentPath, 'clock-history') ?>
                 <?= nav_item('Proses Payroll', 'transaksi/payroll.php', $currentPath, 'cash-stack') ?>
+
             <?php else: ?>
+
+                <!-- MENU PIMPINAN -->
+                <?= nav_heading('Approval') ?>
                 <?= nav_item('Approval Absensi', 'approval/absensi.php', $currentPath, 'check2-circle') ?>
+                <?= nav_item('Validasi Payroll', 'approval/validasi_payroll.php', $currentPath, 'check2-square') ?>
+
+                <?= nav_heading('Laporan') ?>
                 <?= nav_item('Laporan Gaji', 'laporan/laporan.php', $currentPath, 'file-earmark-bar-graph') ?>
+
             <?php endif; ?>
+
         </nav>
 
         <!-- Info box -->
@@ -104,3 +128,4 @@ function nav_item(string $label, string $href, string $currentPath, string $icon
                 };
             </script>
         <?php endif; ?>
+

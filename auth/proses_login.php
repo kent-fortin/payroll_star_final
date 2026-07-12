@@ -28,5 +28,5 @@ if ($user && password_verify($password, $user['password'])) {
         redirect('dashboard_pimpinan.php');
     }
 }
-set_flash('danger', 'Login gagal. Gunakan alternatif Lupa Password apabila diperlukan.');
+set_flash('danger', 'Login gagal. Username atau password yang Anda masukkan salah.');
 redirect('auth/login.php');

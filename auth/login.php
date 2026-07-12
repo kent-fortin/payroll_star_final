@@ -1,7 +1,12 @@
 <?php
+/**
+ * auth/login.php — Halaman login sistem payroll
+ * Hanya berisi form Username & Password. Tanpa fitur OTP/Lupa Password.
+ */
 require_once __DIR__ . '/../config/koneksi.php';
 if (is_logged_in() && $conn) {
-    redirect('dashboard.php');
+    // Redirect ke dashboard spesifik
+    redirect(is_admin() ? 'dashboard_admin.php' : 'dashboard_pimpinan.php');
 }
 $flash = get_flash();
 ?>
@@ -10,7 +15,7 @@ $flash = get_flash();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Payroll</title>
+    <title>Login — Payroll PT Star Samudera Logistik</title>
     <link rel="icon" type="image/png" href="<?= asset('img/favicon.png') ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="<?= asset('css/style.css') ?>" rel="stylesheet">
@@ -35,16 +40,28 @@ $flash = get_flash();
                 </script>
                 <?php endif; ?>
                 <form action="proses_login.php" method="post">
-                    <div class="mb-3"><label class="form-label">Username</label><input type="text" name="username" class="form-control form-control-lg" required></div>
-                    <div class="mb-3"><label class="form-label">Password</label><input type="password" name="password" class="form-control form-control-lg" required></div>
-                    <button class="btn btn-primary btn-lg w-100" type="submit">Login</button>
+                    <div class="mb-3">
+                        <label class="form-label" for="username">Username</label>
+                        <input type="text" id="username" name="username" class="form-control form-control-lg" required autocomplete="username">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" id="password" name="password" class="form-control form-control-lg" required autocomplete="current-password">
+                    </div>
+                    <button class="btn btn-primary btn-lg w-100" type="submit" id="btn-login">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Masuk
+                    </button>
                 </form>
-                <div class="text-center mt-3"><a href="forgot_password.php">Lupa Password?</a></div>
-                <div class="small text-muted mt-4">Demo: admin/admin123 atau pimpinan/pimpinan123</div>
+                <div class="alert alert-info mt-4 mb-0 small text-center">
+                    <strong>Akun Demo:</strong><br>
+                    Admin: admin / admin123<br>
+                    Pimpinan: pimpinan / pimpinan123
+                </div>
             </div>
         </div>
     </div>
 </div>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.27/dist/sweetalert2.all.min.js"></script>
 <script>
     if (window.flashMessage) {

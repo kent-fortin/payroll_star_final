@@ -25,7 +25,8 @@ CREATE TABLE jabatan (
     id_jabatan INT AUTO_INCREMENT PRIMARY KEY,
     kode_jabatan VARCHAR(20) NOT NULL UNIQUE,
     nama_jabatan VARCHAR(100) NOT NULL,
-    gaji_pokok DECIMAL(12,2) NOT NULL
+    gaji_pokok DECIMAL(12,2) NOT NULL,
+    status_jabatan ENUM('Aktif','Tidak Aktif') NOT NULL DEFAULT 'Aktif'
 ) ENGINE=InnoDB;
 
 CREATE TABLE karyawan (
@@ -34,7 +35,7 @@ CREATE TABLE karyawan (
     nama_karyawan VARCHAR(100) NOT NULL,
     jenis_kelamin ENUM('L','P') NOT NULL,
     id_jabatan INT NOT NULL,
-    status_karyawan ENUM('Tetap','Kontrak') NOT NULL,
+    status_karyawan ENUM('Tetap','Kontrak','Resign') NOT NULL,
     tanggal_masuk DATE NOT NULL,
     CONSTRAINT fk_karyawan_jabatan FOREIGN KEY (id_jabatan) REFERENCES jabatan(id_jabatan) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB;
@@ -48,7 +49,6 @@ CREATE TABLE absensi (
     sakit INT NOT NULL DEFAULT 0,
     izin INT NOT NULL DEFAULT 0,
     alpha INT NOT NULL DEFAULT 0,
-    lembur_jam INT NOT NULL DEFAULT 0,
     dibuat_oleh INT NULL,
     dibuat_pada DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     diperbarui_pada DATETIME NULL,
@@ -57,6 +57,17 @@ CREATE TABLE absensi (
     CONSTRAINT fk_absensi_user FOREIGN KEY (dibuat_oleh) REFERENCES users(id_user) ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE lembur (
+    id_lembur INT AUTO_INCREMENT PRIMARY KEY,
+    id_karyawan INT NOT NULL,
+    tanggal_lembur DATE NOT NULL,
+    jam_lembur INT NOT NULL DEFAULT 0,
+    dibuat_oleh INT NULL,
+    dibuat_pada DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_lembur_karyawan FOREIGN KEY (id_karyawan) REFERENCES karyawan(id_karyawan) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_lembur_user FOREIGN KEY (dibuat_oleh) REFERENCES users(id_user) ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB COMMENT='Data lembur harian karyawan';
+
 CREATE TABLE permintaan_edit_absensi (
     id_permintaan INT AUTO_INCREMENT PRIMARY KEY,
     id_absensi INT NOT NULL,
@@ -64,7 +75,6 @@ CREATE TABLE permintaan_edit_absensi (
     sakit_baru INT NOT NULL,
     izin_baru INT NOT NULL,
     alpha_baru INT NOT NULL,
-    lembur_jam_baru INT NOT NULL,
     alasan_perubahan VARCHAR(255) NOT NULL,
     data_lama TEXT NOT NULL,
     status ENUM('Menunggu','Disetujui','Ditolak') NOT NULL DEFAULT 'Menunggu',
@@ -93,6 +103,7 @@ CREATE TABLE payroll (
     total_potongan_alpha DECIMAL(12,2) NOT NULL DEFAULT 0,
     total_gaji_bersih DECIMAL(12,2) NOT NULL,
     status_pembayaran ENUM('Belum Dibayar','Sudah Dibayar') NOT NULL DEFAULT 'Belum Dibayar',
+    status_validasi ENUM('Menunggu','Disetujui','Ditolak') NOT NULL DEFAULT 'Menunggu',
     tanggal_pembayaran DATE NULL,
     tanggal_proses DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     diproses_oleh INT NULL,

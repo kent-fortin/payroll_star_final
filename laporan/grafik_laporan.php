@@ -14,7 +14,7 @@ if (!isset($conn) || !$conn) {
 if (!function_exists('grafik_h')) {
     function grafik_h($value)
     {
-        return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
     }
 }
 
@@ -98,18 +98,18 @@ $dataGrafik = [];
 if ($query) {
     while ($row = mysqli_fetch_assoc($query)) {
         $nomorBulan = $urutanBulan[$row['bulan']] ?? 0;
-        $tahun = (int)$row['tahun'];
+        $tahun = (int) $row['tahun'];
 
         $dataGrafik[] = [
             'bulan' => $row['bulan'],
             'tahun' => $tahun,
             'nomor_bulan' => $nomorBulan,
             'urutan' => ($tahun * 100) + $nomorBulan,
-            'total_gaji' => (float)$row['total_gaji'],
-            'total_dibayar' => (float)$row['total_dibayar'],
-            'total_belum_dibayar' => (float)$row['total_belum_dibayar'],
-            'jumlah_sudah' => (int)$row['jumlah_sudah'],
-            'jumlah_belum' => (int)$row['jumlah_belum']
+            'total_gaji' => (float) $row['total_gaji'],
+            'total_dibayar' => (float) $row['total_dibayar'],
+            'total_belum_dibayar' => (float) $row['total_belum_dibayar'],
+            'jumlah_sudah' => (int) $row['jumlah_sudah'],
+            'jumlah_belum' => (int) $row['jumlah_belum']
         ];
     }
 }
@@ -123,7 +123,7 @@ $rentang = $_GET['rentang']
     ?? $_GET['periode_filter']
     ?? '1tahun';
 
-$rentangNormal = strtolower(str_replace([' ', '-', '_'], '', (string)$rentang));
+$rentangNormal = strtolower(str_replace([' ', '-', '_'], '', (string) $rentang));
 
 if (in_array($rentangNormal, ['1bulan', 'bulanini', 'satu bulan'], true)) {
     $dataGrafik = array_slice($dataGrafik, -1);
@@ -158,168 +158,168 @@ if ($nilaiTerbesar <= 0) {
 ?>
 
 <style>
-.grafik-gaji-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 24px;
-    margin-top: 22px;
-    box-shadow: 0 4px 18px rgba(15, 23, 42, .08);
-}
+    .grafik-gaji-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        margin-top: 22px;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, .08);
+    }
 
-.grafik-gaji-title {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 700;
-    color: #172033;
-}
+    .grafik-gaji-title {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: #172033;
+    }
 
-.grafik-gaji-subtitle {
-    margin: 5px 0 22px;
-    color: #64748b;
-    font-size: 13px;
-}
+    .grafik-gaji-subtitle {
+        margin: 5px 0 22px;
+        color: #64748b;
+        font-size: 13px;
+    }
 
-.grafik-gaji-summary {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(180px, 1fr));
-    gap: 14px;
-    margin-bottom: 24px;
-}
-
-.grafik-summary-item {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 15px;
-}
-
-.grafik-summary-label {
-    color: #64748b;
-    font-size: 13px;
-    margin-bottom: 6px;
-}
-
-.grafik-summary-value {
-    color: #172033;
-    font-size: 19px;
-    font-weight: 700;
-}
-
-.grafik-count {
-    color: #64748b;
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-.grafik-gaji-area {
-    border-top: 1px solid #edf1f5;
-    padding-top: 20px;
-}
-
-.grafik-gaji-row {
-    display: grid;
-    grid-template-columns: 135px minmax(200px, 1fr) 165px;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 18px;
-}
-
-.grafik-gaji-period {
-    font-size: 13px;
-    font-weight: 600;
-    color: #263043;
-}
-
-.grafik-gaji-track {
-    height: 30px;
-    border-radius: 8px;
-    background: #eef2f7;
-    overflow: hidden;
-}
-
-.grafik-gaji-total {
-    height: 100%;
-    display: flex;
-    border-radius: 8px;
-    overflow: hidden;
-    min-width: 4px;
-}
-
-.grafik-gaji-paid {
-    height: 100%;
-    background: #16a34a;
-}
-
-.grafik-gaji-unpaid {
-    height: 100%;
-    background: #ef4444;
-}
-
-.grafik-gaji-nominal {
-    text-align: right;
-    font-size: 13px;
-    font-weight: 600;
-    color: #263043;
-}
-
-.grafik-gaji-legend {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-top: 20px;
-    font-size: 13px;
-    color: #475569;
-}
-
-.grafik-legend-item {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-}
-
-.grafik-legend-box {
-    width: 13px;
-    height: 13px;
-    border-radius: 3px;
-}
-
-.grafik-legend-paid {
-    background: #16a34a;
-}
-
-.grafik-legend-unpaid {
-    background: #ef4444;
-}
-
-.grafik-gaji-empty {
-    padding: 30px;
-    text-align: center;
-    color: #64748b;
-    background: #f8fafc;
-    border-radius: 12px;
-}
-
-@media (max-width: 850px) {
     .grafik-gaji-summary {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .grafik-summary-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 15px;
+    }
+
+    .grafik-summary-label {
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .grafik-summary-value {
+        color: #172033;
+        font-size: 19px;
+        font-weight: 700;
+    }
+
+    .grafik-count {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .grafik-gaji-area {
+        border-top: 1px solid #edf1f5;
+        padding-top: 20px;
     }
 
     .grafik-gaji-row {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: 135px minmax(200px, 1fr) 165px;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .grafik-gaji-period {
+        font-size: 13px;
+        font-weight: 600;
+        color: #263043;
+    }
+
+    .grafik-gaji-track {
+        height: 30px;
+        border-radius: 8px;
+        background: #eef2f7;
+        overflow: hidden;
+    }
+
+    .grafik-gaji-total {
+        height: 100%;
+        display: flex;
+        border-radius: 8px;
+        overflow: hidden;
+        min-width: 4px;
+    }
+
+    .grafik-gaji-paid {
+        height: 100%;
+        background: #16a34a;
+    }
+
+    .grafik-gaji-unpaid {
+        height: 100%;
+        background: #ef4444;
     }
 
     .grafik-gaji-nominal {
-        text-align: left;
+        text-align: right;
+        font-size: 13px;
+        font-weight: 600;
+        color: #263043;
     }
-}
 
-@media print {
-    .grafik-gaji-card {
-        box-shadow: none;
-        border: 1px solid #ccc;
+    .grafik-gaji-legend {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        font-size: 13px;
+        color: #475569;
     }
-}
+
+    .grafik-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .grafik-legend-box {
+        width: 13px;
+        height: 13px;
+        border-radius: 3px;
+    }
+
+    .grafik-legend-paid {
+        background: #16a34a;
+    }
+
+    .grafik-legend-unpaid {
+        background: #ef4444;
+    }
+
+    .grafik-gaji-empty {
+        padding: 30px;
+        text-align: center;
+        color: #64748b;
+        background: #f8fafc;
+        border-radius: 12px;
+    }
+
+    @media (max-width: 850px) {
+        .grafik-gaji-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .grafik-gaji-row {
+            grid-template-columns: 1fr;
+        }
+
+        .grafik-gaji-nominal {
+            text-align: left;
+        }
+    }
+
+    @media print {
+        .grafik-gaji-card {
+            box-shadow: none;
+            border: 1px solid #ccc;
+        }
+    }
 </style>
 
 <div class="grafik-gaji-card">
@@ -381,21 +381,12 @@ if ($nilaiTerbesar <= 0) {
                     </div>
 
                     <div class="grafik-gaji-track">
-                        <div
-                            class="grafik-gaji-total"
-                            style="width:<?= number_format($lebarTotal, 2, '.', '') ?>%;"
-                        >
-                            <div
-                                class="grafik-gaji-paid"
-                                title="Sudah dibayar"
-                                style="width:<?= number_format($persenSudah, 2, '.', '') ?>%;"
-                            ></div>
+                        <div class="grafik-gaji-total" style="width:<?= number_format($lebarTotal, 2, '.', '') ?>%;">
+                            <div class="grafik-gaji-paid" title="Sudah dibayar"
+                                style="width:<?= number_format($persenSudah, 2, '.', '') ?>%;"></div>
 
-                            <div
-                                class="grafik-gaji-unpaid"
-                                title="Belum dibayar"
-                                style="width:<?= number_format($persenBelum, 2, '.', '') ?>%;"
-                            ></div>
+                            <div class="grafik-gaji-unpaid" title="Belum dibayar"
+                                style="width:<?= number_format($persenBelum, 2, '.', '') ?>%;"></div>
                         </div>
                     </div>
 

@@ -14,7 +14,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['keputusan'])) {
     $ok=(bool)$req;
     if($ok && $keputusan==='Disetujui'){
         $idAbs=(int)$req['id_absensi'];
-        $ok=mysqli_query($conn,"UPDATE absensi SET hadir=".(int)$req['hadir_baru'].",sakit=".(int)$req['sakit_baru'].",izin=".(int)$req['izin_baru'].",alpha=".(int)$req['alpha_baru'].",lembur_jam=".(int)$req['lembur_jam_baru'].",diperbarui_pada=NOW() WHERE id_absensi=$idAbs");
+        // Update absensi tanpa lembur_jam (sudah dipisah ke tabel lembur)
+        $ok=mysqli_query($conn,"UPDATE absensi SET hadir=".(int)$req['hadir_baru'].",sakit=".(int)$req['sakit_baru'].",izin=".(int)$req['izin_baru'].",alpha=".(int)$req['alpha_baru'].",diperbarui_pada=NOW() WHERE id_absensi=$idAbs");
     }
     if($ok){
         $statusEsc=mysqli_real_escape_string($conn,$keputusan);
@@ -34,10 +35,39 @@ ORDER BY FIELD(p.status,'Menunggu','Disetujui','Ditolak'),p.id_permintaan DESC")
   <i class="bi bi-check2-circle"></i>
   <h2 class="h5">Persetujuan Edit Absensi</h2>
 </div>
-<p class="section-desc">Pimpinan menyetujui atau menolak perubahan rekap absensi bulanan.</p>
+<p class="section-desc">Pimpinan menyetujui atau menolak perubahan rekap absensi bulanan (Hadir, Sakit, Izin, Alpha).</p>
 <div class="table-responsive"><table class="table table-striped dt-table" style="width:100%"><thead><tr><th>No</th><th>Karyawan</th><th>Periode</th><th>Data Lama</th><th>Data Usulan</th><th>Alasan</th><th>Pengaju</th><th>Status</th><th>Keputusan</th></tr></thead><tbody>
-<?php $no=1;if($data):while($row=mysqli_fetch_assoc($data)):$old=json_decode($row['data_lama'],true)?:[];?><tr><td><?= $no++ ?></td><td><strong><?= e($row['nip']) ?></strong><br><?= e($row['nama_karyawan']) ?></td><td><?= e($row['bulan'].' '.$row['tahun']) ?></td><td class="small">Hadir <?= (int)($old['hadir']??0) ?>; Sakit <?= (int)($old['sakit']??0) ?>; Izin <?= (int)($old['izin']??0) ?>; Alpha <?= (int)($old['alpha']??0) ?>; Lembur <?= (int)($old['lembur_jam']??0) ?> jam</td><td class="small">Hadir <?= $row['hadir_baru'] ?>; Sakit <?= $row['sakit_baru'] ?>; Izin <?= $row['izin_baru'] ?>; Alpha <?= $row['alpha_baru'] ?>; Lembur <?= $row['lembur_jam_baru'] ?> jam</td><td><?= e($row['alasan_perubahan']) ?></td><td><?= e($row['pengaju']) ?><br><span class="text-muted small"><?= e($row['tanggal_pengajuan']) ?></span></td><td><?= status_badge($row['status']) ?><?php if($row['catatan_pimpinan']):?><div class="small mt-1"><?= e($row['catatan_pimpinan']) ?></div><?php endif;?></td><td>
-<?php if($row['status']==='Menunggu'):?><form method="post" class="d-grid gap-2"><input type="hidden" name="id_permintaan" value="<?= $row['id_permintaan'] ?>"><input name="catatan_pimpinan" class="form-control form-control-sm" placeholder="Catatan (opsional)"><button name="keputusan" value="setujui" class="btn btn-sm btn-success">Setujui</button><button name="keputusan" value="tolak" class="btn btn-sm btn-danger">Tolak</button></form><?php else:?><span class="text-muted">Selesai</span><?php endif;?>
-</td></tr><?php endwhile;endif;?>
+<?php $no=1;if($data):while($row=mysqli_fetch_assoc($data)):$old=json_decode($row['data_lama'],true)?:[];?>
+<tr>
+  <td><?= $no++ ?></td>
+  <td><strong><?= e($row['nip']) ?></strong><br><?= e($row['nama_karyawan']) ?></td>
+  <td><?= e($row['bulan'].' '.$row['tahun']) ?></td>
+  <td class="small">
+    Hadir <?= (int)($old['hadir']??0) ?>;
+    Sakit <?= (int)($old['sakit']??0) ?>;
+    Izin <?= (int)($old['izin']??0) ?>;
+    Alpha <?= (int)($old['alpha']??0) ?>
+  </td>
+  <td class="small">
+    Hadir <?= (int)$row['hadir_baru'] ?>;
+    Sakit <?= (int)$row['sakit_baru'] ?>;
+    Izin <?= (int)$row['izin_baru'] ?>;
+    Alpha <?= (int)$row['alpha_baru'] ?>
+  </td>
+  <td><?= e($row['alasan_perubahan']) ?></td>
+  <td><?= e($row['pengaju']) ?><br><span class="text-muted small"><?= e($row['tanggal_pengajuan']) ?></span></td>
+  <td><?= status_badge($row['status']) ?><?php if($row['catatan_pimpinan']):?><div class="small mt-1"><?= e($row['catatan_pimpinan']) ?></div><?php endif;?></td>
+  <td>
+    <?php if($row['status']==='Menunggu'):?>
+    <form method="post" class="d-grid gap-2">
+      <input type="hidden" name="id_permintaan" value="<?= $row['id_permintaan'] ?>">
+      <input name="catatan_pimpinan" class="form-control form-control-sm" placeholder="Catatan (opsional)">
+      <button name="keputusan" value="setujui" class="btn btn-sm btn-success">Setujui</button>
+      <button name="keputusan" value="tolak" class="btn btn-sm btn-danger">Tolak</button>
+    </form>
+    <?php else:?><span class="text-muted">Selesai</span><?php endif;?>
+  </td>
+</tr>
+<?php endwhile;endif;?>
 </tbody></table></div></div>
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

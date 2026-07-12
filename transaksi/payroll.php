@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['simpan_payroll'])) {
             $userId=(int)$_SESSION['id_user'];
             if($existing){
                 $idPayroll=(int)$existing['id_payroll'];
-                $stmt=mysqli_prepare($conn,'UPDATE payroll SET gaji_pokok=?,jam_lembur=?,tarif_lembur=?,total_lembur=?,total_tunjangan=?,jumlah_alpha=?,tarif_alpha=?,total_potongan_alpha=?,total_gaji_bersih=?,tanggal_proses=NOW(),diproses_oleh=? WHERE id_payroll=?');
+                $stmt=mysqli_prepare($conn,"UPDATE payroll SET gaji_pokok=?,jam_lembur=?,tarif_lembur=?,total_lembur=?,total_tunjangan=?,jumlah_alpha=?,tarif_alpha=?,total_potongan_alpha=?,total_gaji_bersih=?,tanggal_proses=NOW(),diproses_oleh=?,status_validasi='Menunggu' WHERE id_payroll=?");
                 $ok=false;
                 if($stmt){mysqli_stmt_bind_param($stmt,'didddidddii',$calc['gaji_pokok'],$calc['lembur_jam'],$calc['tarif_lembur'],$calc['total_lembur'],$calc['total_tunjangan'],$calc['alpha'],$calc['tarif_alpha'],$calc['potongan_alpha'],$calc['gaji_bersih'],$userId,$idPayroll);$ok=mysqli_stmt_execute($stmt);}
             } else {
@@ -51,7 +51,14 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['ubah_status'])) {
     redirect('transaksi/payroll.php');
 }
 
-$karyawan=mysqli_query($conn,'SELECT k.id_karyawan,k.nip,k.nama_karyawan,j.nama_jabatan FROM karyawan k JOIN jabatan j ON j.id_jabatan=k.id_jabatan ORDER BY k.nama_karyawan');
+if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['hapus_payroll'])) {
+    $id=(int)($_POST['id_payroll']??0);
+    $ok=mysqli_query($conn,"DELETE FROM payroll WHERE id_payroll=$id");
+    set_flash($ok?'success':'danger',$ok?'Data payroll berhasil dihapus. Silakan hitung ulang.':'Data payroll gagal dihapus.');
+    redirect('transaksi/payroll.php');
+}
+
+$karyawan=mysqli_query($conn,"SELECT k.id_karyawan,k.nip,k.nama_karyawan,j.nama_jabatan FROM karyawan k JOIN jabatan j ON j.id_jabatan=k.id_jabatan WHERE k.status_karyawan IN ('Tetap','Kontrak') ORDER BY k.nama_karyawan");
 $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM payroll p JOIN karyawan k ON k.id_karyawan=p.id_karyawan JOIN jabatan j ON j.id_jabatan=k.id_jabatan ORDER BY p.tahun DESC,FIELD(p.bulan,'Desember','November','Oktober','September','Agustus','Juli','Juni','Mei','April','Maret','Februari','Januari'),k.nama_karyawan");
 ?>
 <div class="card p-4 mb-4">
@@ -133,6 +140,39 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
   <h2 class="h5">Daftar Payroll</h2>
 </div>
 <div class="table-responsive"><table class="table table-striped dt-table" style="width:100%"><thead><tr><th>No</th><th>Karyawan</th><th>Periode</th><th>Gaji Pokok</th><th>Lembur</th><th>Tunjangan</th><th>Potongan Alpha</th><th>Gaji Bersih</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
-<?php $no=1;if($data):while($row=mysqli_fetch_assoc($data)):?><tr><td><?= $no++ ?></td><td><strong><?= e($row['nip']) ?></strong><br><?= e($row['nama_karyawan']) ?><br><span class="small text-muted"><?= e($row['nama_jabatan']) ?></span></td><td><?= e($row['bulan'].' '.$row['tahun']) ?></td><td><?= rupiah($row['gaji_pokok']) ?></td><td><?= $row['jam_lembur'] ?> × <?= rupiah($row['tarif_lembur']) ?><br><strong><?= rupiah($row['total_lembur']) ?></strong></td><td><strong><?= rupiah($row['total_tunjangan'] ?? 0) ?></strong></td><td><?= $row['jumlah_alpha'] ?> × <?= rupiah($row['tarif_alpha']) ?><br><strong><?= rupiah($row['total_potongan_alpha']) ?></strong></td><td><strong><?= rupiah($row['total_gaji_bersih']) ?></strong></td><td><?= status_badge($row['status_pembayaran']) ?><div class="small text-muted mt-1"><?= e($row['tanggal_pembayaran']??'-') ?></div></td><td><a class="btn btn-sm btn-dark mb-1 w-100" href="<?= url('transaksi/cetak_rincian.php?id='.$row['id_payroll']) ?>">Cetak Rincian</a><form method="post"><input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>"><input type="hidden" name="status" value="<?= $row['status_pembayaran']==='Sudah Dibayar'?'Belum Dibayar':'Sudah Dibayar' ?>"><button name="ubah_status" class="btn btn-sm w-100 <?= $row['status_pembayaran']==='Sudah Dibayar'?'btn-outline-warning':'btn-success' ?>"><?= $row['status_pembayaran']==='Sudah Dibayar'?'Batalkan Bayar':'Tandai Dibayar' ?></button></form></td></tr><?php endwhile;endif;?>
+<?php $no=1;if($data):while($row=mysqli_fetch_assoc($data)):?>
+<tr>
+    <td><?= $no++ ?></td>
+    <td><strong><?= e($row['nip']) ?></strong><br><?= e($row['nama_karyawan']) ?><br><span class="small text-muted"><?= e($row['nama_jabatan']) ?></span></td>
+    <td><?= e($row['bulan'].' '.$row['tahun']) ?></td>
+    <td><?= rupiah($row['gaji_pokok']) ?></td>
+    <td><?= $row['jam_lembur'] ?> × <?= rupiah($row['tarif_lembur']) ?><br><strong><?= rupiah($row['total_lembur']) ?></strong></td>
+    <td><strong><?= rupiah($row['total_tunjangan'] ?? 0) ?></strong></td>
+    <td><?= $row['jumlah_alpha'] ?> × <?= rupiah($row['tarif_alpha']) ?><br><strong><?= rupiah($row['total_potongan_alpha']) ?></strong></td>
+    <td><strong><?= rupiah($row['total_gaji_bersih']) ?></strong></td>
+    <td>
+        <div><?= status_badge($row['status_validasi']) ?></div>
+        <div class="mt-1"><?= status_badge($row['status_pembayaran']) ?></div>
+        <div class="small text-muted mt-1"><?= e($row['tanggal_pembayaran']??'-') ?></div>
+    </td>
+    <td>
+        <?php if ($row['status_validasi'] === 'Disetujui'): ?>
+            <a class="btn btn-sm btn-dark mb-1 w-100" href="<?= url('transaksi/cetak_rincian.php?id='.$row['id_payroll']) ?>">Cetak Rincian</a>
+            <form method="post">
+                <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
+                <input type="hidden" name="status" value="<?= $row['status_pembayaran']==='Sudah Dibayar'?'Belum Dibayar':'Sudah Dibayar' ?>">
+                <button name="ubah_status" class="btn btn-sm w-100 <?= $row['status_pembayaran']==='Sudah Dibayar'?'btn-outline-warning':'btn-success' ?>"><?= $row['status_pembayaran']==='Sudah Dibayar'?'Batalkan Bayar':'Tandai Dibayar' ?></button>
+            </form>
+        <?php elseif ($row['status_validasi'] === 'Ditolak'): ?>
+            <form method="post">
+                <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
+                <button name="hapus_payroll" class="btn btn-sm btn-danger w-100" onclick="return confirm('Hapus data payroll ini agar bisa dihitung ulang?');">Hapus & Hitung Ulang</button>
+            </form>
+        <?php else: ?>
+            <span class="badge text-bg-warning w-100" style="white-space: normal;">Menunggu Validasi Pimpinan</span>
+        <?php endif; ?>
+    </td>
+</tr>
+<?php endwhile;endif;?>
 </tbody></table></div></div>
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

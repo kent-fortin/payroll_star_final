@@ -86,8 +86,9 @@ function require_admin(): void
 {
     require_login();
     if (!is_admin()) {
-        set_flash('warning', 'Menu tersebut hanya dapat diakses oleh admin.');
-        redirect('dashboard.php');
+        set_flash('warning', 'Akses ditolak. Menu tersebut hanya dapat diakses oleh admin.');
+        // Redirect ke dashboard sesuai role yang login
+        redirect(is_pimpinan() ? 'dashboard_pimpinan.php' : 'auth/login.php');
     }
 }
 
@@ -95,8 +96,9 @@ function require_pimpinan(): void
 {
     require_login();
     if (!is_pimpinan()) {
-        set_flash('warning', 'Menu tersebut hanya dapat diakses oleh pimpinan.');
-        redirect('dashboard.php');
+        set_flash('warning', 'Akses ditolak. Menu tersebut hanya dapat diakses oleh pimpinan.');
+        // Redirect ke dashboard sesuai role yang login
+        redirect(is_admin() ? 'dashboard_admin.php' : 'auth/login.php');
     }
 }
 
@@ -164,8 +166,11 @@ function get_setting(mysqli $conn, string $key, float $default = 0): float
 function calculate_payroll(mysqli $conn, int $idKaryawan, string $bulan, int $tahun, float $tunjangan = 0): ?array
 {
     $bulanEsc = mysqli_real_escape_string($conn, $bulan);
+    // Cari nomor bulan dari nama bulan agar bisa query MONTH(tanggal_lembur)
+    $bulanNomor = bulan_nomor($bulan);
+
     $sql = "SELECT k.id_karyawan, k.nip, k.nama_karyawan, j.nama_jabatan, j.gaji_pokok,
-                   a.id_absensi, a.hadir, a.sakit, a.izin, a.alpha, a.lembur_jam
+                   a.id_absensi, a.hadir, a.sakit, a.izin, a.alpha
             FROM karyawan k
             JOIN jabatan j ON j.id_jabatan = k.id_jabatan
             LEFT JOIN absensi a ON a.id_karyawan = k.id_karyawan
@@ -181,9 +186,21 @@ function calculate_payroll(mysqli $conn, int $idKaryawan, string $bulan, int $ta
         return null;
     }
 
+    // Hitung total jam lembur dari tabel lembur (berdasarkan karyawan, bulan, tahun)
+    $lemburSql = "SELECT COALESCE(SUM(jam_lembur), 0) AS total_jam
+                  FROM lembur
+                  WHERE id_karyawan = $idKaryawan
+                    AND MONTH(tanggal_lembur) = $bulanNomor
+                    AND YEAR(tanggal_lembur) = $tahun";
+    $lemburResult = mysqli_query($conn, $lemburSql);
+    $jamLembur = 0;
+    if ($lemburResult) {
+        $lr = mysqli_fetch_assoc($lemburResult);
+        $jamLembur = (int)($lr['total_jam'] ?? 0);
+    }
+
     $tarifLembur = get_setting($conn, 'tarif_lembur_per_jam', 15000);
-    $tarifAlpha = get_setting($conn, 'potongan_alpha_per_hari', 25000);
-    $jamLembur = (int)$row['lembur_jam'];
+    $tarifAlpha  = get_setting($conn, 'potongan_alpha_per_hari', 25000);
     $jumlahAlpha = (int)$row['alpha'];
     $totalLembur = $jamLembur * $tarifLembur;
     $potonganAlpha = $jumlahAlpha * $tarifAlpha;
@@ -191,14 +208,15 @@ function calculate_payroll(mysqli $conn, int $idKaryawan, string $bulan, int $ta
     $gajiBersih = $gajiPokok + $totalLembur + $tunjangan - $potonganAlpha;
 
     return array_merge($row, [
-        'bulan' => $bulan,
-        'tahun' => $tahun,
-        'tarif_lembur' => $tarifLembur,
-        'total_lembur' => $totalLembur,
+        'bulan'         => $bulan,
+        'tahun'         => $tahun,
+        'lembur_jam'    => $jamLembur,
+        'tarif_lembur'  => $tarifLembur,
+        'total_lembur'  => $totalLembur,
         'total_tunjangan' => $tunjangan,
-        'tarif_alpha' => $tarifAlpha,
+        'tarif_alpha'   => $tarifAlpha,
         'potongan_alpha' => $potonganAlpha,
-        'gaji_bersih' => $gajiBersih,
+        'gaji_bersih'   => $gajiBersih,
     ]);
 }
 
