@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require_once __DIR__ . '/../config/koneksi.php';
 require_login();
 db_or_redirect($conn);
