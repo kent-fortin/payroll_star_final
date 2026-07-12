@@ -164,9 +164,10 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
                 <button name="ubah_status" class="btn btn-sm w-100 <?= $row['status_pembayaran']==='Sudah Dibayar'?'btn-outline-warning':'btn-success' ?>"><?= $row['status_pembayaran']==='Sudah Dibayar'?'Batalkan Bayar':'Tandai Dibayar' ?></button>
             </form>
         <?php elseif ($row['status_validasi'] === 'Ditolak'): ?>
-            <form method="post">
+            <form class="hapus-form" method="post" data-confirm="Hapus data payroll ini agar bisa dihitung ulang?">
                 <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
-                <button name="hapus_payroll" class="btn btn-sm btn-danger w-100" onclick="return confirm('Hapus data payroll ini agar bisa dihitung ulang?');">Hapus & Hitung Ulang</button>
+                <input type="hidden" name="hapus_payroll" value="1">
+                <button type="button" class="btn btn-sm btn-danger w-100 btn-hapus">Hapus & Hitung Ulang</button>
             </form>
         <?php else: ?>
             <span class="badge text-bg-warning w-100" style="white-space: normal;">Menunggu Validasi Pimpinan</span>

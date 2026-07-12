@@ -10,14 +10,14 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../helpers/functions.php';
 
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$db = 'db_payroll_star_samudera';
+$host = 'sql312.infinityfree.com';
+$user = 'if0_42362934';
+$pass = 'fFQbSZ02B5U';
+$db = 'if0_42362934_db_payroll_star_samudera';
 
-$conn = @mysqli_connect($host, $user, $pass, $db);
+$conn = mysqli_connect($host, $user, $pass, $db);
 if ($conn) {
     mysqli_set_charset($conn, 'utf8mb4');
 } else {
-    app_log('Database connection failed: ' . mysqli_connect_error());
+    die(mysqli_connect_error());
 }
