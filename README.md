@@ -16,14 +16,29 @@ Sistem ini adalah aplikasi Payroll (Penggajian) berbasis web yang telah direvisi
 5. **Preview Gaji:** Admin dapat meninjau rincian hitungan secara real-time sebelum menyimpannya ke database.
 6. **Laporan & Grafik Terintegrasi:** Laporan dilengkapi dengan *Grafik Chart* offline, dan bisa difilter (1 bulan, 2 bulan terakhir, 1 tahun terakhir).
 
-## 🛠️ Cara Instalasi (Fresh Install)
-Sistem ini menggunakan PHP Native dengan database MySQL.
-1. Salin/Pindahkan seluruh folder project (`payroll_star_final`) ke dalam folder `C:\xampp\htdocs\` (jika Anda menggunakan XAMPP).
-2. Aktifkan **Apache** dan **MySQL** dari XAMPP Control Panel.
-3. Buka **phpMyAdmin** di browser (`http://localhost/phpmyadmin`).
+## 🛠️ Cara Instalasi & Menjalankan Project (Local)
+Sistem ini dibangun menggunakan PHP Native dan MySQL. Ada dua cara untuk menjalankannya di lokal Anda:
+
+### Cara 1: Menggunakan XAMPP / Laragon (Disarankan)
+1. Salin/pindahkan seluruh folder project ini (`payroll_star_final`) ke dalam direktori web server Anda:
+   - Jika **XAMPP**: `C:\xampp\htdocs\`
+   - Jika **Laragon**: `C:\laragon\www\`
+2. Aktifkan modul **Apache** dan **MySQL** pada panel kontrol web server Anda.
+3. Buka browser dan akses **phpMyAdmin** (`http://localhost/phpmyadmin`).
 4. Buat database baru bernama: `db_payroll_star_samudera`.
 5. Import file `database/database.sql` yang sudah disediakan ke dalam database tersebut.
-6. Buka aplikasi di browser: `http://localhost/payroll_star_final/`
+6. Buka aplikasi di browser melalui URL: `http://localhost/payroll_star_final/`
+
+### Cara 2: Menggunakan PHP Built-in Server (Tanpa memindahkan folder)
+Jika Anda tidak ingin memindahkan folder dari lokasi saat ini (misal di Drive D), Anda bisa menggunakan built-in server bawaan PHP:
+1. Pastikan **MySQL** sudah berjalan (bisa nyalakan MySQL dari XAMPP/Laragon).
+2. Buka **phpMyAdmin** (`http://localhost/phpmyadmin`) dan import file `database/database.sql` ke database `db_payroll_star_samudera`.
+3. Buka Terminal / Command Prompt / PowerShell di folder project ini (`payroll_star_final`).
+4. Jalankan perintah berikut:
+   ```bash
+   php -S localhost:8000
+   ```
+5. Buka aplikasi di browser melalui URL: `http://localhost:8000/`
 
 ## 👤 Akun Demo
 Sistem ini memisahkan hak akses antara Admin (HR/Keuangan) dan Pimpinan.
