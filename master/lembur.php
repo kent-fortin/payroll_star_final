@@ -2,6 +2,20 @@
 require_once __DIR__ . '/../layout/header.php';
 require_admin();
 
+// ── AUTO-MIGRATE: pastikan tabel lembur selalu ada ───────────────────────────
+mysqli_query($conn, "CREATE TABLE IF NOT EXISTS lembur (
+    id_lembur INT AUTO_INCREMENT PRIMARY KEY,
+    id_karyawan INT NOT NULL,
+    tanggal_lembur DATE NOT NULL,
+    jam_lembur INT NOT NULL DEFAULT 0,
+    dibuat_oleh INT NULL,
+    dibuat_pada DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_lembur_karyawan FOREIGN KEY (id_karyawan)
+        REFERENCES karyawan(id_karyawan) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_lembur_user FOREIGN KEY (dibuat_oleh)
+        REFERENCES users(id_user) ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB COMMENT='Data lembur harian karyawan'");
+
 // ── HANDLE DELETE (soft: tidak applicable untuk lembur, gunakan hard delete karena ini data harian) ─
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hapus'])) {
     $id = (int)($_POST['id_lembur'] ?? 0);
