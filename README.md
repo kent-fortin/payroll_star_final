@@ -16,29 +16,61 @@ Sistem ini adalah aplikasi Payroll (Penggajian) berbasis web yang telah direvisi
 5. **Preview Gaji:** Admin dapat meninjau rincian hitungan secara real-time sebelum menyimpannya ke database.
 6. **Laporan & Grafik Terintegrasi:** Laporan dilengkapi dengan *Grafik Chart* offline, dan bisa difilter (1 bulan, 2 bulan terakhir, 1 tahun terakhir).
 
-## 🛠️ Cara Instalasi & Menjalankan Project (Local)
-Sistem ini dibangun menggunakan PHP Native dan MySQL. Ada dua cara untuk menjalankannya di lokal Anda:
+## 🛠️ Panduan Lengkap Instalasi & Menjalankan Project (Untuk Pemula)
 
-### Cara 1: Menggunakan XAMPP / Laragon (Disarankan)
-1. Salin/pindahkan seluruh folder project ini (`payroll_star_final`) ke dalam direktori web server Anda:
-   - Jika **XAMPP**: `C:\xampp\htdocs\`
-   - Jika **Laragon**: `C:\laragon\www\`
-2. Aktifkan modul **Apache** dan **MySQL** pada panel kontrol web server Anda.
-3. Buka browser dan akses **phpMyAdmin** (`http://localhost/phpmyadmin`).
-4. Buat database baru bernama: `db_payroll_star_samudera`.
-5. Import file `database/database.sql` yang sudah disediakan ke dalam database tersebut.
-6. Buka aplikasi di browser melalui URL: `http://localhost/payroll_star_final/`
+Jika Anda awam atau baru pertama kali menjalankan project PHP, ikuti langkah-langkah detail di bawah ini dari awal sampai akhir:
 
-### Cara 2: Menggunakan PHP Built-in Server (Tanpa memindahkan folder)
-Jika Anda tidak ingin memindahkan folder dari lokasi saat ini (misal di Drive D), Anda bisa menggunakan built-in server bawaan PHP:
-1. Pastikan **MySQL** sudah berjalan (bisa nyalakan MySQL dari XAMPP/Laragon).
-2. Buka **phpMyAdmin** (`http://localhost/phpmyadmin`) dan import file `database/database.sql` ke database `db_payroll_star_samudera`.
-3. Buka Terminal / Command Prompt / PowerShell di folder project ini (`payroll_star_final`).
-4. Jalankan perintah berikut:
+### Tahap 1: Persiapan (Yang Perlu Didownload & Diinstall)
+1. **XAMPP**: Software ini berisi web server (Apache) dan database (MySQL) yang wajib digunakan untuk menjalankan aplikasi PHP.
+   - Download XAMPP di situs resminya: [apachefriends.org](https://www.apachefriends.org/download.html).
+   - Pilih versi PHP yang kompatibel (seperti versi PHP 7.4 atau PHP 8.x).
+   - Install XAMPP seperti biasa (tinggal di-*next-next* saja) dan pastikan diinstall di folder utama `C:\xampp`.
+2. **Git (Opsional)**: Digunakan untuk mendownload (clone) project dari GitHub menggunakan command line.
+   - Download Git di [git-scm.com](https://git-scm.com/downloads) dan install.
+
+### Tahap 2: Mendapatkan Source Code Project
+Anda bisa mendownload project ini dengan dua cara:
+
+**Cara A: Menggunakan Git Clone (Disarankan)**
+1. Buka folder tempat Anda ingin mendownload project.
+2. Klik kanan di folder tersebut, lalu pilih **Open Git Bash here** (opsi ini muncul jika Git sudah diinstall).
+3. Ketik perintah berikut dan tekan Enter:
    ```bash
-   php -S localhost:8000
+   git clone https://github.com/USERNAME/REPOSITORY.git
    ```
-5. Buka aplikasi di browser melalui URL: `http://localhost:8000/`
+   *(Catatan: Ganti link di atas dengan link repository GitHub project ini)*
+4. Folder project bernama `payroll_star_final` akan otomatis terdownload.
+
+**Cara B: Download Manual via ZIP**
+1. Di halaman GitHub repository ini, klik tombol hijau **Code**, lalu pilih **Download ZIP**.
+2. Setelah file terdownload, ekstrak (unzip) file tersebut.
+3. Ubah nama foldernya menjadi `payroll_star_final` (jika nama bawaannya adalah `nama-repo-main`).
+
+### Tahap 3: Memindahkan Project ke XAMPP
+Aplikasi berbasis PHP harus diletakkan di dalam folder server lokal (XAMPP).
+1. Copy atau Cut folder `payroll_star_final` yang sudah didapatkan dari Tahap 2.
+2. Masuk ke Local Disk C: (tempat XAMPP diinstall).
+3. Buka folder `C:\xampp\htdocs`.
+4. **Paste** folder `payroll_star_final` di dalam folder `htdocs` tersebut.
+
+### Tahap 4: Menjalankan Database & Import Data
+1. Buka aplikasi **XAMPP Control Panel** (bisa dicari dari menu Start Windows).
+2. Klik tombol **Start** pada tulisan **Apache** dan **MySQL** sampai background teksnya berwarna **Hijau**.
+3. Buka browser (Google Chrome, Mozilla Firefox, dll).
+4. Ketik di pencarian url (address bar): `http://localhost/phpmyadmin` dan tekan Enter.
+5. Pada panel sebelah kiri, klik tulisan **New** (Baru) untuk membuat database.
+6. Isi kolom nama basis data (database name) dengan tepat: **`db_payroll_star_samudera`**. Lalu klik tombol **Create** (Buat).
+7. Klik database `db_payroll_star_samudera` yang baru saja dibuat di menu sebelah kiri.
+8. Klik tab **Import** (Impor) di bagian atas halaman.
+9. Klik tombol **Choose File** (Pilih File) atau **Browse**.
+10. Arahkan ke folder project Anda di `C:\xampp\htdocs\payroll_star_final\database\` dan pilih file bernama `database.sql`.
+11. Scroll ke paling bawah halaman dan klik tombol **Import** (atau Go). Tunggu sebentar hingga muncul pesan hijau berhasil *(success)*.
+
+### Tahap 5: Mulai Menjalankan Aplikasi
+1. Buka tab baru di browser Anda.
+2. Ketik alamat URL berikut di address bar:
+   `http://localhost/payroll_star_final/`
+3. Tekan Enter. Halaman Login aplikasi Payroll akan muncul dan siap digunakan!
 
 ## 👤 Akun Demo
 Sistem ini memisahkan hak akses antara Admin (HR/Keuangan) dan Pimpinan.
