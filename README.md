@@ -36,9 +36,8 @@ Anda bisa mendownload project ini dengan dua cara:
 2. Klik kanan di folder tersebut, lalu pilih **Open Git Bash here** (opsi ini muncul jika Git sudah diinstall).
 3. Ketik perintah berikut dan tekan Enter:
    ```bash
-   git clone https://github.com/USERNAME/REPOSITORY.git
+   git clone https://github.com/kent-fortin/payroll_star_final.git
    ```
-   *(Catatan: Ganti link di atas dengan link repository GitHub project ini)*
 4. Folder project bernama `payroll_star_final` akan otomatis terdownload.
 
 **Cara B: Download Manual via ZIP**
