@@ -1,6 +1,4 @@
-DROP DATABASE IF EXISTS db_payroll_star_samudera;
-CREATE DATABASE db_payroll_star_samudera CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE db_payroll_star_samudera;
+
 
 CREATE TABLE users (
     id_user INT AUTO_INCREMENT PRIMARY KEY,
