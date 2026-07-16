@@ -15,26 +15,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     $s = $_POST['status_karyawan'] ?? 'Tetap';
     $status = in_array($s, ['Tetap','Kontrak','Resign']) ? $s : 'Tetap';
     $tanggal = trim($_POST['tanggal_masuk'] ?? '');
+    $noKtp = trim($_POST['no_ktp'] ?? '');
+    $noKk = trim($_POST['no_kk'] ?? '');
     $today = date('Y-m-d');
     if ($nama === '' || $jabatan < 1 || $tanggal === '') {
         set_flash('danger', 'Data karyawan gagal disimpan. Lengkapi seluruh data wajib.');
     } elseif ($tanggal > $today) {
         set_flash('danger', 'Data karyawan gagal disimpan. Tanggal masuk tidak boleh lebih dari tanggal hari ini.');
     } elseif ($id > 0) {
-        $stmt = mysqli_prepare($conn, 'UPDATE karyawan SET nama_karyawan=?,jenis_kelamin=?,id_jabatan=?,status_karyawan=?,tanggal_masuk=? WHERE id_karyawan=?');
+        $stmt = mysqli_prepare($conn, 'UPDATE karyawan SET nama_karyawan=?,jenis_kelamin=?,id_jabatan=?,status_karyawan=?,tanggal_masuk=?,no_ktp=?,no_kk=? WHERE id_karyawan=?');
         $ok = false;
         if ($stmt) {
-            mysqli_stmt_bind_param($stmt, 'ssissi', $nama, $jk, $jabatan, $status, $tanggal, $id);
+            mysqli_stmt_bind_param($stmt, 'ssissssi', $nama, $jk, $jabatan, $status, $tanggal, $noKtp, $noKk, $id);
             $ok = mysqli_stmt_execute($stmt);
         }
         set_flash($ok ? 'success':'danger', $ok ? 'Data karyawan berhasil diperbarui.':'Data karyawan gagal diperbarui.');
         if (!$ok) app_log('Update karyawan: '.mysqli_error($conn));
     } else {
         $placeholder = 'TMP' . bin2hex(random_bytes(5));
-        $stmt = mysqli_prepare($conn, 'INSERT INTO karyawan (nip,nama_karyawan,jenis_kelamin,id_jabatan,status_karyawan,tanggal_masuk) VALUES (?,?,?,?,?,?)');
+        $stmt = mysqli_prepare($conn, 'INSERT INTO karyawan (nip,nama_karyawan,jenis_kelamin,id_jabatan,status_karyawan,tanggal_masuk,no_ktp,no_kk) VALUES (?,?,?,?,?,?,?,?)');
         $ok = false;
         if ($stmt) {
-            mysqli_stmt_bind_param($stmt, 'sssiss', $placeholder, $nama, $jk, $jabatan, $status, $tanggal);
+            mysqli_stmt_bind_param($stmt, 'sssissss', $placeholder, $nama, $jk, $jabatan, $status, $tanggal, $noKtp, $noKk);
             $ok = mysqli_stmt_execute($stmt);
         }
         if ($ok) {
@@ -70,6 +72,8 @@ $data = mysqli_query($conn,'SELECT k.*,j.nama_jabatan FROM karyawan k JOIN jabat
 <div class="col-md-2"><label class="form-label">Jabatan</label><select name="id_jabatan" class="form-select" required><option value="">Pilih</option><?php if($jabatan): while($j=mysqli_fetch_assoc($jabatan)): ?><option value="<?= $j['id_jabatan'] ?>" <?= (int)($edit['id_jabatan']??0)===(int)$j['id_jabatan']?'selected':'' ?>><?= e($j['nama_jabatan']) ?></option><?php endwhile; endif; ?></select></div>
 <div class="col-md-2"><label class="form-label">Status</label><select name="status_karyawan" class="form-select"><option <?= ($edit['status_karyawan']??'Tetap')==='Tetap'?'selected':'' ?>>Tetap</option><option <?= ($edit['status_karyawan']??'')==='Kontrak'?'selected':'' ?>>Kontrak</option><option <?= ($edit['status_karyawan']??'')==='Resign'?'selected':'' ?>>Resign</option></select></div>
 <div class="col-md-2"><label class="form-label">Tanggal Masuk</label><input type="date" name="tanggal_masuk" class="form-control" value="<?= e($edit['tanggal_masuk']??'') ?>" max="<?= date('Y-m-d') ?>" required></div>
+<div class="col-md-3"><label class="form-label">No. KTP (Opsional)</label><input type="text" name="no_ktp" class="form-control" value="<?= e($edit['no_ktp']??'') ?>" placeholder="16 digit NIK"></div>
+<div class="col-md-3"><label class="form-label">No. KK (Opsional)</label><input type="text" name="no_kk" class="form-control" value="<?= e($edit['no_kk']??'') ?>" placeholder="16 digit KK"></div>
 <div class="col-12 mt-4 pt-3 border-top"><button name="simpan" class="btn btn-primary px-5"><?= $edit?'Update Data':'Simpan Data' ?></button> <?php if($edit): ?><a class="btn btn-secondary px-4 ms-2" href="<?= url('master/karyawan.php') ?>">Batal</a><?php endif; ?></div>
 </form></div>
 <div class="card p-4">

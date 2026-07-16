@@ -10,10 +10,23 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../helpers/functions.php';
 
+// ==========================================
+// KONFIGURASI DATABASE
+// ==========================================
+
+// --- VERSI LOCAL ---
+$host = 'localhost';
+$user = 'root';
+$pass = '';
+$db   = 'db_payroll_star_samudera';
+
+// --- VERSI LIVE ---
+/*
 $host = 'sql312.infinityfree.com';
 $user = 'if0_42362934';
 $pass = 'fFQbSZ02B5U';
-$db = 'if0_42362934_db_payroll_star_samudera';
+$db   = 'if0_42362934_db_payroll_star_samudera';
+*/
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 if ($conn) {

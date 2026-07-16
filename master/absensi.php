@@ -12,10 +12,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['simpan'])) {
     $idKaryawan=(int)($_POST['id_karyawan']??0);
     $bulan=trim($_POST['bulan']??'');
     $tahun=(int)($_POST['tahun']??date('Y'));
-    $hadir=max(0,(int)($_POST['hadir']??0));
     $sakit=max(0,(int)($_POST['sakit']??0));
     $izin=max(0,(int)($_POST['izin']??0));
     $alpha=max(0,(int)($_POST['alpha']??0));
+    
+    // Hitung hadir secara otomatis
+    $totalHariKerja = get_setting($conn, 'total_hari_kerja', 26);
+    $hadir = max(0, $totalHariKerja - ($sakit + $izin + $alpha));
     if($idKaryawan<1||bulan_nomor($bulan)===0||$tahun<2000){
         set_flash('danger','Data absensi gagal disimpan. Periksa karyawan, bulan, dan tahun.');
     } elseif($idAbsensi>0){
@@ -66,7 +69,6 @@ $tarifAlpha=get_setting($conn,'potongan_alpha_per_hari',25000);
 <div class="col-md-4"><label class="form-label">Karyawan</label><select name="id_karyawan" class="form-select" <?= $edit?'disabled':'' ?> required><?php if($karyawan):while($k=mysqli_fetch_assoc($karyawan)):?><option value="<?= $k['id_karyawan'] ?>" <?= (int)($edit['id_karyawan']??0)===(int)$k['id_karyawan']?'selected':'' ?>><?= e($k['nip'].' - '.$k['nama_karyawan']) ?></option><?php endwhile;endif;?></select><?php if($edit):?><input type="hidden" name="id_karyawan" value="<?= $edit['id_karyawan'] ?>"><?php endif;?></div>
 <div class="col-md-2"><label class="form-label">Bulan</label><select name="bulan" class="form-select" <?= $edit?'disabled':'' ?>><?= bulan_options($edit['bulan']??current_month_name()) ?></select><?php if($edit):?><input type="hidden" name="bulan" value="<?= e($edit['bulan']) ?>"><?php endif;?></div>
 <div class="col-md-2"><label class="form-label">Tahun</label><input type="number" name="tahun" class="form-control" value="<?= e($edit['tahun']??date('Y')) ?>" <?= $edit?'readonly':'' ?> required></div>
-<div class="col-md-1"><label class="form-label">Hadir</label><input type="number" min="0" name="hadir" class="form-control" value="<?= e($edit['hadir']??0) ?>"></div>
 <div class="col-md-1"><label class="form-label">Sakit</label><input type="number" min="0" name="sakit" class="form-control" value="<?= e($edit['sakit']??0) ?>"></div>
 <div class="col-md-1"><label class="form-label">Izin</label><input type="number" min="0" name="izin" class="form-control" value="<?= e($edit['izin']??0) ?>"></div>
 <div class="col-md-1"><label class="form-label">Alpha</label><input type="number" min="0" name="alpha" class="form-control" value="<?= e($edit['alpha']??0) ?>"></div>
