@@ -145,34 +145,48 @@ INSERT INTO karyawan (nip,nama_karyawan,jenis_kelamin,id_jabatan,status_karyawan
 ('SSL014','Nanda Putra','L',3,'Tetap','2022-05-16'),
 ('SSL015','Olivia Marbun','P',4,'Tetap','2020-06-22');
 
-INSERT INTO absensi (id_karyawan,bulan,tahun,hadir,sakit,izin,alpha,lembur_jam,dibuat_oleh) VALUES
-(1,'April',2026,24,1,0,0,6,1),(2,'April',2026,23,0,1,1,4,1),(3,'April',2026,25,0,0,0,5,1),
-(4,'April',2026,22,1,1,1,3,1),(5,'April',2026,25,0,0,0,8,1),(6,'April',2026,24,0,0,1,6,1),
-(7,'April',2026,25,0,0,0,4,1),(8,'April',2026,23,1,0,1,2,1),(9,'April',2026,25,0,0,0,4,1),
-(10,'April',2026,25,0,0,0,10,1),(11,'April',2026,24,0,1,0,2,1),(12,'April',2026,23,0,1,1,5,1),
-(13,'April',2026,24,0,0,1,3,1),(14,'April',2026,25,0,0,0,4,1),(15,'April',2026,25,0,0,0,6,1),
-(1,'Mei',2026,25,0,0,0,4,1),(2,'Mei',2026,24,0,1,0,5,1),(3,'Mei',2026,24,1,0,0,6,1),
-(4,'Mei',2026,23,0,1,1,2,1),(5,'Mei',2026,25,0,0,0,7,1),(6,'Mei',2026,23,1,0,1,5,1),
-(7,'Mei',2026,25,0,0,0,3,1),(8,'Mei',2026,24,0,1,0,4,1),(9,'Mei',2026,25,0,0,0,5,1),
-(10,'Mei',2026,25,0,0,0,8,1),(11,'Mei',2026,24,0,1,0,4,1),(12,'Mei',2026,24,0,0,1,6,1),
-(13,'Mei',2026,23,1,0,1,2,1),(14,'Mei',2026,25,0,0,0,5,1),(15,'Mei',2026,24,1,0,0,4,1);
+INSERT INTO absensi (id_karyawan,bulan,tahun,hadir,sakit,izin,alpha,dibuat_oleh) VALUES
+(1,'April',2026,24,1,0,0,1),(2,'April',2026,23,0,1,1,1),(3,'April',2026,25,0,0,0,1),
+(4,'April',2026,22,1,1,1,1),(5,'April',2026,25,0,0,0,1),(6,'April',2026,24,0,0,1,1),
+(7,'April',2026,25,0,0,0,1),(8,'April',2026,23,1,0,1,1),(9,'April',2026,25,0,0,0,1),
+(10,'April',2026,25,0,0,0,1),(11,'April',2026,24,0,1,0,1),(12,'April',2026,23,0,1,1,1),
+(13,'April',2026,24,0,0,1,1),(14,'April',2026,25,0,0,0,1),(15,'April',2026,25,0,0,0,1),
+(1,'Mei',2026,25,0,0,0,1),(2,'Mei',2026,24,0,1,0,1),(3,'Mei',2026,24,1,0,0,1),
+(4,'Mei',2026,23,0,1,1,1),(5,'Mei',2026,25,0,0,0,1),(6,'Mei',2026,23,1,0,1,1),
+(7,'Mei',2026,25,0,0,0,1),(8,'Mei',2026,24,0,1,0,1),(9,'Mei',2026,25,0,0,0,1),
+(10,'Mei',2026,25,0,0,0,1),(11,'Mei',2026,24,0,1,0,1),(12,'Mei',2026,24,0,0,1,1),
+(13,'Mei',2026,23,1,0,1,1),(14,'Mei',2026,25,0,0,0,1),(15,'Mei',2026,24,1,0,0,1);
+
+INSERT INTO lembur (id_karyawan,tanggal_lembur,jam_lembur,dibuat_oleh) VALUES
+(1,'2026-04-10',6,1),(2,'2026-04-11',4,1),(3,'2026-04-12',5,1),(4,'2026-04-13',3,1),(5,'2026-04-14',8,1),
+(6,'2026-04-15',6,1),(7,'2026-04-16',4,1),(8,'2026-04-17',2,1),(9,'2026-04-18',4,1),(10,'2026-04-19',10,1),
+(11,'2026-04-20',2,1),(12,'2026-04-21',5,1),(13,'2026-04-22',3,1),(14,'2026-04-23',4,1),(15,'2026-04-24',6,1),
+(1,'2026-05-10',4,1),(2,'2026-05-11',5,1),(3,'2026-05-12',6,1),(4,'2026-05-13',2,1),(5,'2026-05-14',7,1),
+(6,'2026-05-15',5,1),(7,'2026-05-16',3,1),(8,'2026-05-17',4,1),(9,'2026-05-18',5,1),(10,'2026-05-19',8,1),
+(11,'2026-05-20',4,1),(12,'2026-05-21',6,1),(13,'2026-05-22',2,1),(14,'2026-05-23',5,1),(15,'2026-05-24',4,1);
 
 INSERT INTO payroll
-(id_karyawan,bulan,tahun,gaji_pokok,jam_lembur,tarif_lembur,total_lembur,jumlah_alpha,tarif_alpha,total_potongan_alpha,total_gaji_bersih,status_pembayaran,tanggal_pembayaran,tanggal_proses,diproses_oleh)
-SELECT k.id_karyawan,a.bulan,a.tahun,j.gaji_pokok,a.lembur_jam,15000,a.lembur_jam*15000,a.alpha,25000,a.alpha*25000,
-       j.gaji_pokok+(a.lembur_jam*15000)-(a.alpha*25000),
+(id_karyawan,bulan,tahun,gaji_pokok,jam_lembur,tarif_lembur,total_lembur,total_tunjangan,jumlah_alpha,tarif_alpha,total_potongan_alpha,total_gaji_bersih,status_pembayaran,tanggal_pembayaran,tanggal_proses,diproses_oleh)
+SELECT k.id_karyawan,a.bulan,a.tahun,j.gaji_pokok, COALESCE(l.jam_lembur, 0), 15000, COALESCE(l.jam_lembur, 0)*15000, 0, a.alpha, 25000, a.alpha*25000,
+       j.gaji_pokok+(COALESCE(l.jam_lembur, 0)*15000)-(a.alpha*25000),
        CASE WHEN k.id_karyawan<=10 THEN 'Sudah Dibayar' ELSE 'Belum Dibayar' END,
        CASE WHEN k.id_karyawan<=10 THEN '2026-04-30' ELSE NULL END,
        '2026-04-30 10:00:00',1
-FROM absensi a JOIN karyawan k ON k.id_karyawan=a.id_karyawan JOIN jabatan j ON j.id_jabatan=k.id_jabatan
+FROM absensi a 
+JOIN karyawan k ON k.id_karyawan=a.id_karyawan 
+JOIN jabatan j ON j.id_jabatan=k.id_jabatan
+LEFT JOIN (SELECT id_karyawan, SUM(jam_lembur) as jam_lembur FROM lembur WHERE MONTH(tanggal_lembur)=4 AND YEAR(tanggal_lembur)=2026 GROUP BY id_karyawan) l ON l.id_karyawan=k.id_karyawan
 WHERE a.bulan='April' AND a.tahun=2026;
 
 INSERT INTO payroll
-(id_karyawan,bulan,tahun,gaji_pokok,jam_lembur,tarif_lembur,total_lembur,jumlah_alpha,tarif_alpha,total_potongan_alpha,total_gaji_bersih,status_pembayaran,tanggal_pembayaran,tanggal_proses,diproses_oleh)
-SELECT k.id_karyawan,a.bulan,a.tahun,j.gaji_pokok,a.lembur_jam,15000,a.lembur_jam*15000,a.alpha,25000,a.alpha*25000,
-       j.gaji_pokok+(a.lembur_jam*15000)-(a.alpha*25000),
+(id_karyawan,bulan,tahun,gaji_pokok,jam_lembur,tarif_lembur,total_lembur,total_tunjangan,jumlah_alpha,tarif_alpha,total_potongan_alpha,total_gaji_bersih,status_pembayaran,tanggal_pembayaran,tanggal_proses,diproses_oleh)
+SELECT k.id_karyawan,a.bulan,a.tahun,j.gaji_pokok, COALESCE(l.jam_lembur, 0), 15000, COALESCE(l.jam_lembur, 0)*15000, 0, a.alpha, 25000, a.alpha*25000,
+       j.gaji_pokok+(COALESCE(l.jam_lembur, 0)*15000)-(a.alpha*25000),
        CASE WHEN k.id_karyawan<=7 THEN 'Sudah Dibayar' ELSE 'Belum Dibayar' END,
        CASE WHEN k.id_karyawan<=7 THEN '2026-05-31' ELSE NULL END,
        '2026-05-31 10:00:00',1
-FROM absensi a JOIN karyawan k ON k.id_karyawan=a.id_karyawan JOIN jabatan j ON j.id_jabatan=k.id_jabatan
+FROM absensi a 
+JOIN karyawan k ON k.id_karyawan=a.id_karyawan 
+JOIN jabatan j ON j.id_jabatan=k.id_jabatan
+LEFT JOIN (SELECT id_karyawan, SUM(jam_lembur) as jam_lembur FROM lembur WHERE MONTH(tanggal_lembur)=5 AND YEAR(tanggal_lembur)=2026 GROUP BY id_karyawan) l ON l.id_karyawan=k.id_karyawan
 WHERE a.bulan='Mei' AND a.tahun=2026;
