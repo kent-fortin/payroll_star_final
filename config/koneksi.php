@@ -37,6 +37,20 @@ if ($conn) {
     if ($qKaryawan && mysqli_num_rows($qKaryawan) == 0) {
         @mysqli_query($conn, "ALTER TABLE karyawan ADD no_ktp VARCHAR(20) NULL, ADD no_kk VARCHAR(20) NULL");
     }
+
+    // Auto-migrate: buat tabel presensi_harian jika belum ada
+    $qPresensi = @mysqli_query($conn, "SHOW TABLES LIKE 'presensi_harian'");
+    if ($qPresensi && mysqli_num_rows($qPresensi) == 0) {
+        @mysqli_query($conn, "CREATE TABLE presensi_harian (
+            id_presensi      INT AUTO_INCREMENT PRIMARY KEY,
+            id_karyawan      INT NOT NULL,
+            tanggal          DATE NOT NULL,
+            status_kehadiran ENUM('Hadir','Sakit','Izin','Alpha') NOT NULL DEFAULT 'Hadir',
+            UNIQUE KEY unik_presensi (id_karyawan, tanggal),
+            CONSTRAINT fk_presensi_karyawan FOREIGN KEY (id_karyawan)
+                REFERENCES karyawan(id_karyawan) ON UPDATE CASCADE ON DELETE CASCADE
+        ) ENGINE=InnoDB COMMENT='Presensi harian karyawan'");
+    }
 } else {
     die(mysqli_connect_error());
 }

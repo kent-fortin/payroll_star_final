@@ -62,6 +62,7 @@ function nav_heading(string $label): string
 
                 <!-- TRANSAKSI -->
                 <?= nav_heading('Transaksi') ?>
+                <?= nav_item('Presensi Harian', 'master/presensi_harian.php', $currentPath, 'calendar3-week-fill') ?>
                 <?= nav_item('Rekap Absensi', 'master/absensi.php', $currentPath, 'calendar-check-fill') ?>
                 <?= nav_item('Data Lembur', 'master/lembur.php', $currentPath, 'clock-history') ?>
                 <?= nav_item('Proses Payroll', 'transaksi/payroll.php', $currentPath, 'cash-stack') ?>

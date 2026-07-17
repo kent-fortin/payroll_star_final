@@ -43,18 +43,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['toggle_status'])) {
 if (isset($_POST['toggle_status'])) {
     $id = (int)($_POST['id_jabatan'] ?? 0);
     $status = $_POST['status_baru'] ?? 'Aktif';
-    $password_pimpinan = $_POST['password_pimpinan'] ?? '';
-    
-    // Cari password pimpinan di database
-    $qPimpinan = mysqli_query($conn, "SELECT password FROM users WHERE role='pimpinan' LIMIT 1");
-    $pimpinan = mysqli_fetch_assoc($qPimpinan);
-    
-    if ($pimpinan && password_verify($password_pimpinan, $pimpinan['password'])) {
+    $allowedStatus = ['Aktif', 'Tidak Aktif'];
+    if ($id > 0 && in_array($status, $allowedStatus)) {
         $statusEsc = mysqli_real_escape_string($conn, $status);
         $ok = mysqli_query($conn, "UPDATE jabatan SET status_jabatan='$statusEsc' WHERE id_jabatan=$id");
-        set_flash($ok ? 'success' : 'danger', $ok ? 'Status jabatan berhasil diperbarui (Validasi Pimpinan Sukses).' : 'Status jabatan gagal diperbarui.');
+        set_flash($ok ? 'success' : 'danger', $ok ? 'Status jabatan berhasil diperbarui.' : 'Status jabatan gagal diperbarui.');
+        if (!$ok) app_log('Toggle jabatan status: ' . mysqli_error($conn));
     } else {
-        set_flash('danger', 'Validasi Pimpinan gagal! Password Pimpinan salah.');
+        set_flash('danger', 'Data tidak valid.');
     }
     redirect('master/jabatan.php');
 }
@@ -78,28 +74,21 @@ $data = mysqli_query($conn, 'SELECT * FROM jabatan ORDER BY id_jabatan');
   <h2 class="h5">Daftar Jabatan</h2>
 </div>
 <div class="table-responsive"><table class="table table-striped dt-table" style="width:100%"><thead><tr><th>No</th><th>Kode</th><th>Nama Jabatan</th><th>Gaji Pokok</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
-<?php $no=1; if ($data): while ($row=mysqli_fetch_assoc($data)): $status = $row['status_jabatan'] ?? 'Aktif'; $newStatus = $status === 'Aktif' ? 'Tidak Aktif' : 'Aktif'; ?><tr><td><?= $no++ ?></td><td><?= e($row['kode_jabatan']) ?></td><td><?= e($row['nama_jabatan']) ?></td><td><?= rupiah($row['gaji_pokok']) ?></td><td><span class="badge <?= $status === 'Aktif' ? 'bg-success' : 'bg-secondary' ?>"><?= e($status) ?></span></td><td><a class="btn btn-sm btn-warning" href="?edit=<?= $row['id_jabatan'] ?>">Edit</a> <button type="button" class="btn btn-sm <?= $status === 'Aktif' ? 'btn-danger' : 'btn-success' ?>" onclick="validasiPimpinan(<?= $row['id_jabatan'] ?>, '<?= $newStatus ?>', '<?= e($row['nama_jabatan']) ?>')"><?= $status === 'Aktif' ? 'Tidak Aktif' : 'Active' ?></button></td></tr><?php endwhile; endif; ?>
+<?php $no=1; if ($data): while ($row=mysqli_fetch_assoc($data)): $status = $row['status_jabatan'] ?? 'Aktif'; $newStatus = $status === 'Aktif' ? 'Tidak Aktif' : 'Aktif'; ?><tr><td><?= $no++ ?></td><td><?= e($row['kode_jabatan']) ?></td><td><?= e($row['nama_jabatan']) ?></td><td><?= rupiah($row['gaji_pokok']) ?></td><td><span class="badge <?= $status === 'Aktif' ? 'bg-success' : 'bg-secondary' ?>"><?= e($status) ?></span></td><td><a class="btn btn-sm btn-warning" href="?edit=<?= $row['id_jabatan'] ?>">Edit</a> <button type="button" class="btn btn-sm <?= $status === 'Aktif' ? 'btn-danger' : 'btn-success' ?>" onclick="toggleStatusJabatan(<?= $row['id_jabatan'] ?>, <?= json_encode($newStatus) ?>, <?= json_encode($row['nama_jabatan']) ?>)"><?= $status === 'Aktif' ? 'Tidak Aktif' : 'Aktifkan' ?></button></td></tr><?php endwhile; endif; ?>
 </tbody></table></div></div>
 
 <form id="form_toggle_status" method="post" style="display:none;">
     <input type="hidden" name="id_jabatan" id="id_jabatan_input">
     <input type="hidden" name="status_baru" id="status_baru_input">
-    <input type="hidden" name="password_pimpinan" id="password_pimpinan_input">
     <input type="hidden" name="toggle_status" value="1">
 </form>
 
 <script>
-function validasiPimpinan(idJabatan, statusBaru, namaJabatan) {
-    let msg = `VALIDASI PIMPINAN DIBUTUHKAN\n\nAnda akan mengubah status jabatan "${namaJabatan}" menjadi ${statusBaru}.\n\nSilakan masukkan Password akun Pimpinan untuk menyetujui:`;
-    let pwd = prompt(msg);
-    if (pwd !== null) {
-        if (pwd.trim() === '') {
-            alert('Password tidak boleh kosong!');
-            return;
-        }
+function toggleStatusJabatan(idJabatan, statusBaru, namaJabatan) {
+    let konfirmasi = confirm(`Yakin ingin mengubah status jabatan "${namaJabatan}" menjadi "${statusBaru}"?`);
+    if (konfirmasi) {
         document.getElementById('id_jabatan_input').value = idJabatan;
         document.getElementById('status_baru_input').value = statusBaru;
-        document.getElementById('password_pimpinan_input').value = pwd;
         document.getElementById('form_toggle_status').submit();
     }
 }

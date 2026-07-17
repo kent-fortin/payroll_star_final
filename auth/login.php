@@ -52,11 +52,7 @@ $flash = get_flash();
                         <i class="bi bi-box-arrow-in-right me-2"></i>Masuk
                     </button>
                 </form>
-                <div class="alert alert-info mt-4 mb-0 small text-center">
-                    <strong>Akun Demo:</strong><br>
-                    Admin: admin / admin123<br>
-                    Pimpinan: pimpinan / pimpinan123
-                </div>
+
             </div>
         </div>
     </div>

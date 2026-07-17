@@ -28,6 +28,6 @@ $countValidasi = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) t
 <div><strong>Total Lembur</strong> = Jam lembur × <?= rupiah(get_setting($conn,'tarif_lembur_per_jam',15000)) ?></div>
 <div class="mt-2"><strong>Potongan Alpha</strong> = Hari alpha × <?= rupiah(get_setting($conn,'potongan_alpha_per_hari',25000)) ?></div>
 <div class="mt-2"><strong>Gaji Bersih</strong> = Gaji pokok + total lembur − potongan alpha</div>
-</div><div class="mt-3 small text-muted">Absensi yang dikelola merupakan rekap bulanan, bukan presensi harian.</div></div></div>
+</div><div class="mt-3 small text-muted">Absensi yang dikelola merupakan presensi rekap harian.</div></div></div>
 </div>
 <?php require_once __DIR__ . '/layout/footer.php'; ?>

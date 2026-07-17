@@ -1,4 +1,25 @@
+-- ============================================================
+-- Database Payroll PT Star Samudera Logistik
+-- Generated: Fresh Install Script
+-- ============================================================
 
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS payroll;
+DROP TABLE IF EXISTS permintaan_edit_absensi;
+DROP TABLE IF EXISTS presensi_harian;
+DROP TABLE IF EXISTS absensi;
+DROP TABLE IF EXISTS lembur;
+DROP TABLE IF EXISTS karyawan;
+DROP TABLE IF EXISTS jabatan;
+DROP TABLE IF EXISTS pengaturan_payroll;
+DROP TABLE IF EXISTS users;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================================
+-- STRUKTUR TABEL
+-- ============================================================
 
 CREATE TABLE users (
     id_user INT AUTO_INCREMENT PRIMARY KEY,
@@ -35,6 +56,8 @@ CREATE TABLE karyawan (
     id_jabatan INT NOT NULL,
     status_karyawan ENUM('Tetap','Kontrak','Resign') NOT NULL,
     tanggal_masuk DATE NOT NULL,
+    no_ktp VARCHAR(20) NULL,
+    no_kk VARCHAR(20) NULL,
     CONSTRAINT fk_karyawan_jabatan FOREIGN KEY (id_jabatan) REFERENCES jabatan(id_jabatan) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
@@ -54,6 +77,16 @@ CREATE TABLE absensi (
     CONSTRAINT fk_absensi_karyawan FOREIGN KEY (id_karyawan) REFERENCES karyawan(id_karyawan) ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT fk_absensi_user FOREIGN KEY (dibuat_oleh) REFERENCES users(id_user) ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB;
+
+CREATE TABLE presensi_harian (
+    id_presensi      INT AUTO_INCREMENT PRIMARY KEY,
+    id_karyawan      INT NOT NULL,
+    tanggal          DATE NOT NULL,
+    status_kehadiran ENUM('Hadir','Sakit','Izin','Alpha') NOT NULL DEFAULT 'Hadir',
+    UNIQUE KEY unik_presensi (id_karyawan, tanggal),
+    CONSTRAINT fk_presensi_karyawan FOREIGN KEY (id_karyawan)
+        REFERENCES karyawan(id_karyawan) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='Presensi harian karyawan';
 
 CREATE TABLE lembur (
     id_lembur INT AUTO_INCREMENT PRIMARY KEY,
@@ -110,6 +143,10 @@ CREATE TABLE payroll (
     CONSTRAINT fk_payroll_user FOREIGN KEY (diproses_oleh) REFERENCES users(id_user) ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- ============================================================
+-- DATA AWAL (SEED)
+-- ============================================================
+
 INSERT INTO users (username,password,nama_lengkap,role,email,no_whatsapp) VALUES
 ('admin','$2y$12$qOoEq1cYdKjhvFcREUFnEeXxN6YQCY9g6n63CeSk15.h5KjcH4Axy','Administrator Payroll','admin','angelinocttt@gmail.com','6287738565119'),
 ('pimpinan','$2y$12$cKBHjEPMil4982WxBgAoZuff8wb0ccZcbSNRAHRG82A.5meQlWQWi','Pimpinan PT Star Samudera Logistik','pimpinan','kentfh206@gmail.com','6281933630535');
@@ -163,28 +200,36 @@ INSERT INTO lembur (id_karyawan,tanggal_lembur,jam_lembur,dibuat_oleh) VALUES
 (6,'2026-05-15',5,1),(7,'2026-05-16',3,1),(8,'2026-05-17',4,1),(9,'2026-05-18',5,1),(10,'2026-05-19',8,1),
 (11,'2026-05-20',4,1),(12,'2026-05-21',6,1),(13,'2026-05-22',2,1),(14,'2026-05-23',5,1),(15,'2026-05-24',4,1);
 
+-- Payroll April 2026
+-- id_karyawan <= 10 sudah dibayar (status_validasi = Disetujui)
+-- id_karyawan > 10 belum dibayar (status_validasi = Menunggu)
 INSERT INTO payroll
-(id_karyawan,bulan,tahun,gaji_pokok,jam_lembur,tarif_lembur,total_lembur,total_tunjangan,jumlah_alpha,tarif_alpha,total_potongan_alpha,total_gaji_bersih,status_pembayaran,tanggal_pembayaran,tanggal_proses,diproses_oleh)
+(id_karyawan,bulan,tahun,gaji_pokok,jam_lembur,tarif_lembur,total_lembur,total_tunjangan,jumlah_alpha,tarif_alpha,total_potongan_alpha,total_gaji_bersih,status_pembayaran,status_validasi,tanggal_pembayaran,tanggal_proses,diproses_oleh)
 SELECT k.id_karyawan,a.bulan,a.tahun,j.gaji_pokok, COALESCE(l.jam_lembur, 0), 15000, COALESCE(l.jam_lembur, 0)*15000, 0, a.alpha, 25000, a.alpha*25000,
        j.gaji_pokok+(COALESCE(l.jam_lembur, 0)*15000)-(a.alpha*25000),
        CASE WHEN k.id_karyawan<=10 THEN 'Sudah Dibayar' ELSE 'Belum Dibayar' END,
+       CASE WHEN k.id_karyawan<=10 THEN 'Disetujui' ELSE 'Menunggu' END,
        CASE WHEN k.id_karyawan<=10 THEN '2026-04-30' ELSE NULL END,
        '2026-04-30 10:00:00',1
-FROM absensi a 
-JOIN karyawan k ON k.id_karyawan=a.id_karyawan 
+FROM absensi a
+JOIN karyawan k ON k.id_karyawan=a.id_karyawan
 JOIN jabatan j ON j.id_jabatan=k.id_jabatan
 LEFT JOIN (SELECT id_karyawan, SUM(jam_lembur) as jam_lembur FROM lembur WHERE MONTH(tanggal_lembur)=4 AND YEAR(tanggal_lembur)=2026 GROUP BY id_karyawan) l ON l.id_karyawan=k.id_karyawan
 WHERE a.bulan='April' AND a.tahun=2026;
 
+-- Payroll Mei 2026
+-- id_karyawan <= 7 sudah dibayar (status_validasi = Disetujui)
+-- id_karyawan > 7 belum dibayar (status_validasi = Menunggu)
 INSERT INTO payroll
-(id_karyawan,bulan,tahun,gaji_pokok,jam_lembur,tarif_lembur,total_lembur,total_tunjangan,jumlah_alpha,tarif_alpha,total_potongan_alpha,total_gaji_bersih,status_pembayaran,tanggal_pembayaran,tanggal_proses,diproses_oleh)
+(id_karyawan,bulan,tahun,gaji_pokok,jam_lembur,tarif_lembur,total_lembur,total_tunjangan,jumlah_alpha,tarif_alpha,total_potongan_alpha,total_gaji_bersih,status_pembayaran,status_validasi,tanggal_pembayaran,tanggal_proses,diproses_oleh)
 SELECT k.id_karyawan,a.bulan,a.tahun,j.gaji_pokok, COALESCE(l.jam_lembur, 0), 15000, COALESCE(l.jam_lembur, 0)*15000, 0, a.alpha, 25000, a.alpha*25000,
        j.gaji_pokok+(COALESCE(l.jam_lembur, 0)*15000)-(a.alpha*25000),
        CASE WHEN k.id_karyawan<=7 THEN 'Sudah Dibayar' ELSE 'Belum Dibayar' END,
+       CASE WHEN k.id_karyawan<=7 THEN 'Disetujui' ELSE 'Menunggu' END,
        CASE WHEN k.id_karyawan<=7 THEN '2026-05-31' ELSE NULL END,
        '2026-05-31 10:00:00',1
-FROM absensi a 
-JOIN karyawan k ON k.id_karyawan=a.id_karyawan 
+FROM absensi a
+JOIN karyawan k ON k.id_karyawan=a.id_karyawan
 JOIN jabatan j ON j.id_jabatan=k.id_jabatan
 LEFT JOIN (SELECT id_karyawan, SUM(jam_lembur) as jam_lembur FROM lembur WHERE MONTH(tanggal_lembur)=5 AND YEAR(tanggal_lembur)=2026 GROUP BY id_karyawan) l ON l.id_karyawan=k.id_karyawan
 WHERE a.bulan='Mei' AND a.tahun=2026;

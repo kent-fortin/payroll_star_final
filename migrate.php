@@ -58,4 +58,29 @@ if (mysqli_error($conn)) {
     echo "Created table lembur\n";
 }
 
+// 7. Buat tabel presensi_harian
+$sql = "CREATE TABLE IF NOT EXISTS presensi_harian (
+    id_presensi      INT AUTO_INCREMENT PRIMARY KEY,
+    id_karyawan      INT NOT NULL,
+    tanggal          DATE NOT NULL,
+    status_kehadiran ENUM('Hadir','Sakit','Izin','Alpha') NOT NULL DEFAULT 'Hadir',
+    UNIQUE KEY unik_presensi (id_karyawan, tanggal),
+    CONSTRAINT fk_presensi_karyawan FOREIGN KEY (id_karyawan)
+        REFERENCES karyawan(id_karyawan) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='Presensi harian karyawan'";
+mysqli_query($conn, $sql);
+if (mysqli_error($conn)) {
+    echo "Error creating presensi_harian: " . mysqli_error($conn) . "\n";
+} else {
+    echo "Created table presensi_harian\n";
+}
+
+// 8. Tambah kolom diperbarui_pada di absensi jika belum ada
+$q = mysqli_query($conn, "SHOW COLUMNS FROM absensi LIKE 'diperbarui_pada'");
+if (mysqli_num_rows($q) == 0) {
+    mysqli_query($conn, "ALTER TABLE absensi ADD diperbarui_pada DATETIME NULL");
+    echo "Added diperbarui_pada to absensi\n";
+}
+
 echo "Selesai.\n";
+
