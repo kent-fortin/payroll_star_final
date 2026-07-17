@@ -37,6 +37,7 @@ $(document).ready(function () {
             pageLength: 10,
             ordering: true,
             responsive: false,
+            scrollX: true,
             dom: '<"dt-top-row"lf>rt<"dt-bottom-row"ip>',
             initComplete: function () {
                 // Style the top row
@@ -96,14 +97,18 @@ $(document).ready(function () {
         e.preventDefault();
         var form = $(this).closest('.hapus-form');
         var msg  = form.data('confirm') || 'Apakah Anda yakin ingin menghapus data ini?';
+        var isResign = msg.toLowerCase().includes('resign');
+        var title = isResign ? 'Konfirmasi Resign' : 'Konfirmasi Hapus';
+        var confirmBtn = isResign ? 'Ya, Resign!' : 'Ya, Hapus!';
+
         Swal.fire({
-            title: 'Konfirmasi Hapus',
+            title: title,
             text: msg,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#dc2626',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Ya, Hapus!',
+            confirmButtonText: confirmBtn,
             cancelButtonText: 'Batal'
         }).then(function (result) {
             if (result.isConfirmed) {
