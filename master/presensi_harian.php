@@ -13,18 +13,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_presensi'])) {
         set_flash('warning', 'Tidak ada data presensi yang diinput.');
     } else {
         $tanggalEsc = mysqli_real_escape_string($conn, $tanggal);
+        $isToday = ($tanggal === date('Y-m-d'));
         
-        // Cek apakah data untuk tanggal ini sudah ada di database (sudah pernah disimpan)
-        $cekSudahAda = mysqli_query($conn, "SELECT id_presensi FROM presensi_harian WHERE tanggal='$tanggalEsc' LIMIT 1");
-        if (mysqli_num_rows($cekSudahAda) > 0) {
-            set_flash('danger', 'Data presensi untuk tanggal ini sudah pernah disimpan dan tidak dapat diubah lagi.');
-            redirect("master/presensi_harian.php?tanggal=" . urlencode($tanggal));
+        // Ambil data yang sudah ada untuk memvalidasi
+        $existingQuery = mysqli_query($conn, "SELECT id_karyawan FROM presensi_harian WHERE tanggal='$tanggalEsc'");
+        $existingPost = [];
+        if ($existingQuery) {
+            while ($row = mysqli_fetch_assoc($existingQuery)) {
+                $existingPost[] = (int)$row['id_karyawan'];
+            }
         }
 
         $berhasil = 0;
         $gagal = 0;
         foreach ($presensiData as $idKaryawan => $status) {
             $idKaryawan = (int)$idKaryawan;
+            
+            // SECURITY: Jika bukan hari ini dan karyawan ini sudah punya data, tolak perubahan!
+            if (!$isToday && in_array($idKaryawan, $existingPost)) {
+                continue;
+            }
+            
             $allowedStatus = ['Hadir', 'Sakit', 'Izin', 'Alpha'];
             if ($idKaryawan < 1 || !in_array($status, $allowedStatus)) continue;
             $statusEsc = mysqli_real_escape_string($conn, $status);
@@ -71,7 +80,7 @@ if ($existingQuery) {
         $existing[(int)$row['id_karyawan']] = $row['status_kehadiran'];
     }
 }
-$isSudahDisimpan = count($existing) > 0;
+$isToday = ($tanggalInput === date('Y-m-d'));
 
 // Hitung ringkasan
 $ringkasanQuery = mysqli_query($conn, "SELECT status_kehadiran, COUNT(*) total FROM presensi_harian WHERE tanggal='$tanggalEsc' GROUP BY status_kehadiran");
@@ -124,8 +133,11 @@ if ($ringkasanQuery) {
           </tr>
         </thead>
         <tbody>
-        <?php $no = 1; if ($karyawanQuery): while ($k = mysqli_fetch_assoc($karyawanQuery)):
-            $currentStatus = $existing[(int)$k['id_karyawan']] ?? 'Hadir';
+        <?php $no = 1; $adaYangBisaDisimpan = false; if ($karyawanQuery): while ($k = mysqli_fetch_assoc($karyawanQuery)):
+            $hasData = isset($existing[(int)$k['id_karyawan']]);
+            $currentStatus = $hasData ? $existing[(int)$k['id_karyawan']] : 'Hadir';
+            $isLocked = !$isToday && $hasData;
+            if (!$isLocked) $adaYangBisaDisimpan = true;
         ?>
         <tr>
           <td><?= $no++ ?></td>
@@ -140,7 +152,7 @@ if ($ringkasanQuery) {
                   id="p_<?= $k['id_karyawan'] ?>_<?= $st ?>" 
                   value="<?= $st ?>" 
                   <?= $currentStatus === $st ? 'checked' : '' ?> 
-                  <?= $isSudahDisimpan ? 'disabled' : 'required' ?>>
+                  <?= $isLocked ? 'disabled' : 'required' ?>>
                 <label class="btn btn-outline-<?= $color ?> btn-sm px-3 fw-semibold" for="p_<?= $k['id_karyawan'] ?>_<?= $st ?>">
                   <?= $st ?>
                 </label>
@@ -153,7 +165,7 @@ if ($ringkasanQuery) {
       </table>
     </div>
     <div class="mt-3 pt-3 border-top">
-      <?php if ($isSudahDisimpan): ?>
+      <?php if (!$isToday && !$adaYangBisaDisimpan): ?>
         <div class="alert alert-warning mb-0">
           <i class="bi bi-lock-fill me-1"></i> Data presensi untuk tanggal ini <strong>sudah disimpan dan dikunci</strong>. 
           Jika ada kesalahan input, silakan ajukan perbaikan melalui fitur <strong>Ajukan Edit</strong> di menu Rekap Absensi.
@@ -163,6 +175,11 @@ if ($ringkasanQuery) {
           <i class="bi bi-save me-1"></i>Simpan Presensi
         </button>
         <span class="text-muted small ms-3">Menyimpan untuk tanggal: <strong><?= e(date('d/m/Y', strtotime($tanggalInput))) ?></strong></span>
+        <?php if (!$isToday && count($existing) > 0): ?>
+          <div class="alert alert-info mt-3 mb-0 py-2 small">
+            <i class="bi bi-info-circle me-1"></i> Mengedit tanggal lampau. Karyawan yang sudah diinput telah dikunci. Anda hanya dapat menginput data untuk karyawan yang terlewat atau karyawan baru.
+          </div>
+        <?php endif; ?>
       <?php endif; ?>
     </div>
   </form>
