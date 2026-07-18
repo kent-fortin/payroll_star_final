@@ -18,11 +18,38 @@ $countValidasi = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) t
 <div class="col-md-3"><div class="card stat-card bg-dark text-white p-4"><div class="small">Validasi Payroll (Menunggu)</div><div class="metric-number"><?= $countValidasi ?></div></div></div>
 </div>
 <div class="row g-4">
-<div class="col-lg-8"><div class="card content-card shadow-sm p-4"><h2 class="h4 mb-3">Akses Menu</h2>
-<div class="row g-3">
-<div class="col-md-4"><a class="btn btn-outline-primary w-100 py-3" href="<?= url('approval/absensi.php') ?>">Persetujuan Edit Absensi</a></div>
-<div class="col-md-4"><a class="btn btn-outline-primary w-100 py-3" href="<?= url('approval/validasi_payroll.php') ?>">Validasi Payroll</a></div>
-<div class="col-md-4"><a class="btn btn-outline-primary w-100 py-3" href="<?= url('laporan/laporan.php') ?>">Lihat Laporan Gaji</a></div>
+<div class="col-lg-8"><div class="card content-card shadow-sm p-4 h-100"><h2 class="h4 mb-3">Daftar Tugas & Approval</h2>
+<div class="row g-3 h-100 pb-3">
+<div class="col-md-4">
+  <a class="btn btn-outline-primary w-100 py-3 position-relative d-flex flex-column align-items-center justify-content-center h-100" style="border-radius: 12px;" href="<?= url('approval/absensi.php') ?>">
+    <i class="bi bi-check2-circle fs-4 mb-2"></i>
+    <span style="font-size: 0.9rem;">Edit Absensi</span>
+    <?php if ($countPending > 0): ?>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.75rem; padding: 0.4em 0.65em;">
+        <?= $countPending ?>
+        <span class="visually-hidden">menunggu persetujuan</span>
+      </span>
+    <?php endif; ?>
+  </a>
+</div>
+<div class="col-md-4">
+  <a class="btn btn-outline-primary w-100 py-3 position-relative d-flex flex-column align-items-center justify-content-center h-100" style="border-radius: 12px;" href="<?= url('approval/validasi_payroll.php') ?>">
+    <i class="bi bi-check2-square fs-4 mb-2"></i>
+    <span style="font-size: 0.9rem;">Validasi Payroll</span>
+    <?php if ($countValidasi > 0): ?>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.75rem; padding: 0.4em 0.65em;">
+        <?= $countValidasi ?>
+        <span class="visually-hidden">menunggu validasi</span>
+      </span>
+    <?php endif; ?>
+  </a>
+</div>
+<div class="col-md-4">
+  <a class="btn btn-outline-secondary w-100 py-3 position-relative d-flex flex-column align-items-center justify-content-center h-100" style="border-radius: 12px;" href="<?= url('laporan/laporan.php') ?>">
+    <i class="bi bi-file-earmark-bar-graph fs-4 mb-2 text-secondary"></i>
+    <span style="font-size: 0.9rem;">Lihat Laporan</span>
+  </a>
+</div>
 </div></div></div>
 <div class="col-lg-4"><div class="card content-card shadow-sm p-4"><h2 class="h4 mb-3">Rumus Payroll</h2><div class="formula-box small">
 <div><strong>Total Lembur</strong> = Jam lembur × <?= rupiah(get_setting($conn,'tarif_lembur_per_jam',15000)) ?></div>

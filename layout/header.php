@@ -6,17 +6,28 @@ db_or_redirect($conn);
 $flash = get_flash();
 $currentPath = str_replace('\\', '/', $_SERVER['PHP_SELF'] ?? '');
 
-function nav_item(string $label, string $href, string $currentPath, string $icon = 'circle'): string
+function nav_item(string $label, string $href, string $currentPath, string $icon = 'circle', int $badgeCount = 0): string
 {
     $active = str_contains($currentPath, $href) ? 'active' : '';
+    $badgeHtml = $badgeCount > 0 ? '<span class="badge bg-danger rounded-pill ms-auto" style="font-size:0.7rem; box-shadow:0 0 0 2px var(--sidebar-bg-start);">' . $badgeCount . '</span>' : '';
     return '<a class="nav-link ' . $active . '" href="' . e(url($href)) . '">'
-         . '<i class="bi bi-' . $icon . '"></i> ' . e($label)
+         . '<i class="bi bi-' . $icon . '"></i> <span>' . e($label) . '</span>' . $badgeHtml
          . '</a>';
 }
 
 function nav_heading(string $label): string
 {
     return '<div class="sidebar-heading">' . e($label) . '</div>';
+}
+
+$pendingEditAbsensi = 0;
+$pendingValidasiPayroll = 0;
+if (is_logged_in() && is_pimpinan()) {
+    $q1 = mysqli_query($conn, "SELECT COUNT(*) total FROM permintaan_edit_absensi WHERE status='Menunggu'");
+    $pendingEditAbsensi = $q1 ? (int)mysqli_fetch_assoc($q1)['total'] : 0;
+    
+    $q2 = mysqli_query($conn, "SELECT COUNT(*) total FROM payroll WHERE status_validasi='Menunggu'");
+    $pendingValidasiPayroll = $q2 ? (int)mysqli_fetch_assoc($q2)['total'] : 0;
 }
 ?>
 <!DOCTYPE html>
@@ -71,8 +82,8 @@ function nav_heading(string $label): string
 
                 <!-- MENU PIMPINAN -->
                 <?= nav_heading('Approval') ?>
-                <?= nav_item('Approval Absensi', 'approval/absensi.php', $currentPath, 'check2-circle') ?>
-                <?= nav_item('Validasi Payroll', 'approval/validasi_payroll.php', $currentPath, 'check2-square') ?>
+                <?= nav_item('Approval Absensi', 'approval/absensi.php', $currentPath, 'check2-circle', $pendingEditAbsensi) ?>
+                <?= nav_item('Validasi Payroll', 'approval/validasi_payroll.php', $currentPath, 'check2-square', $pendingValidasiPayroll) ?>
 
                 <?= nav_heading('Laporan') ?>
                 <?= nav_item('Laporan Gaji', 'laporan/laporan.php', $currentPath, 'file-earmark-bar-graph') ?>
