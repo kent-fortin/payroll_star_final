@@ -18,10 +18,9 @@ require_once __DIR__ . '/../helpers/functions.php';
 // $host = 'localhost';
 // $user = 'root';
 // $pass = '';
-// $db   = 'db_payroll_star_samudera';
+// $db = 'db_payroll_star_samudera';
 
 // --- VERSI LIVE ---
-
 $host = 'sql312.infinityfree.com';
 $user = 'if0_42362934';
 $pass = 'fFQbSZ02B5U';

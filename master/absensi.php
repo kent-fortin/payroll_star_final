@@ -52,20 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hitung_rekap'])) {
                     $ok ? $diperbarui++ : $gagal++;
                 } else {
                     // Insert rekap baru
-                    $stmt = mysqli_prepare($conn,
-                        'INSERT INTO absensi (id_karyawan,bulan,tahun,hadir,sakit,izin,alpha,dibuat_oleh)
-                         VALUES (?,?,?,?,?,?,?,?)');
-                    $ok = false;
-                    if ($stmt) {
-                        mysqli_stmt_bind_param($stmt, 'isiiiiii',
-                            $idK, $bulan, $tahun, $hadir, $sakit, $izin, $alpha, $userId);
-                        $ok = mysqli_stmt_execute($stmt);
-                    }
+                    $sqlInsert = "INSERT INTO absensi (id_karyawan, bulan, tahun, hadir, sakit, izin, alpha, dibuat_oleh)
+                                  VALUES ($idK, '$bulanEsc', $tahun, $hadir, $sakit, $izin, $alpha, $userId)";
+                    $ok = mysqli_query($conn, $sqlInsert);
                     $ok ? $berhasil++ : $gagal++;
                     if (!$ok) app_log('Insert rekap absensi: ' . mysqli_error($conn));
                 }
             }
-            if ($gagal === 0) {
+            
+            if ($berhasil === 0 && $diperbarui === 0 && $gagal === 0) {
+                set_flash('warning', "Tidak ada data presensi harian pada $bulan $tahun untuk direkap.");
+            } elseif ($gagal === 0) {
                 set_flash('success', "Rekap $bulan $tahun berhasil! Baru: $berhasil, Diperbarui: $diperbarui karyawan.");
             } else {
                 set_flash('warning', "Rekap selesai. Baru: $berhasil, Diperbarui: $diperbarui, Gagal: $gagal.");
@@ -94,6 +91,7 @@ $tarifAlpha = get_setting($conn, 'potongan_alpha_per_hari', 25000);
   Potongan alpha = hari alpha × <?= rupiah($tarifAlpha) ?>.
 </div>
 <form method="post" class="row g-3 align-items-end" onsubmit="return confirm('Hitung dan simpan rekap absensi dari data presensi harian untuk periode yang dipilih?')">
+  <input type="hidden" name="hitung_rekap" value="1">
   <div class="col-md-3">
     <label class="form-label">Bulan</label>
     <select name="bulan" class="form-select" required>
@@ -105,7 +103,7 @@ $tarifAlpha = get_setting($conn, 'potongan_alpha_per_hari', 25000);
     <input type="number" name="tahun" class="form-control" value="<?= date('Y') ?>" min="2000" required>
   </div>
   <div class="col-md-3">
-    <button name="hitung_rekap" class="btn btn-primary px-4">
+    <button type="submit" class="btn btn-primary px-4">
       <i class="bi bi-calculator me-1"></i>Hitung Otomatis
     </button>
   </div>
