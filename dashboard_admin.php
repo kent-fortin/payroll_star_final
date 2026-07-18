@@ -17,7 +17,7 @@ $paid = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) total,COALESCE(S
 <div class="col-md-3"><div class="card stat-card bg-dark text-white p-4"><div class="small">Payroll Sudah Dibayar</div><div class="metric-number"><?= (int)($paid['total'] ?? 0) ?></div></div></div>
 </div>
 <div class="row g-4">
-<div class="col-lg-8"><div class="card content-card shadow-sm p-4 h-100"><h2 class="h4 mb-3">Alur Sistem (Step-by-Step)</h2>
+<div class="col-lg-12"><div class="card content-card shadow-sm p-4 h-100"><h2 class="h4 mb-3">Alur Sistem (Step-by-Step)</h2>
 <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch text-center mb-4">
   <div class="flex-fill">
     <a class="btn btn-outline-primary w-100 py-3 h-100 d-flex align-items-center justify-content-center flex-column" style="border-radius: 12px; font-size: 0.85rem;" href="<?= url('master/presensi_harian.php') ?>">
@@ -55,11 +55,5 @@ $paid = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) total,COALESCE(S
 <div class="col-md-6"><a class="btn btn-outline-secondary w-100 py-2 text-start px-3" href="<?= url('master/karyawan.php') ?>"><i class="bi bi-people-fill me-2 text-primary"></i>Kelola Data Karyawan</a></div>
 <div class="col-md-6"><a class="btn btn-outline-secondary w-100 py-2 text-start px-3" href="<?= url('master/jabatan.php') ?>"><i class="bi bi-tag-fill me-2 text-success"></i>Kelola Data Jabatan</a></div>
 </div>
-</div></div>
-<div class="col-lg-4"><div class="card content-card shadow-sm p-4 h-100"><h2 class="h4 mb-3">Rumus Payroll</h2><div class="formula-box small flex-grow-1">
-<div><strong>Total Lembur</strong> = Jam lembur × <?= rupiah(get_setting($conn,'tarif_lembur_per_jam',15000)) ?></div>
-<div class="mt-3"><strong>Potongan Alpha</strong> = Hari alpha × <?= rupiah(get_setting($conn,'potongan_alpha_per_hari',25000)) ?></div>
-<div class="mt-3"><strong>Gaji Bersih</strong> = Gaji pokok + total lembur − potongan alpha</div>
-</div><div class="mt-4 small text-muted"><i class="bi bi-info-circle me-1"></i>Pastikan master data karyawan dan jabatan up-to-date sebelum Anda memulai proses hitung Payroll.</div></div></div>
 </div>
 <?php require_once __DIR__ . '/layout/footer.php'; ?>
