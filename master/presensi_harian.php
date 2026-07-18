@@ -13,6 +13,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_presensi'])) {
         set_flash('warning', 'Tidak ada data presensi yang diinput.');
     } else {
         $tanggalEsc = mysqli_real_escape_string($conn, $tanggal);
+        
+        // Cek apakah data untuk tanggal ini sudah ada di database (sudah pernah disimpan)
+        $cekSudahAda = mysqli_query($conn, "SELECT id_presensi FROM presensi_harian WHERE tanggal='$tanggalEsc' LIMIT 1");
+        if (mysqli_num_rows($cekSudahAda) > 0) {
+            set_flash('danger', 'Data presensi untuk tanggal ini sudah pernah disimpan dan tidak dapat diubah lagi.');
+            redirect("master/presensi_harian.php?tanggal=" . urlencode($tanggal));
+        }
+
         $berhasil = 0;
         $gagal = 0;
         foreach ($presensiData as $idKaryawan => $status) {
@@ -63,6 +71,7 @@ if ($existingQuery) {
         $existing[(int)$row['id_karyawan']] = $row['status_kehadiran'];
     }
 }
+$isSudahDisimpan = count($existing) > 0;
 
 // Hitung ringkasan
 $ringkasanQuery = mysqli_query($conn, "SELECT status_kehadiran, COUNT(*) total FROM presensi_harian WHERE tanggal='$tanggalEsc' GROUP BY status_kehadiran");
@@ -86,7 +95,9 @@ if ($ringkasanQuery) {
       <input type="date" name="tanggal" class="form-control" value="<?= e($tanggalInput) ?>" max="<?= date('Y-m-d') ?>" onchange="this.form.submit()">
     </div>
     <div class="col-auto">
-      <a href="?tanggal=<?= urlencode(date('Y-m-d')) ?>" class="btn btn-outline-secondary">Hari Ini</a>
+      <a href="?tanggal=<?= urlencode(date('Y-m-d')) ?>" class="btn btn-primary shadow-sm">
+        <i class="bi bi-calendar-day me-1"></i> Hari Ini
+      </a>
     </div>
   </form>
 
@@ -128,7 +139,8 @@ if ($ringkasanQuery) {
                   name="presensi[<?= $k['id_karyawan'] ?>]" 
                   id="p_<?= $k['id_karyawan'] ?>_<?= $st ?>" 
                   value="<?= $st ?>" 
-                  <?= $currentStatus === $st ? 'checked' : '' ?> required>
+                  <?= $currentStatus === $st ? 'checked' : '' ?> 
+                  <?= $isSudahDisimpan ? 'disabled' : 'required' ?>>
                 <label class="btn btn-outline-<?= $color ?> btn-sm px-3 fw-semibold" for="p_<?= $k['id_karyawan'] ?>_<?= $st ?>">
                   <?= $st ?>
                 </label>
@@ -141,10 +153,17 @@ if ($ringkasanQuery) {
       </table>
     </div>
     <div class="mt-3 pt-3 border-top">
-      <button name="simpan_presensi" class="btn btn-primary px-5">
-        <i class="bi bi-save me-1"></i>Simpan Presensi
-      </button>
-      <span class="text-muted small ms-3">Menyimpan untuk tanggal: <strong><?= e(date('d/m/Y', strtotime($tanggalInput))) ?></strong></span>
+      <?php if ($isSudahDisimpan): ?>
+        <div class="alert alert-warning mb-0">
+          <i class="bi bi-lock-fill me-1"></i> Data presensi untuk tanggal ini <strong>sudah disimpan dan dikunci</strong>. 
+          Jika ada kesalahan input, silakan ajukan perbaikan melalui fitur <strong>Ajukan Edit</strong> di menu Rekap Absensi.
+        </div>
+      <?php else: ?>
+        <button name="simpan_presensi" class="btn btn-primary px-5">
+          <i class="bi bi-save me-1"></i>Simpan Presensi
+        </button>
+        <span class="text-muted small ms-3">Menyimpan untuk tanggal: <strong><?= e(date('d/m/Y', strtotime($tanggalInput))) ?></strong></span>
+      <?php endif; ?>
     </div>
   </form>
 </div>
