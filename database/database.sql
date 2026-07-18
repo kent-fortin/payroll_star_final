@@ -1,4 +1,5 @@
 -- Database Dump (Latest Local Structure)
+SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS `absensi`;
 CREATE TABLE `absensi` (
@@ -165,3 +166,4 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `role`, `email`, `no_whatsapp`, `reset_otp`, `reset_otp_expired_at`) VALUES ('1', 'admin', '$2y$12$qOoEq1cYdKjhvFcREUFnEeXxN6YQCY9g6n63CeSk15.h5KjcH4Axy', 'Administrator Payroll', 'admin', 'angelinocttt@gmail.com', '6287738565119', NULL, NULL);
 INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `role`, `email`, `no_whatsapp`, `reset_otp`, `reset_otp_expired_at`) VALUES ('2', 'pimpinan', '$2y$12$cKBHjEPMil4982WxBgAoZuff8wb0ccZcbSNRAHRG82A.5meQlWQWi', 'Pimpinan PT Star Samudera Logistik', 'pimpinan', 'kentfh206@gmail.com', '6281933630535', NULL, NULL);
 
+SET FOREIGN_KEY_CHECKS = 1;
