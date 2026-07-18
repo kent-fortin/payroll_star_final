@@ -356,11 +356,22 @@ h1, h2, h3, h4, h5, h6 {
 .btn-dark     { background: linear-gradient(135deg, #334155 0%, #1e293b 100%) !important; color: #fff !important; box-shadow: 0 3px 8px rgba(30,41,59,0.25); }
 
 .btn-outline-primary { background:transparent !important; border:2px solid #2563eb !important; color:#2563eb !important; font-weight:700; }
-.btn-outline-primary:hover { background:linear-gradient(135deg,#3b82f6,#2563eb) !important; color:#fff !important; border-color:transparent !important; }
-.btn-outline-dark    { background:transparent !important; border:2px solid #334155 !important; color:#334155 !important; }
-.btn-outline-dark:hover    { background:linear-gradient(135deg,#334155,#1e293b) !important; color:#fff !important; border-color:transparent !important; }
+.btn-outline-primary:hover, .btn-check:checked + .btn-outline-primary { background:linear-gradient(135deg,#3b82f6,#2563eb) !important; color:#fff !important; border-color:transparent !important; }
+
+.btn-outline-dark { background:transparent !important; border:2px solid #334155 !important; color:#334155 !important; }
+.btn-outline-dark:hover, .btn-check:checked + .btn-outline-dark { background:linear-gradient(135deg,#334155,#1e293b) !important; color:#fff !important; border-color:transparent !important; }
+
 .btn-outline-warning { background:transparent !important; border:2px solid #f59e0b !important; color:#d97706 !important; }
-.btn-outline-warning:hover { background:linear-gradient(135deg,#f59e0b,#d97706) !important; color:#fff !important; border-color:transparent !important; }
+.btn-outline-warning:hover, .btn-check:checked + .btn-outline-warning { background:linear-gradient(135deg,#f59e0b,#d97706) !important; color:#fff !important; border-color:transparent !important; }
+
+.btn-outline-success { background:transparent !important; border:2px solid #10b981 !important; color:#10b981 !important; }
+.btn-outline-success:hover, .btn-check:checked + .btn-outline-success { background:linear-gradient(135deg,#10b981,#059669) !important; color:#fff !important; border-color:transparent !important; }
+
+.btn-outline-info { background:transparent !important; border:2px solid #0ea5e9 !important; color:#0ea5e9 !important; }
+.btn-outline-info:hover, .btn-check:checked + .btn-outline-info { background:linear-gradient(135deg,#38bdf8,#0284c7) !important; color:#fff !important; border-color:transparent !important; }
+
+.btn-outline-danger { background:transparent !important; border:2px solid #ef4444 !important; color:#ef4444 !important; }
+.btn-outline-danger:hover, .btn-check:checked + .btn-outline-danger { background:linear-gradient(135deg,#ef4444,#dc2626) !important; color:#fff !important; border-color:transparent !important; }
 
 /* ============================================= */
 /*   Form Controls                               */

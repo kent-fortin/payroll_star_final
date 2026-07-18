@@ -90,7 +90,7 @@ $tarifAlpha = get_setting($conn, 'potongan_alpha_per_hari', 25000);
   <strong>Catatan:</strong> Pastikan data <strong>Presensi Harian</strong> sudah diinput terlebih dahulu sebelum membuat rekap bulanan.
   Potongan alpha = hari alpha × <?= rupiah($tarifAlpha) ?>.
 </div>
-<form method="post" class="row g-3 align-items-end" onsubmit="return confirm('Hitung dan simpan rekap absensi dari data presensi harian untuk periode yang dipilih?')">
+<form method="post" id="formRekap" class="row g-3 align-items-end">
   <input type="hidden" name="hitung_rekap" value="1">
   <div class="col-md-3">
     <label class="form-label">Bulan</label>
@@ -103,11 +103,30 @@ $tarifAlpha = get_setting($conn, 'potongan_alpha_per_hari', 25000);
     <input type="number" name="tahun" class="form-control" value="<?= date('Y') ?>" min="2000" required>
   </div>
   <div class="col-md-3">
-    <button type="submit" class="btn btn-primary px-4">
+    <button type="button" class="btn btn-primary px-4" onclick="konfirmasiRekap()">
       <i class="bi bi-calculator me-1"></i>Hitung Otomatis
     </button>
   </div>
 </form>
+
+<script>
+function konfirmasiRekap() {
+    Swal.fire({
+        title: 'Konfirmasi',
+        text: 'Hitung dan simpan rekap absensi dari data presensi harian untuk periode yang dipilih?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Lanjutkan!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('formRekap').submit();
+        }
+    });
+}
+</script>
 </div>
 
 <div class="card p-4">

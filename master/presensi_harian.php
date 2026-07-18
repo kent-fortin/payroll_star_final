@@ -83,10 +83,7 @@ if ($ringkasanQuery) {
   <form method="get" class="row g-2 align-items-end mb-3">
     <div class="col-auto">
       <label class="form-label">Pilih Tanggal</label>
-      <input type="date" name="tanggal" class="form-control" value="<?= e($tanggalInput) ?>" max="<?= date('Y-m-d') ?>">
-    </div>
-    <div class="col-auto">
-      <button class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>Tampilkan</button>
+      <input type="date" name="tanggal" class="form-control" value="<?= e($tanggalInput) ?>" max="<?= date('Y-m-d') ?>" onchange="this.form.submit()">
     </div>
     <div class="col-auto">
       <a href="?tanggal=<?= urlencode(date('Y-m-d')) ?>" class="btn btn-outline-secondary">Hari Ini</a>
@@ -125,18 +122,16 @@ if ($ringkasanQuery) {
           <td><?= e($k['nama_karyawan']) ?></td>
           <td><?= e($k['nama_jabatan']) ?></td>
           <td>
-            <div class="d-flex gap-2 flex-wrap">
+            <div class="btn-group shadow-sm" role="group">
               <?php foreach (['Hadir' => 'success', 'Sakit' => 'warning', 'Izin' => 'info', 'Alpha' => 'danger'] as $st => $color): ?>
-              <div class="form-check form-check-inline mb-0">
-                <input class="form-check-input" type="radio"
-                  name="presensi[<?= $k['id_karyawan'] ?>]"
-                  id="p_<?= $k['id_karyawan'] ?>_<?= $st ?>"
-                  value="<?= $st ?>"
+                <input type="radio" class="btn-check" 
+                  name="presensi[<?= $k['id_karyawan'] ?>]" 
+                  id="p_<?= $k['id_karyawan'] ?>_<?= $st ?>" 
+                  value="<?= $st ?>" 
                   <?= $currentStatus === $st ? 'checked' : '' ?> required>
-                <label class="form-check-label text-<?= $color ?> fw-semibold" for="p_<?= $k['id_karyawan'] ?>_<?= $st ?>">
+                <label class="btn btn-outline-<?= $color ?> btn-sm px-3 fw-semibold" for="p_<?= $k['id_karyawan'] ?>_<?= $st ?>">
                   <?= $st ?>
                 </label>
-              </div>
               <?php endforeach; ?>
             </div>
           </td>
@@ -149,7 +144,7 @@ if ($ringkasanQuery) {
       <button name="simpan_presensi" class="btn btn-primary px-5">
         <i class="bi bi-save me-1"></i>Simpan Presensi
       </button>
-      <span class="text-muted small ms-3">Tanggal: <strong><?= e(date('d-m-Y', strtotime($tanggalInput))) ?></strong></span>
+      <span class="text-muted small ms-3">Menyimpan untuk tanggal: <strong><?= e(date('d/m/Y', strtotime($tanggalInput))) ?></strong></span>
     </div>
   </form>
 </div>

@@ -74,7 +74,7 @@ $data = mysqli_query($conn, 'SELECT * FROM jabatan ORDER BY id_jabatan');
   <h2 class="h5">Daftar Jabatan</h2>
 </div>
 <div class="table-responsive"><table class="table table-striped dt-table" style="width:100%"><thead><tr><th>No</th><th>Kode</th><th>Nama Jabatan</th><th>Gaji Pokok</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
-<?php $no=1; if ($data): while ($row=mysqli_fetch_assoc($data)): $status = $row['status_jabatan'] ?? 'Aktif'; $newStatus = $status === 'Aktif' ? 'Tidak Aktif' : 'Aktif'; ?><tr><td><?= $no++ ?></td><td><?= e($row['kode_jabatan']) ?></td><td><?= e($row['nama_jabatan']) ?></td><td><?= rupiah($row['gaji_pokok']) ?></td><td><span class="badge <?= $status === 'Aktif' ? 'bg-success' : 'bg-secondary' ?>"><?= e($status) ?></span></td><td><a class="btn btn-sm btn-warning" href="?edit=<?= $row['id_jabatan'] ?>">Edit</a> <button type="button" class="btn btn-sm <?= $status === 'Aktif' ? 'btn-danger' : 'btn-success' ?>" onclick="toggleStatusJabatan(<?= $row['id_jabatan'] ?>, <?= json_encode($newStatus) ?>, <?= json_encode($row['nama_jabatan']) ?>)"><?= $status === 'Aktif' ? 'Tidak Aktif' : 'Aktifkan' ?></button></td></tr><?php endwhile; endif; ?>
+<?php $no=1; if ($data): while ($row=mysqli_fetch_assoc($data)): $status = $row['status_jabatan'] ?? 'Aktif'; $newStatus = $status === 'Aktif' ? 'Tidak Aktif' : 'Aktif'; ?><tr><td><?= $no++ ?></td><td><?= e($row['kode_jabatan']) ?></td><td><?= e($row['nama_jabatan']) ?></td><td><?= rupiah($row['gaji_pokok']) ?></td><td><span class="badge <?= $status === 'Aktif' ? 'bg-success' : 'bg-secondary' ?>"><?= e($status) ?></span></td><td><a class="btn btn-sm btn-warning" href="?edit=<?= $row['id_jabatan'] ?>">Edit</a> <button type="button" class="btn btn-sm <?= $status === 'Aktif' ? 'btn-danger' : 'btn-success' ?>" onclick="toggleStatusJabatan(<?= $row['id_jabatan'] ?>, <?= htmlspecialchars(json_encode($newStatus), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($row['nama_jabatan']), ENT_QUOTES, 'UTF-8') ?>)"><?= $status === 'Aktif' ? 'Tidak Aktif' : 'Aktifkan' ?></button></td></tr><?php endwhile; endif; ?>
 </tbody></table></div></div>
 
 <form id="form_toggle_status" method="post" style="display:none;">
@@ -85,12 +85,22 @@ $data = mysqli_query($conn, 'SELECT * FROM jabatan ORDER BY id_jabatan');
 
 <script>
 function toggleStatusJabatan(idJabatan, statusBaru, namaJabatan) {
-    let konfirmasi = confirm(`Yakin ingin mengubah status jabatan "${namaJabatan}" menjadi "${statusBaru}"?`);
-    if (konfirmasi) {
-        document.getElementById('id_jabatan_input').value = idJabatan;
-        document.getElementById('status_baru_input').value = statusBaru;
-        document.getElementById('form_toggle_status').submit();
-    }
+    Swal.fire({
+        title: 'Konfirmasi',
+        text: `Yakin ingin mengubah status jabatan "${namaJabatan}" menjadi "${statusBaru}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Lanjutkan!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('id_jabatan_input').value = idJabatan;
+            document.getElementById('status_baru_input').value = statusBaru;
+            document.getElementById('form_toggle_status').submit();
+        }
+    });
 }
 </script>
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
