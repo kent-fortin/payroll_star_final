@@ -107,7 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajukan_edit_absensi']
 
 // ── GET: Tampilkan halaman ───────────────────────────────────────────────────
 $data = mysqli_query($conn, "SELECT a.*,k.nip,k.nama_karyawan,
-    (SELECT p.status FROM permintaan_edit_absensi p WHERE p.id_absensi=a.id_absensi ORDER BY p.id_permintaan DESC LIMIT 1) status_edit
+    (SELECT p.status FROM permintaan_edit_absensi p WHERE p.id_absensi=a.id_absensi ORDER BY p.id_permintaan DESC LIMIT 1) status_edit,
+    (SELECT p.catatan_pimpinan FROM permintaan_edit_absensi p WHERE p.id_absensi=a.id_absensi ORDER BY p.id_permintaan DESC LIMIT 1) catatan_pimpinan
     FROM absensi a JOIN karyawan k ON k.id_karyawan=a.id_karyawan
     ORDER BY a.tahun DESC,FIELD(a.bulan,'Desember','November','Oktober','September','Agustus','Juli','Juni','Mei','April','Maret','Februari','Januari'),k.nama_karyawan");
 $tarifAlpha = get_setting($conn, 'potongan_alpha_per_hari', 25000);
@@ -179,7 +180,12 @@ function konfirmasiRekap() {
   <td><?= $row['izin'] ?></td>
   <td><?= $row['alpha'] ?></td>
   <td><?= rupiah($row['alpha'] * $tarifAlpha) ?></td>
-  <td><?= $row['status_edit'] ? status_badge($row['status_edit']) : '<span class="text-muted">-</span>' ?></td>
+  <td>
+    <?= $row['status_edit'] ? status_badge($row['status_edit']) : '<span class="text-muted">-</span>' ?>
+    <?php if (!empty($row['catatan_pimpinan'])): ?>
+      <div class="small text-muted mt-1" style="font-size:0.75rem"><i class="bi bi-chat-text me-1"></i><?= e($row['catatan_pimpinan']) ?></div>
+    <?php endif; ?>
+  </td>
   <td>
     <?php if($row['status_edit'] === 'Menunggu'): ?>
       <button class="btn btn-sm btn-outline-secondary" disabled title="Menunggu Persetujuan Pimpinan"><i class="bi bi-hourglass-split"></i> Menunggu</button>
