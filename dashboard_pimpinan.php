@@ -46,7 +46,7 @@ $countValidasi = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) t
 </div>
 <div class="col-md-4">
   <a class="btn btn-outline-secondary w-100 py-3 position-relative d-flex flex-column align-items-center justify-content-center h-100" style="border-radius: 12px;" href="<?= url('laporan/laporan.php') ?>">
-    <i class="bi bi-file-earmark-bar-graph fs-4 mb-2 text-secondary"></i>
+    <i class="bi bi-file-earmark-bar-graph fs-4 mb-2"></i>
     <span style="font-size: 0.9rem;">Lihat Laporan</span>
   </a>
 </div>
