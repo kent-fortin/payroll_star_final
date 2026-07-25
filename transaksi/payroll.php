@@ -208,31 +208,38 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
         </form>
     </div>
 </div>
-<?php endif;?>
-<div class="card p-4">
+<?php endif;?><div class="card p-4">
 <div class="section-header">
   <i class="bi bi-table"></i>
   <h2 class="h5">Daftar Payroll</h2>
 </div>
-<div class="table-responsive"><table class="table table-striped dt-table align-middle" style="width:100%"><thead><tr><th>No</th><th>Karyawan</th><th>Periode</th><th>Gaji Pokok</th><th>Lembur</th><th>Tunjangan</th><th>Potongan Alpha</th><th>Gaji Bersih</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+<div class="table-responsive"><table class="table table-hover dt-table align-middle" style="width:100%"><thead><tr><th style="width: 5%">No</th><th style="width: 25%">Karyawan & Periode</th><th style="width: 14%">Gaji Pokok</th><th style="width: 16%">Lembur & Tunjangan</th><th style="width: 13%">Potongan Alpha</th><th style="width: 13%">Gaji Bersih</th><th style="width: 14%">Status</th><th style="width: 10%" class="text-center">Aksi</th></tr></thead><tbody>
 <?php $no=1;if($data):while($row=mysqli_fetch_assoc($data)):?>
 <tr>
     <td><?= $no++ ?></td>
-    <td><strong><?= e($row['nip']) ?></strong><br><?= e($row['nama_karyawan']) ?><br><span class="small text-muted"><?= e($row['nama_jabatan']) ?></span></td>
-    <td><?= e($row['bulan'].' '.$row['tahun']) ?></td>
+    <td>
+      <div class="fw-bold fs-6 text-dark"><?= e($row['nama_karyawan']) ?></div>
+      <div class="small text-muted mb-1">NIP: <strong><?= e($row['nip']) ?></strong> | <?= e($row['nama_jabatan']) ?></div>
+      <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"><i class="bi bi-calendar3 me-1"></i><?= e($row['bulan'].' '.$row['tahun']) ?></span>
+    </td>
     <td><?= rupiah($row['gaji_pokok']) ?></td>
-    <td><?= $row['jam_lembur'] ?> jam<br><strong><?= rupiah($row['total_lembur']) ?></strong></td>
-    <td><strong class="text-success"><?= rupiah($row['total_tunjangan'] ?? 0) ?></strong></td>
-    <td><?= $row['jumlah_alpha'] ?> hari<br><strong class="text-danger"><?= rupiah($row['total_potongan_alpha']) ?></strong></td>
+    <td class="small">
+      <div class="d-flex justify-content-between mb-1"><span class="text-muted">Lembur (<?= $row['jam_lembur'] ?>j):</span> <strong><?= rupiah($row['total_lembur']) ?></strong></div>
+      <div class="d-flex justify-content-between"><span class="text-muted">Tunjangan:</span> <strong class="text-success"><?= rupiah($row['total_tunjangan'] ?? 0) ?></strong></div>
+    </td>
+    <td class="small">
+      <div class="text-danger fw-bold"><?= rupiah($row['total_potongan_alpha']) ?></div>
+      <div class="text-muted" style="font-size: 0.75rem;">(<?= $row['jumlah_alpha'] ?> hari Alpha)</div>
+    </td>
     <td><strong class="text-primary fs-6"><?= rupiah($row['total_gaji_bersih']) ?></strong></td>
     <td>
         <div><?= status_badge($row['status_validasi']) ?></div>
         <div class="mt-1"><?= status_badge($row['status_pembayaran']) ?></div>
-        <?php if(!empty($row['tanggal_pembayaran'])): ?><div class="small text-muted mt-1"><?= e($row['tanggal_pembayaran']) ?></div><?php endif; ?>
+        <?php if(!empty($row['tanggal_pembayaran'])): ?><div class="small text-muted mt-1" style="font-size: 0.75rem;"><i class="bi bi-check2-circle me-1"></i><?= e($row['tanggal_pembayaran']) ?></div><?php endif; ?>
     </td>
-    <td>
+    <td class="text-center">
         <?php if ($row['status_validasi'] === 'Disetujui'): ?>
-            <div class="d-flex flex-column gap-1" style="min-width: 140px;">
+            <div class="d-flex flex-column gap-1" style="min-width: 130px;">
                 <a class="btn btn-sm btn-dark w-100 fw-bold" href="<?= url('transaksi/cetak_rincian.php?id='.$row['id_payroll']) ?>"><i class="bi bi-printer me-1"></i>Cetak Rincian</a>
                 <form method="post">
                     <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
@@ -241,13 +248,13 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
                 </form>
             </div>
         <?php elseif ($row['status_validasi'] === 'Ditolak'): ?>
-            <form class="hapus-form" method="post" data-confirm="Hapus data payroll ini agar bisa dihitung ulang?" style="min-width: 140px;">
+            <form class="hapus-form" method="post" data-confirm="Hapus data payroll ini agar bisa dihitung ulang?" style="min-width: 130px;">
                 <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
                 <input type="hidden" name="hapus_payroll" value="1">
-                <button type="button" class="btn btn-sm btn-danger w-100 fw-bold btn-hapus"><i class="bi bi-arrow-repeat me-1"></i>Hapus & Hitung Ulang</button>
+                <button type="button" class="btn btn-sm btn-danger w-100 fw-bold btn-hapus"><i class="bi bi-arrow-repeat me-1"></i>Hapus & Ulang</button>
             </form>
         <?php else: ?>
-            <div class="d-flex flex-column gap-1" style="min-width: 140px;">
+            <div class="d-flex flex-column gap-1" style="min-width: 130px;">
                 <button type="button" class="btn btn-sm btn-outline-primary w-100 fw-bold" data-bs-toggle="modal" data-bs-target="#editTunjanganModal<?= $row['id_payroll'] ?>"><i class="bi bi-pencil-square me-1"></i>Edit Tunjangan</button>
                 <form class="hapus-form" method="post" data-confirm="Hapus data payroll ini agar bisa diproses ulang?">
                     <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
@@ -255,7 +262,7 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
                     <button type="button" class="btn btn-sm btn-outline-danger w-100 fw-bold btn-hapus"><i class="bi bi-trash me-1"></i>Hapus</button>
                 </form>
             </div>
-            
+        <?php endif; ?>        
             <!-- Modal Edit Tunjangan -->
             <div class="modal fade" id="editTunjanganModal<?= $row['id_payroll'] ?>" tabindex="-1" aria-hidden="true">
               <div class="modal-dialog">
@@ -280,7 +287,6 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
                 </form>
               </div>
             </div>
-        <?php endif; ?>
     </td>
 </tr>
 <?php endwhile;endif;?>
