@@ -194,84 +194,117 @@ function konfirmasiRekap() {
   <i class="bi bi-table"></i>
   <h2 class="h5">Daftar Rekap Absensi</h2>
 </div>
-<div class="table-responsive"><table class="table table-striped dt-table" style="width:100%"><thead><tr><th>No</th><th>NIP</th><th>Nama</th><th>Periode</th><th>Hadir</th><th>Sakit</th><th>Izin</th><th>Alpha</th><th>Potongan Alpha</th><th>Status Edit</th><th>Aksi</th></tr></thead><tbody>
-<?php $no=1; if($data): while($row=mysqli_fetch_assoc($data)): ?>
-<tr>
-  <td><?= $no++ ?></td>
-  <td><?= e($row['nip']) ?></td>
-  <td><?= e($row['nama_karyawan']) ?></td>
-  <td><?= e($row['bulan'].' '.$row['tahun']) ?></td>
-  <td><?= $row['hadir'] ?></td>
-  <td><?= $row['sakit'] ?></td>
-  <td><?= $row['izin'] ?></td>
-  <td><?= $row['alpha'] ?></td>
-  <td><?= rupiah($row['alpha'] * $tarifAlpha) ?></td>
-  <td>
-    <?= $row['status_edit'] ? status_badge($row['status_edit']) : '<span class="text-muted">-</span>' ?>
-    <?php if (!empty($row['catatan_pimpinan'])): ?>
-      <div class="small text-muted mt-1" style="font-size:0.75rem"><i class="bi bi-chat-text me-1"></i><?= e($row['catatan_pimpinan']) ?></div>
-    <?php endif; ?>
-  </td>
-  <td>
-    <?php if($row['status_edit'] === 'Menunggu'): ?>
-      <button class="btn btn-sm btn-outline-secondary" disabled title="Menunggu Persetujuan Pimpinan"><i class="bi bi-hourglass-split"></i> Menunggu</button>
-    <?php else: ?>
-      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['id_absensi'] ?>" title="Ajukan Edit">
-        <i class="bi bi-pencil-square"></i> Ajukan Edit
-      </button>
-      
-      <!-- Modal Ajukan Edit -->
-      <div class="modal fade" id="editModal<?= $row['id_absensi'] ?>" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-          <form method="post" class="modal-content text-start">
-            <input type="hidden" name="ajukan_edit_absensi" value="1">
-            <input type="hidden" name="id_absensi" value="<?= $row['id_absensi'] ?>">
-            <div class="modal-header">
-              <h5 class="modal-title">Ajukan Edit Absensi - <?= e($row['nama_karyawan']) ?></h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="table-responsive">
+  <table class="table table-hover dt-table align-middle" style="width:100%">
+    <thead>
+      <tr>
+        <th style="width: 5%">No</th>
+        <th style="width: 22%">Karyawan & Periode</th>
+        <th style="width: 26%">Rekap Kehadiran (H / S / I / A)</th>
+        <th style="width: 15%">Potongan Alpha</th>
+        <th style="width: 18%">Status Edit</th>
+        <th style="width: 14%" class="text-center">Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php $no=1; if($data): while($row=mysqli_fetch_assoc($data)): ?>
+      <tr>
+        <td><?= $no++ ?></td>
+        <td>
+          <div class="fw-bold fs-6 text-dark"><?= e($row['nama_karyawan']) ?></div>
+          <div class="small text-muted mb-1">NIP: <strong><?= e($row['nip']) ?></strong></div>
+          <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"><i class="bi bi-calendar3 me-1"></i><?= e($row['bulan'].' '.$row['tahun']) ?></span>
+        </td>
+        <td>
+          <div class="d-flex flex-wrap gap-1" style="min-width: 200px; max-width: 260px;">
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 flex-fill text-start"><i class="bi bi-check-circle me-1"></i>Hadir: <strong><?= $row['hadir'] ?></strong></span>
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 flex-fill text-start"><i class="bi bi-plus-circle me-1"></i>Sakit: <strong><?= $row['sakit'] ?></strong></span>
+            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 flex-fill text-start"><i class="bi bi-info-circle me-1"></i>Izin: <strong><?= $row['izin'] ?></strong></span>
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 flex-fill text-start"><i class="bi bi-x-circle me-1"></i>Alpha: <strong><?= $row['alpha'] ?></strong></span>
+          </div>
+        </td>
+        <td>
+          <?php $pot = $row['alpha'] * $tarifAlpha; ?>
+          <div class="<?= $pot > 0 ? 'text-danger fw-bold fs-6' : 'text-success fw-semibold' ?>"><?= rupiah($pot) ?></div>
+          <div class="text-muted" style="font-size: 0.75rem;">(<?= $row['alpha'] ?> hari × <?= rupiah($tarifAlpha) ?>)</div>
+        </td>
+        <td>
+          <?= $row['status_edit'] ? status_badge($row['status_edit']) : '<span class="text-muted small">-</span>' ?>
+          <?php if (!empty($row['catatan_pimpinan'])): ?>
+            <div class="mt-2 p-2 bg-danger-subtle text-danger rounded border border-danger-subtle small fw-semibold" style="max-width: 220px; word-wrap: break-word; white-space: normal; font-size: 0.75rem;">
+              <i class="bi bi-exclamation-triangle-fill me-1"></i><?= e($row['catatan_pimpinan']) ?>
             </div>
-            <div class="modal-body">
-              <p class="mb-3 text-muted">Periode: <?= e($row['bulan'] . ' ' . $row['tahun']) ?></p>
-              
-              <div class="alert alert-info py-2 small">
-                <i class="bi bi-info-circle me-1"></i> Perubahan ini memerlukan persetujuan Pimpinan.
-              </div>
+          <?php endif; ?>
+        </td>
+        <td class="text-center">
+          <?php if($row['status_edit'] === 'Menunggu'): ?>
+            <button class="btn btn-sm btn-outline-secondary w-100 py-2 fw-semibold" disabled title="Menunggu Persetujuan Pimpinan"><i class="bi bi-hourglass-split me-1"></i> Menunggu</button>
+          <?php else: ?>
+            <button type="button" class="btn btn-sm btn-outline-primary w-100 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#editModal<?= $row['id_absensi'] ?>" title="Ajukan Edit">
+              <i class="bi bi-pencil-square me-1"></i> Ajukan Edit
+            </button>
+            
+            <!-- Modal Ajukan Edit -->
+            <div class="modal fade" id="editModal<?= $row['id_absensi'] ?>" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <form method="post" class="modal-content text-start form-ajukan-edit shadow-lg border-0" style="border-radius: 14px;">
+                  <input type="hidden" name="ajukan_edit_absensi" value="1">
+                  <input type="hidden" name="id_absensi" value="<?= $row['id_absensi'] ?>">
+                  <div class="modal-header bg-light border-bottom py-3">
+                    <h5 class="modal-title fs-6 fw-bold text-dark"><i class="bi bi-pencil-square text-primary me-2"></i>Ajukan Edit Absensi - <?= e($row['nama_karyawan']) ?></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-secondary-subtle rounded small text-secondary">
+                      <span><strong>NIP:</strong> <?= e($row['nip']) ?></span>
+                      <span><strong>Periode:</strong> <?= e($row['bulan'] . ' ' . $row['tahun']) ?></span>
+                    </div>
+                    
+                    <div class="alert alert-info py-2 small mb-4 d-flex align-items-center">
+                      <i class="bi bi-info-circle-fill fs-5 me-2"></i>
+                      <div>Perubahan ini akan dikirim ke <strong>Pimpinan</strong> untuk diproses dan disetujui.</div>
+                    </div>
 
-              <div class="row g-3">
-                <div class="col-6">
-                  <label class="form-label">Hadir</label>
-                  <input type="number" name="hadir" class="form-control" value="<?= $row['hadir'] ?>" min="0" required>
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Sakit</label>
-                  <input type="number" name="sakit" class="form-control" value="<?= $row['sakit'] ?>" min="0" required>
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Izin</label>
-                  <input type="number" name="izin" class="form-control" value="<?= $row['izin'] ?>" min="0" required>
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Alpha</label>
-                  <input type="number" name="alpha" class="form-control" value="<?= $row['alpha'] ?>" min="0" required>
-                </div>
-                <div class="col-12">
-                  <label class="form-label">Alasan Perubahan</label>
-                  <textarea name="alasan" class="form-control" rows="2" required placeholder="Jelaskan alasan mengapa absensi diubah..."></textarea>
-                </div>
+                    <label class="form-label fw-bold small text-muted mb-2">USULAN JUMLAH KEHADIRAN (HARI)</label>
+                    <div class="row g-3 mb-4">
+                      <div class="col-6">
+                        <label class="form-label small text-success fw-semibold"><i class="bi bi-check-circle me-1"></i>Hadir</label>
+                        <input type="number" name="hadir" class="form-control fw-bold" value="<?= $row['hadir'] ?>" min="0" required>
+                      </div>
+                      <div class="col-6">
+                        <label class="form-label small text-warning fw-semibold"><i class="bi bi-plus-circle me-1"></i>Sakit</label>
+                        <input type="number" name="sakit" class="form-control fw-bold" value="<?= $row['sakit'] ?>" min="0" required>
+                      </div>
+                      <div class="col-6">
+                        <label class="form-label small text-info fw-semibold"><i class="bi bi-info-circle me-1"></i>Izin</label>
+                        <input type="number" name="izin" class="form-control fw-bold" value="<?= $row['izin'] ?>" min="0" required>
+                      </div>
+                      <div class="col-6">
+                        <label class="form-label small text-danger fw-semibold"><i class="bi bi-x-circle me-1"></i>Alpha</label>
+                        <input type="number" name="alpha" class="form-control fw-bold" value="<?= $row['alpha'] ?>" min="0" required>
+                      </div>
+                    </div>
+                    
+                    <div class="mb-2">
+                      <label class="form-label fw-bold small text-dark">Alasan Perubahan <span class="text-danger">*</span></label>
+                      <textarea name="alasan" class="form-control" rows="3" required placeholder="Contoh: Koreksi salah input hari alpha karena karyawan ternyata izin cuti tahunan..."></textarea>
+                      <div class="form-text small">Jelaskan alasan secara spesifik agar mudah disetujui Pimpinan.</div>
+                    </div>
+                  </div>
+                  <div class="modal-footer bg-light border-top py-2">
+                    <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold"><i class="bi bi-send me-1"></i>Kirim Pengajuan</button>
+                  </div>
+                </form>
               </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-              <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    <?php endif; ?>
-  </td>
-</tr>
-<?php endwhile; endif; ?>
-</tbody></table></div>
+          <?php endif; ?>
+        </td>
+      </tr>
+    <?php endwhile; endif; ?>
+    </tbody>
+  </table>
+</div>
 </div>
 
 <div class="card p-4 mt-4">
@@ -279,63 +312,92 @@ function konfirmasiRekap() {
   <i class="bi bi-clock-history"></i>
   <h2 class="h5">Riwayat Pengajuan Edit Absensi</h2>
 </div>
-<p class="section-desc">Daftar seluruh riwayat pengajuan edit absensi kepada Pimpinan beserta status dan catatan penolakan/persetujuannya.</p>
+<p class="section-desc mb-4">Daftar seluruh riwayat pengajuan edit absensi kepada Pimpinan beserta status dan catatan keputusannya.</p>
 <div class="table-responsive">
-<table class="table table-striped dt-table" style="width:100%">
-  <thead>
-    <tr>
-      <th>No</th>
-      <th>NIP & Nama</th>
-      <th>Periode</th>
-      <th>Usulan Perubahan</th>
-      <th>Alasan Pengajuan</th>
-      <th>Status</th>
-      <th>Catatan Pimpinan</th>
-      <th>Tanggal</th>
-    </tr>
-  </thead>
-  <tbody>
-  <?php 
-  if ($historyEdit && mysqli_num_rows($historyEdit) > 0): 
-    $noHist = 1;
-    while ($h = mysqli_fetch_assoc($historyEdit)): 
-      $badge = match($h['status']) {
-          'Disetujui' => 'bg-success',
-          'Ditolak' => 'bg-danger',
-          default => 'bg-warning text-dark'
-      };
-  ?>
-    <tr>
-      <td><?= $noHist++ ?></td>
-      <td><strong><?= e($h['nip']) ?></strong><br><?= e($h['nama_karyawan']) ?></td>
-      <td><?= e($h['bulan'].' '.$h['tahun']) ?></td>
-      <td class="small">
-        <div class="d-flex flex-wrap gap-1">
-          <span class="badge bg-success-subtle text-success border border-success-subtle">H: <?= $h['hadir_baru'] ?></span>
-          <span class="badge bg-warning-subtle text-warning border border-warning-subtle">S: <?= $h['sakit_baru'] ?></span>
-          <span class="badge bg-info-subtle text-info border border-info-subtle">I: <?= $h['izin_baru'] ?></span>
-          <span class="badge bg-danger-subtle text-danger border border-danger-subtle">A: <?= $h['alpha_baru'] ?></span>
-        </div>
-      </td>
-      <td><?= e($h['alasan_perubahan']) ?></td>
-      <td><span class="badge <?= $badge ?>"><?= e($h['status']) ?></span></td>
-      <td>
-        <?php if (!empty($h['catatan_pimpinan'])): ?>
-          <div class="p-2 rounded <?= $h['status']==='Ditolak'?'bg-danger-subtle text-danger':'bg-light text-dark' ?> small fw-bold" style="min-width: 180px; max-width: 280px; white-space: normal !important; word-break: break-word;">
-            <i class="bi bi-chat-left-text me-1"></i> <?= e($h['catatan_pimpinan']) ?>
+  <table class="table table-hover dt-table align-middle" style="width:100%">
+    <thead>
+      <tr>
+        <th style="width: 5%">No</th>
+        <th style="width: 25%">Karyawan & Periode</th>
+        <th style="width: 25%">Usulan Perubahan</th>
+        <th style="width: 25%">Alasan & Tanggal</th>
+        <th style="width: 20%">Status & Catatan Pimpinan</th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php 
+    if ($historyEdit && mysqli_num_rows($historyEdit) > 0): 
+      $noHist = 1;
+      while ($h = mysqli_fetch_assoc($historyEdit)): 
+        $badge = match($h['status']) {
+            'Disetujui' => 'bg-success',
+            'Ditolak' => 'bg-danger',
+            default => 'bg-warning text-dark'
+        };
+    ?>
+      <tr>
+        <td><?= $noHist++ ?></td>
+        <td>
+          <div class="fw-bold fs-6 text-dark"><?= e($h['nama_karyawan']) ?></div>
+          <div class="small text-muted mb-1">NIP: <strong><?= e($h['nip']) ?></strong></div>
+          <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"><i class="bi bi-calendar3 me-1"></i><?= e($h['bulan'].' '.$h['tahun']) ?></span>
+        </td>
+        <td>
+          <div class="d-flex flex-wrap gap-1" style="min-width: 180px; max-width: 240px;">
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 flex-fill text-start">H: <strong><?= $h['hadir_baru'] ?></strong></span>
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 flex-fill text-start">S: <strong><?= $h['sakit_baru'] ?></strong></span>
+            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 flex-fill text-start">I: <strong><?= $h['izin_baru'] ?></strong></span>
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 flex-fill text-start">A: <strong><?= $h['alpha_baru'] ?></strong></span>
           </div>
-        <?php else: ?>
-          <span class="text-muted small">-</span>
-        <?php endif; ?>
-      </td>
-      <td class="small text-muted"><?= e($h['tanggal_pengajuan']) ?></td>
-    </tr>
-  <?php 
-    endwhile; 
-  endif; 
-  ?>
-  </tbody>
-</table>
+        </td>
+        <td>
+          <div class="p-2 bg-light rounded border-start border-primary border-3 small mb-1 fst-italic" style="max-width: 260px; word-wrap: break-word; white-space: normal;">
+            "<?= e($h['alasan_perubahan']) ?>"
+          </div>
+          <div class="small text-muted" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= e($h['tanggal_pengajuan']) ?></div>
+        </td>
+        <td>
+          <?= status_badge($h['status']) ?>
+          <?php if (!empty($h['catatan_pimpinan'])): ?>
+            <div class="mt-2 p-2 <?= $h['status']==='Ditolak'?'bg-danger-subtle text-danger border border-danger-subtle':'bg-light text-dark border' ?> rounded small fw-semibold" style="max-width: 220px; white-space: normal !important; word-break: break-word; font-size: 0.75rem;">
+              <i class="bi bi-chat-left-text me-1"></i><?= e($h['catatan_pimpinan']) ?>
+            </div>
+          <?php endif; ?>
+        </td>
+      </tr>
+    <?php 
+      endwhile; 
+    endif; 
+    ?>
+    </tbody>
+  </table>
 </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.form-ajukan-edit').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var modalEl = this.closest('.modal');
+            var modalInstance = bootstrap.Modal.getInstance(modalEl);
+            
+            Swal.fire({
+                title: 'Kirim Pengajuan Edit?',
+                text: 'Usulan perubahan absensi ini akan dikirim ke Pimpinan untuk proses persetujuan.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="bi bi-send me-1"></i> Ya, Kirim Sekarang',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (modalInstance) modalInstance.hide();
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
