@@ -216,11 +216,11 @@ function konfirmasiRekap() {
           <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"><i class="bi bi-calendar3 me-1"></i><?= e($row['bulan'].' '.$row['tahun']) ?></span>
         </td>
         <td>
-          <div class="d-flex flex-wrap gap-1" style="min-width: 200px; max-width: 260px;">
-            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 flex-fill text-start"><i class="bi bi-check-circle me-1"></i>Hadir: <strong><?= $row['hadir'] ?></strong></span>
-            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 flex-fill text-start"><i class="bi bi-plus-circle me-1"></i>Sakit: <strong><?= $row['sakit'] ?></strong></span>
-            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 flex-fill text-start"><i class="bi bi-info-circle me-1"></i>Izin: <strong><?= $row['izin'] ?></strong></span>
-            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 flex-fill text-start"><i class="bi bi-x-circle me-1"></i>Alpha: <strong><?= $row['alpha'] ?></strong></span>
+          <div class="d-flex flex-wrap gap-1" style="max-width: 220px;">
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle me-1"></i>Hadir: <strong><?= $row['hadir'] ?></strong></span>
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1"><i class="bi bi-plus-circle me-1"></i>Sakit: <strong><?= $row['sakit'] ?></strong></span>
+            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1"><i class="bi bi-info-circle me-1"></i>Izin: <strong><?= $row['izin'] ?></strong></span>
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"><i class="bi bi-x-circle me-1"></i>Alpha: <strong><?= $row['alpha'] ?></strong></span>
           </div>
         </td>
         <td>
@@ -343,11 +343,11 @@ function konfirmasiRekap() {
           <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"><i class="bi bi-calendar3 me-1"></i><?= e($h['bulan'].' '.$h['tahun']) ?></span>
         </td>
         <td>
-          <div class="d-flex flex-wrap gap-1" style="min-width: 180px; max-width: 240px;">
-            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 flex-fill text-start">H: <strong><?= $h['hadir_baru'] ?></strong></span>
-            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 flex-fill text-start">S: <strong><?= $h['sakit_baru'] ?></strong></span>
-            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 flex-fill text-start">I: <strong><?= $h['izin_baru'] ?></strong></span>
-            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 flex-fill text-start">A: <strong><?= $h['alpha_baru'] ?></strong></span>
+          <div class="d-flex flex-wrap gap-1" style="max-width: 200px;">
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">H: <strong><?= $h['hadir_baru'] ?></strong></span>
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">S: <strong><?= $h['sakit_baru'] ?></strong></span>
+            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1">I: <strong><?= $h['izin_baru'] ?></strong></span>
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">A: <strong><?= $h['alpha_baru'] ?></strong></span>
           </div>
         </td>
         <td>
