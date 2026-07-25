@@ -1,5 +1,23 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: laporan.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman utama rekapitulasi dan filter laporan penggajian bulanan karyawan.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Filter laporan berdasarkan bulan dan tahun.
+ * 2. Menampilkan ringkasan total gaji bersih yang harus dibayarkan oleh perusahaan.
+ * 3. Tombol navigasi cepat ke halaman Cetak Formal dan Analitik Grafik.
+ *
+ * HAK AKSES / PENGGUNA: Admin & Pimpinan
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../config/koneksi.php';
+// --- SECTION 1: OTENTIKASI PENGGUNA ---
+// Memastikan pengguna telah masuk ke dalam sistem.
 require_login();
 if (is_admin()) {
     redirect('dashboard_admin.php');

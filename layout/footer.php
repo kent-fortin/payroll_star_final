@@ -1,3 +1,21 @@
+<?php
+/**
+ * ============================================================================
+ * NAMA FILE: footer.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Bagian penutup halaman web (template footer) yang dipanggil di setiap halaman aplikasi.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Menutup tag container HTML dan memuat pustaka JavaScript (Bootstrap, jQuery, SweetAlert2, DataTables).
+ * 2. Inisialisasi DataTables dengan konfigurasi responsif (scrollX: false) agar tabel tidak bergeser.
+ * 3. Menampilkan toast notifikasi dari flash messages.
+ *
+ * HAK AKSES / PENGGUNA: Semua Halaman
+ * ============================================================================
+ */
+
+?>
         </div><!-- /.page-content -->
     </div><!-- /.main-content -->
 </div><!-- /.app-wrapper -->
@@ -37,7 +55,8 @@ $(document).ready(function () {
             pageLength: 10,
             ordering: true,
             responsive: false,
-            scrollX: true,
+            scrollX: false,
+            autoWidth: false,
             dom: '<"dt-top-row"lf>rt<"dt-bottom-row"ip>',
             initComplete: function () {
                 // Style the top row

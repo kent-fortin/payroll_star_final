@@ -1,5 +1,23 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: cetak.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Menghasilkan halaman cetak laporan gaji berkala bergaya formal yang siap diprint atau disimpah sebagai PDF.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Menampilkan rincian penghasilan seluruh karyawan pada periode bulan & tahun tertentu.
+ * 2. Menghitung total keseluruhan pengeluaran gaji perusahaan.
+ * 3. Kolom tanda tangan resmi untuk pengesahan pimpinan.
+ *
+ * HAK AKSES / PENGGUNA: Admin & Pimpinan
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../config/koneksi.php';
+// --- SECTION 1: OTENTIKASI PENGGUNA ---
+// Memastikan pengguna sudah login sebelum mencetak laporan resmi.
 require_login();
 if (is_admin()) {
     redirect('dashboard.php');

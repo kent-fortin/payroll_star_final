@@ -1,4 +1,20 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: header.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Bagian pembuka halaman web (template header) dan bilah navigasi (navbar) utama aplikasi.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Memuat stylesheet CSS dan font icon Bootstrap.
+ * 2. Mengecek validasi sesi login (mengalihkan ke login jika belum masuk).
+ * 3. Menampilkan menu navigasi yang disesuaikan dengan peran pengguna (Admin atau Pimpinan).
+ *
+ * HAK AKSES / PENGGUNA: Semua Halaman
+ * ============================================================================
+ */
+
 ob_start();
 require_once __DIR__ . '/../config/koneksi.php';
 require_login();

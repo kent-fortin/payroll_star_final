@@ -1,7 +1,27 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: jabatan.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman pengelola master data jabatan karyawan di perusahaan.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Create, Read, Update, Delete (CRUD) data jabatan beserta standar Gaji Pokok.
+ * 2. Pembuatan kode jabatan otomatis berawalan JBT.
+ * 3. Validasi pencegahan penghapusan jabatan yang sedang digunakan oleh karyawan.
+ *
+ * HAK AKSES / PENGGUNA: Admin
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../layout/header.php';
+// --- SECTION 1: OTENTIKASI & KONTROL HAK AKSES ---
+// Memastikan hanya Admin yang dapat mengakses halaman manajemen jabatan ini.
 require_admin();
 $edit = null;
+// --- SECTION 2: PENGAMBILAN DATA JABATAN UNTUK FORM EDIT ---
+// Mengambil data jabatan dari database jika admin mengklik tombol edit pada tabel.
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
     $result = mysqli_query($conn, "SELECT * FROM jabatan WHERE id_jabatan=$id LIMIT 1");
@@ -54,6 +74,8 @@ if (isset($_POST['toggle_status'])) {
     }
     redirect('master/jabatan.php');
 }
+// --- SECTION 5: PENGAMBILAN SELURUH DATA JABATAN UNTUK TABEL ---
+// Mengambil semua daftar jabatan beserta spesifikasi gaji pokok untuk ditampilkan di antarmuka tabel.
 $data = mysqli_query($conn, 'SELECT * FROM jabatan ORDER BY id_jabatan');
 ?>
 <div class="card p-4 mb-4">

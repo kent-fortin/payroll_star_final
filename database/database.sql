@@ -1,3 +1,37 @@
+-- ============================================================================
+-- NAMA FILE: database.sql
+-- ============================================================================
+-- TUJUAN & FUNGSI FILE:
+-- Skema struktur database lengkap untuk aplikasi Payroll Star yang bebas error saat di-import.
+--
+-- ALUR & FITUR UTAMA:
+-- 1. Definisi tabel master (users, jabatan, karyawan, pengaturan_payroll).
+-- 2. Definisi tabel absensi & transaksi (presensi_harian, absensi, lembur, payroll, permintaan_edit_absensi).
+-- 3. Relasi Foreign Key yang konsisten dan data awal (seeding) untuk sistem.
+--
+-- HAK AKSES / PENGGUNA: Database Administrator / Setup Awal
+-- ============================================================================
+
+-- TUJUAN & FUNGSI FILE:
+-- Skema struktur database lengkap untuk aplikasi Payroll Star yang bebas error saat di-import.
+--
+-- ALUR & FITUR UTAMA:
+-- 1. Definisi tabel master (users, jabatan, karyawan, pengaturan_payroll).
+-- 2. Definisi tabel absensi & transaksi (presensi_harian, absensi, lembur, payroll, permintaan_edit_absensi).
+-- 3. Relasi Foreign Key yang konsisten dan data awal (seeding) untuk sistem.
+--
+-- HAK AKSES / PENGGUNA: Database Administrator / Setup Awal
+-- ============================================================================
+
+-- TUJUAN & FUNGSI FILE:
+-- Skema struktur database lengkap untuk aplikasi Payroll Star yang bebas error saat di-import.
+--
+-- ALUR & FITUR UTAMA:
+-- 1. Definisi tabel master (users, jabatan, karyawan, pengaturan_payroll).\n * 2. Definisi tabel absensi & transaksi (presensi_harian, absensi, lembur, payroll, permintaan_edit_absensi).\n * 3. Relasi Foreign Key yang konsisten dan data awal (seeding) untuk sistem.
+--
+-- HAK AKSES / PENGGUNA: Database Administrator / Setup Awal
+-- ============================================================================
+
 -- Database Dump (Latest Local Structure, Ordered)
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -66,7 +100,7 @@ CREATE TABLE `karyawan` (
   UNIQUE KEY `nip` (`nip`),
   KEY `fk_karyawan_jabatan` (`id_jabatan`),
   CONSTRAINT `fk_karyawan_jabatan` FOREIGN KEY (`id_jabatan`) REFERENCES `jabatan` (`id_jabatan`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `absensi`;
 CREATE TABLE `absensi` (
@@ -86,7 +120,7 @@ CREATE TABLE `absensi` (
   KEY `fk_absensi_user` (`dibuat_oleh`),
   CONSTRAINT `fk_absensi_karyawan` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`) ON UPDATE CASCADE,
   CONSTRAINT `fk_absensi_user` FOREIGN KEY (`dibuat_oleh`) REFERENCES `users` (`id_user`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `presensi_harian`;
 CREATE TABLE `presensi_harian` (
@@ -97,7 +131,7 @@ CREATE TABLE `presensi_harian` (
   PRIMARY KEY (`id_presensi`),
   UNIQUE KEY `unik_presensi` (`id_karyawan`,`tanggal`),
   CONSTRAINT `fk_presensi_karyawan` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Presensi harian karyawan';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Presensi harian karyawan';
 
 DROP TABLE IF EXISTS `lembur`;
 CREATE TABLE `lembur` (
@@ -112,7 +146,7 @@ CREATE TABLE `lembur` (
   KEY `fk_lembur_user` (`dibuat_oleh`),
   CONSTRAINT `fk_lembur_karyawan` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`) ON UPDATE CASCADE,
   CONSTRAINT `fk_lembur_user` FOREIGN KEY (`dibuat_oleh`) REFERENCES `users` (`id_user`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Data lembur harian karyawan';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Data lembur harian karyawan';
 
 DROP TABLE IF EXISTS `payroll`;
 CREATE TABLE `payroll` (

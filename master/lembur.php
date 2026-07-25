@@ -1,5 +1,23 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: lembur.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman pencatatan dan pengelolaan aktivitas lembur karyawan.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Admin mencatat tanggal dan jumlah jam lembur per karyawan.
+ * 2. Akumulasi jam lembur bulanan otomatis dikalikan tarif lembur saat proses hitung payroll.
+ * 3. Fitur pencarian, edit, dan hapus catatan lembur.
+ *
+ * HAK AKSES / PENGGUNA: Admin
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../layout/header.php';
+// --- SECTION 1: OTENTIKASI & KONTROL HAK AKSES ---
+// Memastikan pengguna berhak mengelola catatan lembur karyawan.
 require_admin();
 
 // ── HANDLE DELETE ────────────────────────────────────────────────────────────

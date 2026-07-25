@@ -1,5 +1,23 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: dashboard_pimpinan.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman beranda eksekutif (dashboard) untuk pengguna dengan hak akses Pimpinan.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Menampilkan notifikasi persetujuan payroll dan edit absensi yang tertunda.
+ * 2. Ringkasan pengeluaran keuangan dan grafik statistik payroll bulanan.
+ * 3. Akses cepat untuk melakukan approval atau penolakan transaksi.
+ *
+ * HAK AKSES / PENGGUNA: Pimpinan
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/layout/header.php';
+// --- SECTION 1: OTENTIKASI PIMPINAN ---
+// Memastikan pengguna yang mengakses adalah Pimpinan.
 require_pimpinan();
 
 $countKaryawan = (int)(mysqli_fetch_assoc(mysqli_query($conn, 'SELECT COUNT(*) total FROM karyawan'))['total'] ?? 0);

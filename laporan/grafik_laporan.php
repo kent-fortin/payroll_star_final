@@ -1,4 +1,20 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: grafik_laporan.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Menyajikan analitik visual dan statistik grafis terkait pengeluaran gaji perusahaan.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Visualisasi tren pengeluaran payroll bulanan menggunakan Chart.js.
+ * 2. Analisis perbandingan total gaji pokok, lembur, tunjangan, dan potongan alpha.
+ * 3. Filter periode untuk mempermudah evaluasi keuangan pimpinan.
+ *
+ * HAK AKSES / PENGGUNA: Admin & Pimpinan
+ * ============================================================================
+ */
+
 /*
 |--------------------------------------------------------------------------
 | GRAFIK LAPORAN GAJI - OFFLINE

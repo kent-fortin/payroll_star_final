@@ -1,5 +1,23 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: absensi.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman pengelola data rekapitulasi absensi bulanan karyawan (Hadir, Sakit, Izin, Alpha).
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Kalkulasi otomatis rekap bulanan berdasarkan data presensi harian.
+ * 2. Fitur pengajuan edit rekap absensi yang mengalihkan persetujuan ke Pimpinan.
+ * 3. Tabel Riwayat Pengajuan Edit yang menampilkan status dan catatan penolakan Pimpinan.
+ *
+ * HAK AKSES / PENGGUNA: Admin
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../layout/header.php';
+// --- SECTION 1: OTENTIKASI & KONTROL HAK AKSES ---
+// Memastikan pengguna adalah Admin sebelum mengelola rekap absensi.
 require_admin();
 
 // ── POST: Hitung otomatis rekap dari presensi_harian ────────────────────────
@@ -112,6 +130,14 @@ $data = mysqli_query($conn, "SELECT a.*,k.nip,k.nama_karyawan,
     FROM absensi a JOIN karyawan k ON k.id_karyawan=a.id_karyawan
     ORDER BY a.tahun DESC,FIELD(a.bulan,'Desember','November','Oktober','September','Agustus','Juli','Juni','Mei','April','Maret','Februari','Januari'),k.nama_karyawan");
 $tarifAlpha = get_setting($conn, 'potongan_alpha_per_hari', 25000);
+// --- SECTION 4: PENGAMBILAN DATA RIWAYAT PENGAJUAN EDIT ---
+// Mengambil daftar riwayat pengajuan edit absensi beserta status dan catatan penolakan dari Pimpinan.
+$historyEdit = mysqli_query($conn, "SELECT p.*, a.bulan, a.tahun, k.nip, k.nama_karyawan, u.nama_lengkap as penyetuju 
+    FROM permintaan_edit_absensi p 
+    JOIN absensi a ON a.id_absensi = p.id_absensi 
+    JOIN karyawan k ON k.id_karyawan = a.id_karyawan 
+    LEFT JOIN users u ON u.id_user = p.id_penyetuju 
+    ORDER BY p.tanggal_pengajuan DESC");
 ?>
 <div class="card p-4 mb-4">
 <div class="section-header">
@@ -246,5 +272,70 @@ function konfirmasiRekap() {
 </tr>
 <?php endwhile; endif; ?>
 </tbody></table></div>
+</div>
+
+<div class="card p-4 mt-4">
+<div class="section-header">
+  <i class="bi bi-clock-history"></i>
+  <h2 class="h5">Riwayat Pengajuan Edit Absensi</h2>
+</div>
+<p class="section-desc">Daftar seluruh riwayat pengajuan edit absensi kepada Pimpinan beserta status dan catatan penolakan/persetujuannya.</p>
+<div class="table-responsive">
+<table class="table table-striped dt-table" style="width:100%">
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>NIP & Nama</th>
+      <th>Periode</th>
+      <th>Usulan Perubahan</th>
+      <th>Alasan Pengajuan</th>
+      <th>Status</th>
+      <th>Catatan Pimpinan</th>
+      <th>Tanggal</th>
+    </tr>
+  </thead>
+  <tbody>
+  <?php 
+  if ($historyEdit && mysqli_num_rows($historyEdit) > 0): 
+    $noHist = 1;
+    while ($h = mysqli_fetch_assoc($historyEdit)): 
+      $badge = match($h['status']) {
+          'Disetujui' => 'bg-success',
+          'Ditolak' => 'bg-danger',
+          default => 'bg-warning text-dark'
+      };
+  ?>
+    <tr>
+      <td><?= $noHist++ ?></td>
+      <td><strong><?= e($h['nip']) ?></strong><br><?= e($h['nama_karyawan']) ?></td>
+      <td><?= e($h['bulan'].' '.$h['tahun']) ?></td>
+      <td class="small">
+        <div class="d-flex flex-wrap gap-1">
+          <span class="badge bg-success-subtle text-success border border-success-subtle">H: <?= $h['hadir_baru'] ?></span>
+          <span class="badge bg-warning-subtle text-warning border border-warning-subtle">S: <?= $h['sakit_baru'] ?></span>
+          <span class="badge bg-info-subtle text-info border border-info-subtle">I: <?= $h['izin_baru'] ?></span>
+          <span class="badge bg-danger-subtle text-danger border border-danger-subtle">A: <?= $h['alpha_baru'] ?></span>
+        </div>
+      </td>
+      <td><?= e($h['alasan_perubahan']) ?></td>
+      <td><span class="badge <?= $badge ?>"><?= e($h['status']) ?></span></td>
+      <td>
+        <?php if (!empty($h['catatan_pimpinan'])): ?>
+          <div class="p-2 rounded <?= $h['status']==='Ditolak'?'bg-danger-subtle text-danger':'bg-light text-dark' ?> small fw-bold" style="min-width: 180px; max-width: 280px; white-space: normal !important; word-break: break-word;">
+            <i class="bi bi-chat-left-text me-1"></i> <?= e($h['catatan_pimpinan']) ?>
+          </div>
+        <?php else: ?>
+          <span class="text-muted small">-</span>
+        <?php endif; ?>
+      </td>
+      <td class="small text-muted"><?= e($h['tanggal_pengajuan']) ?></td>
+    </tr>
+  <?php 
+    endwhile; 
+  endif; 
+  ?>
+  </tbody>
+</table>
+</div>
 </div>
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

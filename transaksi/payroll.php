@@ -1,5 +1,23 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: payroll.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman utama pemrosesan, kalkulasi, dan manajemen gaji bulanan (Payroll) karyawan.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Simulasi/preview hitungan gaji sebelum disimpan ke database.
+ * 2. Fitur Edit dan Hapus Tunjangan (di preview maupun setelah disimpan saat status Menunggu).
+ * 3. Mengirim data payroll ke Pimpinan untuk divalidasi dan pencatatan pembayaran.
+ *
+ * HAK AKSES / PENGGUNA: Admin
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../layout/header.php';
+// --- SECTION 1: OTENTIKASI & KONTROL HAK AKSES ---
+// Memastikan hanya Admin yang berhak memproses dan mengkalkulasi gaji (payroll).
 require_admin();
 $preview=null;
 $selectedId=(int)($_POST['id_karyawan']??0);
@@ -58,6 +76,32 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['hapus_payroll'])) {
     redirect('transaksi/payroll.php');
 }
 
+// --- SECTION 4: EDIT TUNJANGAN PADA PAYROLL YANG MENUNGGU VALIDASI ---
+// Memungkinkan Admin mengubah nominal tunjangan dan mengkalkulasi ulang gaji bersih sebelum divalidasi Pimpinan.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_tunjangan_table'])) {
+    $idPayroll = (int)($_POST['id_payroll'] ?? 0);
+    $tunjanganBaru = (float)($_POST['tunjangan_baru'] ?? 0);
+    $res = mysqli_query($conn, "SELECT id_karyawan, bulan, tahun, status_validasi FROM payroll WHERE id_payroll = $idPayroll LIMIT 1");
+    if ($res && ($row = mysqli_fetch_assoc($res))) {
+        if ($row['status_validasi'] !== 'Menunggu') {
+            set_flash('warning', 'Hanya payroll dengan status Menunggu yang dapat diubah tunjangannya.');
+        } else {
+            $calc = calculate_payroll($conn, (int)$row['id_karyawan'], $row['bulan'], (int)$row['tahun'], $tunjanganBaru);
+            if ($calc) {
+                $stmt = mysqli_prepare($conn, "UPDATE payroll SET total_tunjangan=?, total_gaji_bersih=?, tanggal_proses=NOW() WHERE id_payroll=?");
+                if ($stmt) {
+                    mysqli_stmt_bind_param($stmt, 'ddi', $tunjanganBaru, $calc['gaji_bersih'], $idPayroll);
+                    $ok = mysqli_stmt_execute($stmt);
+                    set_flash($ok ? 'success' : 'danger', $ok ? 'Tunjangan berhasil diperbarui dan gaji bersih telah dihitung ulang.' : 'Gagal memperbarui tunjangan.');
+                }
+            } else {
+                set_flash('danger', 'Gagal menghitung ulang gaji.');
+            }
+        }
+    }
+    redirect('transaksi/payroll.php');
+}
+
 $karyawan=mysqli_query($conn,"SELECT k.id_karyawan,k.nip,k.nama_karyawan,j.nama_jabatan FROM karyawan k JOIN jabatan j ON j.id_jabatan=k.id_jabatan WHERE k.status_karyawan IN ('Tetap','Kontrak') ORDER BY k.nama_karyawan");
 $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM payroll p JOIN karyawan k ON k.id_karyawan=p.id_karyawan JOIN jabatan j ON j.id_jabatan=k.id_jabatan ORDER BY p.tahun DESC,FIELD(p.bulan,'Desember','November','Oktober','September','Agustus','Juli','Juni','Mei','April','Maret','Februari','Januari'),k.nama_karyawan");
 ?>
@@ -97,7 +141,38 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
                 <div class="preview-row border-0 pb-0 pt-3"><span>Total Lembur</span><strong class="text-success">+ <?= rupiah($preview['total_lembur']) ?></strong></div>
             </div>
             <div class="bg-white rounded-4 p-3" style="border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                <div class="preview-row border-0 py-1"><span>Total Tunjangan</span><strong class="text-success">+ <?= rupiah($preview['total_tunjangan']) ?></strong></div>
+                <div class="preview-row border-0 py-1 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span>Total Tunjangan</span>
+                        <div class="mt-1">
+                            <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 text-decoration-none" onclick="document.getElementById('edit-tunjangan-box').style.display = document.getElementById('edit-tunjangan-box').style.display === 'none' ? 'block' : 'none';"><i class="bi bi-pencil-square"></i> Edit</button>
+                            <?php if ($preview['total_tunjangan'] > 0): ?>
+                            <form method="post" class="d-inline ms-1 hapus-form" data-confirm="Hapus tunjangan tambahan menjadi Rp 0?">
+                                <input type="hidden" name="id_karyawan" value="<?= $selectedId ?>">
+                                <input type="hidden" name="bulan" value="<?= e($selectedMonth) ?>">
+                                <input type="hidden" name="tahun" value="<?= $selectedYear ?>">
+                                <input type="hidden" name="total_tunjangan" value="0">
+                                <input type="hidden" name="preview" value="1">
+                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 btn-hapus"><i class="bi bi-trash"></i> Hapus</button>
+                            </form>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <strong class="text-success fs-6">+ <?= rupiah($preview['total_tunjangan']) ?></strong>
+                </div>
+                <div id="edit-tunjangan-box" class="mt-2 pt-2 border-top" style="display: none;">
+                    <form method="post" class="d-flex gap-2 align-items-center">
+                        <input type="hidden" name="id_karyawan" value="<?= $selectedId ?>">
+                        <input type="hidden" name="bulan" value="<?= e($selectedMonth) ?>">
+                        <input type="hidden" name="tahun" value="<?= $selectedYear ?>">
+                        <input type="hidden" name="preview" value="1">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">Rp</span>
+                            <input type="number" name="total_tunjangan" class="form-control" value="<?= (float)$preview['total_tunjangan'] ?>" placeholder="Nominal tunjangan" required min="0">
+                            <button type="submit" class="btn btn-success"><i class="bi bi-check-lg me-1"></i>Update</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
         
@@ -139,38 +214,72 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
   <i class="bi bi-table"></i>
   <h2 class="h5">Daftar Payroll</h2>
 </div>
-<div class="table-responsive"><table class="table table-striped dt-table" style="width:100%"><thead><tr><th>No</th><th>Karyawan</th><th>Periode</th><th>Gaji Pokok</th><th>Lembur</th><th>Tunjangan</th><th>Potongan Alpha</th><th>Gaji Bersih</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+<div class="table-responsive"><table class="table table-striped dt-table align-middle" style="width:100%"><thead><tr><th>No</th><th>Karyawan</th><th>Periode</th><th>Gaji Pokok</th><th>Lembur</th><th>Tunjangan</th><th>Potongan Alpha</th><th>Gaji Bersih</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
 <?php $no=1;if($data):while($row=mysqli_fetch_assoc($data)):?>
 <tr>
     <td><?= $no++ ?></td>
     <td><strong><?= e($row['nip']) ?></strong><br><?= e($row['nama_karyawan']) ?><br><span class="small text-muted"><?= e($row['nama_jabatan']) ?></span></td>
     <td><?= e($row['bulan'].' '.$row['tahun']) ?></td>
     <td><?= rupiah($row['gaji_pokok']) ?></td>
-    <td><?= $row['jam_lembur'] ?> × <?= rupiah($row['tarif_lembur']) ?><br><strong><?= rupiah($row['total_lembur']) ?></strong></td>
-    <td><strong><?= rupiah($row['total_tunjangan'] ?? 0) ?></strong></td>
-    <td><?= $row['jumlah_alpha'] ?> × <?= rupiah($row['tarif_alpha']) ?><br><strong><?= rupiah($row['total_potongan_alpha']) ?></strong></td>
-    <td><strong><?= rupiah($row['total_gaji_bersih']) ?></strong></td>
+    <td><?= $row['jam_lembur'] ?> jam<br><strong><?= rupiah($row['total_lembur']) ?></strong></td>
+    <td><strong class="text-success"><?= rupiah($row['total_tunjangan'] ?? 0) ?></strong></td>
+    <td><?= $row['jumlah_alpha'] ?> hari<br><strong class="text-danger"><?= rupiah($row['total_potongan_alpha']) ?></strong></td>
+    <td><strong class="text-primary fs-6"><?= rupiah($row['total_gaji_bersih']) ?></strong></td>
     <td>
         <div><?= status_badge($row['status_validasi']) ?></div>
         <div class="mt-1"><?= status_badge($row['status_pembayaran']) ?></div>
-        <div class="small text-muted mt-1"><?= e($row['tanggal_pembayaran']??'-') ?></div>
+        <?php if(!empty($row['tanggal_pembayaran'])): ?><div class="small text-muted mt-1"><?= e($row['tanggal_pembayaran']) ?></div><?php endif; ?>
     </td>
     <td>
         <?php if ($row['status_validasi'] === 'Disetujui'): ?>
-            <a class="btn btn-sm btn-dark mb-1 w-100" href="<?= url('transaksi/cetak_rincian.php?id='.$row['id_payroll']) ?>">Cetak Rincian</a>
-            <form method="post">
-                <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
-                <input type="hidden" name="status" value="<?= $row['status_pembayaran']==='Sudah Dibayar'?'Belum Dibayar':'Sudah Dibayar' ?>">
-                <button name="ubah_status" class="btn btn-sm w-100 <?= $row['status_pembayaran']==='Sudah Dibayar'?'btn-outline-warning':'btn-success' ?>"><?= $row['status_pembayaran']==='Sudah Dibayar'?'Batalkan Bayar':'Tandai Dibayar' ?></button>
-            </form>
+            <div class="d-flex flex-column gap-1" style="min-width: 140px;">
+                <a class="btn btn-sm btn-dark w-100 fw-bold" href="<?= url('transaksi/cetak_rincian.php?id='.$row['id_payroll']) ?>"><i class="bi bi-printer me-1"></i>Cetak Rincian</a>
+                <form method="post">
+                    <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
+                    <input type="hidden" name="status" value="<?= $row['status_pembayaran']==='Sudah Dibayar'?'Belum Dibayar':'Sudah Dibayar' ?>">
+                    <button name="ubah_status" class="btn btn-sm w-100 fw-bold <?= $row['status_pembayaran']==='Sudah Dibayar'?'btn-outline-warning':'btn-success' ?>"><i class="bi <?= $row['status_pembayaran']==='Sudah Dibayar'?'bi-x-circle':'bi-check-circle' ?> me-1"></i><?= $row['status_pembayaran']==='Sudah Dibayar'?'Batalkan Bayar':'Tandai Dibayar' ?></button>
+                </form>
+            </div>
         <?php elseif ($row['status_validasi'] === 'Ditolak'): ?>
-            <form class="hapus-form" method="post" data-confirm="Hapus data payroll ini agar bisa dihitung ulang?">
+            <form class="hapus-form" method="post" data-confirm="Hapus data payroll ini agar bisa dihitung ulang?" style="min-width: 140px;">
                 <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
                 <input type="hidden" name="hapus_payroll" value="1">
-                <button type="button" class="btn btn-sm btn-danger w-100 btn-hapus">Hapus & Hitung Ulang</button>
+                <button type="button" class="btn btn-sm btn-danger w-100 fw-bold btn-hapus"><i class="bi bi-arrow-repeat me-1"></i>Hapus & Hitung Ulang</button>
             </form>
         <?php else: ?>
-            <span class="badge text-bg-warning w-100" style="white-space: normal;">Menunggu Validasi Pimpinan</span>
+            <div class="d-flex flex-column gap-1" style="min-width: 140px;">
+                <button type="button" class="btn btn-sm btn-outline-primary w-100 fw-bold" data-bs-toggle="modal" data-bs-target="#editTunjanganModal<?= $row['id_payroll'] ?>"><i class="bi bi-pencil-square me-1"></i>Edit Tunjangan</button>
+                <form class="hapus-form" method="post" data-confirm="Hapus data payroll ini agar bisa diproses ulang?">
+                    <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
+                    <input type="hidden" name="hapus_payroll" value="1">
+                    <button type="button" class="btn btn-sm btn-outline-danger w-100 fw-bold btn-hapus"><i class="bi bi-trash me-1"></i>Hapus</button>
+                </form>
+            </div>
+            
+            <!-- Modal Edit Tunjangan -->
+            <div class="modal fade" id="editTunjanganModal<?= $row['id_payroll'] ?>" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                <form method="post" class="modal-content text-start">
+                  <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
+                  <input type="hidden" name="update_tunjangan_table" value="1">
+                  <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2 text-primary"></i>Edit Tunjangan (<?= e($row['nip']) ?>)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p class="small text-muted mb-3">Ubah nominal tunjangan untuk <strong><?= e($row['nama_karyawan']) ?></strong> periode <strong><?= e($row['bulan'].' '.$row['tahun']) ?></strong>. Gaji bersih akan dihitung ulang secara otomatis.</p>
+                    <div class="mb-3">
+                      <label class="form-label">Nominal Tunjangan (Rp)</label>
+                      <input type="number" name="tunjangan_baru" class="form-control" value="<?= (float)($row['total_tunjangan'] ?? 0) ?>" required min="0">
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
         <?php endif; ?>
     </td>
 </tr>

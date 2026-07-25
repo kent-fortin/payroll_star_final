@@ -1,4 +1,20 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: proses_login.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Skrip pemroses verifikasi data kredensial login yang dikirimkan dari form login.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Mencocokkan username dan password di database tabel users.
+ * 2. Mengatur sesi (session) berdasarkan hak akses (role: admin atau pimpinan).
+ * 3. Mengalihkan ke dashboard admin atau pimpinan sesuai perannya.
+ *
+ * HAK AKSES / PENGGUNA: Publik / Tamu (Guest)
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../config/koneksi.php';
 if (!$conn) {
     set_flash('danger', 'Login gagal. Silakan coba kembali.');

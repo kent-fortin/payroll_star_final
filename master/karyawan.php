@@ -1,12 +1,34 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: karyawan.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman pengelola master data SDM atau karyawan perusahaan.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Create, Read, Update, Delete (CRUD) data profil karyawan lengkap.
+ * 2. Pembuatan Nomor Induk Pegawai (NIP) otomatis yang berurutan mulai dari SSL001.
+ * 3. Pengaturan status karyawan (Tetap, Kontrak, Nonaktif) dan relasi ke jabatan.
+ *
+ * HAK AKSES / PENGGUNA: Admin
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../layout/header.php';
+// --- SECTION 1: OTENTIKASI & KONTROL HAK AKSES ---
+// Memastikan pengguna yang mengakses halaman ini adalah Admin yang sah.
 require_admin();
 $edit = null;
+// --- SECTION 2: PENGAMBILAN DATA UNTUK FORM EDIT (GET REQUEST) ---
+// Mengecek apakah ada parameter '?edit=ID' di URL untuk mengambil data karyawan yang akan diedit.
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
     $result = mysqli_query($conn, "SELECT * FROM karyawan WHERE id_karyawan=$id LIMIT 1");
     $edit = $result ? mysqli_fetch_assoc($result) : null;
 }
+// --- SECTION 3: PEMROSESAN FORM SIMPAN / UPDATE DATA (POST REQUEST) ---
+// Menangani pengiriman form saat tombol 'Simpan' ditekan (tambah baru dengan NIP otomatis atau edit data lama).
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     $id = (int)($_POST['id_karyawan'] ?? 0);
     $nama = trim($_POST['nama_karyawan'] ?? '');
@@ -50,6 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     }
     redirect('master/karyawan.php');
 }
+// --- SECTION 4: PEMROSESAN AKSI RESIGN / NONAKTIF ---
+// Mengubah status karyawan menjadi 'Resign' tanpa menghapus riwayat datanya di database.
 if (isset($_POST['resign'])) {
     $id = (int)($_POST['id_karyawan'] ?? 0);
     $ok = mysqli_query($conn, "UPDATE karyawan SET status_karyawan='Resign' WHERE id_karyawan=$id");

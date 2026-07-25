@@ -1,5 +1,23 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: cetak_rincian.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman cetak slip rincian gaji (pay-slip) individu untuk satu orang karyawan.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Menampilkan komponen pendapatan (gaji pokok, lembur, tunjangan) dan potongan alpha.
+ * 2. Bersih dari elemen potongan BPJS dan PPh 21 (karena ditanggung penuh oleh perusahaan).
+ * 3. Siap dicetak untuk dibagikan kepada karyawan bersangkutan.
+ *
+ * HAK AKSES / PENGGUNA: Admin & Pimpinan
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../config/koneksi.php';
+// --- SECTION 1: OTENTIKASI & PENGAMBILAN ID PAYROLL ---
+// Mengecek login dan mengambil ID payroll yang diminta untuk dicetak.
 require_login();
 if(!$conn)die('Data tidak dapat ditampilkan.');
 $id=(int)($_GET['id']??0);

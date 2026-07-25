@@ -1,3 +1,17 @@
+/* ============================================================================
+ * NAMA FILE: style.css
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Stylesheet utama yang mengatur desain antarmuka (UI) aplikasi Payroll Star agar terlihat modern, bersih, dan profesional.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Desain Glassmorphism dengan warna HSL yang harmonis.
+ * 2. Tata letak tabel responsif (overflow-x: auto) tanpa teks bertumpuk atau terpotong.
+ * 3. Badge warna-warni dan animasi transisi yang halus.
+ *
+ * HAK AKSES / PENGGUNA: Publik / Semua Halaman
+ * ============================================================================ */
+
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 /* ============================================= */
@@ -573,7 +587,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.875rem;
   white-space: nowrap;
 }
-.table-responsive { border-radius: 12px; overflow: hidden; }
+.table-responsive { border-radius: 12px; overflow-x: auto; overflow-y: hidden; }
 .table tbody tr:last-child td { border-bottom: none; }
 .table tbody tr:hover td { background-color: #f8fafc; }
 .table-striped tbody tr:nth-of-type(odd) td { background-color: #fafafa; }

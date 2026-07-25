@@ -1,5 +1,23 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: presensi_harian.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman input dan monitoring kehadiran (presensi) harian karyawan.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Mencatat status kehadiran harian (Hadir, Sakit, Izin, Alpha) per tanggal.
+ * 2. Menjadi sumber data utama saat Admin menekan tombol Hitung Otomatis Rekap Absensi.
+ * 3. Terintegrasi langsung dengan widget presensi hari ini di Dashboard Admin.
+ *
+ * HAK AKSES / PENGGUNA: Admin
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../layout/header.php';
+// --- SECTION 1: OTENTIKASI & KONTROL HAK AKSES ---
+// Memastikan hanya Admin yang dapat menginput absensi harian.
 require_admin();
 
 // ── POST: Simpan presensi untuk satu tanggal ─────────────────────────────────

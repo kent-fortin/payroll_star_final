@@ -1,5 +1,23 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: validasi_payroll.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman bagi Pimpinan untuk memeriksa, menyetujui, atau menolak perhitungan gaji (payroll) bulanan yang diproses oleh Admin.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Filter data payroll berdasarkan bulan dan tahun.
+ * 2. Aksi persetujuan massal (atau per item) untuk memvalidasi payroll.
+ * 3. Fitur tolak payroll agar Admin dapat menghitung ulang jika ada kesalahan.
+ *
+ * HAK AKSES / PENGGUNA: Pimpinan
+ * ============================================================================
+ */
+
 require_once __DIR__ . '/../layout/header.php';
+// --- SECTION 1: OTENTIKASI & KONTROL HAK AKSES ---
+// Memastikan hanya Pimpinan yang berhak memvalidasi atau menolak payroll.
 require_pimpinan();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['keputusan'])) {

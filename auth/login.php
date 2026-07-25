@@ -1,8 +1,20 @@
 <?php
 /**
- * auth/login.php — Halaman login sistem payroll
- * Hanya berisi form Username & Password. Tanpa fitur OTP/Lupa Password.
+ * ============================================================================
+ * NAMA FILE: login.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Halaman antarmuka login bagi pengguna (Admin dan Pimpinan) untuk masuk ke dalam sistem Payroll Star.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Form input username dan password bergaya modern.
+ * 2. Integrasi notifikasi pesan error/sukses menggunakan SweetAlert2.
+ * 3. Tampilan bersih tanpa teks kredensial demo.
+ *
+ * HAK AKSES / PENGGUNA: Publik / Tamu (Guest)
+ * ============================================================================
  */
+
 require_once __DIR__ . '/../config/koneksi.php';
 if (is_logged_in() && $conn) {
     // Redirect ke dashboard spesifik

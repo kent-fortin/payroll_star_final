@@ -1,4 +1,20 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: functions.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Kumpulan fungsi bantu (helper functions) yang digunakan secara global di seluruh aplikasi.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Format angka ke mata uang Rupiah & pengamanan string XSS (e()).
+ * 2. Generator otomatis kode NIP (mulai dari SSL001) dan kode Jabatan.
+ * 3. Fungsi inti hitung payroll (calculate_payroll) yang bersih dari potongan BPJS dan PPh 21.
+ *
+ * HAK AKSES / PENGGUNA: Sistem / Semua File
+ * ============================================================================
+ */
+
 function base_path(): string
 {
     // Determine the base path based on the location of index.php
@@ -29,6 +45,8 @@ function asset(string $path): string
     return url('assets/' . ltrim($path, '/'));
 }
 
+// --- SECTION 1: FUNGSI KEAMANAN & FORMATTING ---
+// Fungsi untuk mengamankan string dari serangan XSS serta memformat angka ke rupiah.
 function e($value): string
 {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
@@ -39,6 +57,8 @@ function rupiah($value): string
     return 'Rp ' . number_format((float)$value, 0, ',', '.');
 }
 
+// --- SECTION 4: MANAJEMEN PESAN NOTIFIKASI (FLASH MESSAGES) ---
+// Mengatur dan mengambil pesan notifikasi sukses/error untuk ditampilkan via SweetAlert2.
 function set_flash(string $type, string $message): void
 {
     $_SESSION['flash'] = ['type' => $type, 'message' => $message];
@@ -163,6 +183,8 @@ function get_setting(mysqli $conn, string $key, float $default = 0): float
     return $default;
 }
 
+// --- SECTION 3: RUMUS INTI PERHITUNGAN GAJI (PAYROLL ENGINE) ---
+// Menghitung Gaji Pokok + Lembur + Tunjangan - Potongan Alpha (bersih tanpa potongan BPJS/PPh 21).
 function calculate_payroll(mysqli $conn, int $idKaryawan, string $bulan, int $tahun, float $tunjangan = 0): ?array
 {
     $bulanEsc = mysqli_real_escape_string($conn, $bulan);
@@ -225,6 +247,8 @@ function generate_jabatan_code(int $id): string
     return 'JBT' . str_pad((string)$id, 3, '0', STR_PAD_LEFT);
 }
 
+// --- SECTION 2: GENERATOR AUTOMATION KODE ---
+// Fungsi otomatis pembuat NIP (mulai SSL001) dan kode Jabatan (JBT...).
 function generate_nip(int $id): string
 {
     return 'SSL' . str_pad((string)$id, 3, '0', STR_PAD_LEFT);

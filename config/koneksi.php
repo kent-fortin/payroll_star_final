@@ -1,4 +1,20 @@
 <?php
+/**
+ * ============================================================================
+ * NAMA FILE: koneksi.php
+ * ============================================================================
+ * TUJUAN & FUNGSI FILE:
+ * Jembatan penghubung utama antara aplikasi PHP dan database MySQL.
+ *
+ * ALUR & FITUR UTAMA:
+ * 1. Menyimpan parameter koneksi database (host, user, password, db name).
+ * 2. Mengatur mode error reporting yang aman (tanpa memunculkan pesan error fatal ke layar).
+ * 3. Auto-migrasi untuk membuat tabel atau kolom pendukung secara otomatis jika belum ada.
+ *
+ * HAK AKSES / PENGGUNA: Sistem / Semua File
+ * ============================================================================
+ */
+
 error_reporting(E_ALL);
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');
@@ -15,29 +31,58 @@ require_once __DIR__ . '/../helpers/functions.php';
 // ==========================================
 
 // --- VERSI LOCAL ---
-// $host = 'localhost';
-// $user = 'root';
-// $pass = '';
-// $db = 'db_payroll_star_samudera';
+// --- SECTION 1: PARAMETER KONEKSI DATABASE ---
+// Konfigurasi host, user, password, dan nama database MySQL.
+$host = 'localhost';
+$user = 'root';
+$pass = '';
+$db = 'db_payroll_star_samudera';
 
 // --- VERSI LIVE ---
-$host = 'sql312.infinityfree.com';
-$user = 'if0_42362934';
-$pass = 'fFQbSZ02B5U';
-$db = 'if0_42362934_db_payroll_star_samudera';
+// $host = 'sql312.infinityfree.com';
+// $user = 'if0_42362934';
+// $pass = 'fFQbSZ02B5U';
+// $db = 'if0_42362934_db_payroll_star_samudera';
 
 
+// --- SECTION 2: PEMBUATAN KONEKSI & ERROR REPORTING ---
+// Menghubungkan PHP dengan MySQL serta mengatur standar karakter utf8mb4.
 $conn = mysqli_connect($host, $user, $pass, $db);
 if ($conn) {
     mysqli_set_charset($conn, 'utf8mb4');
 
-    // Auto-migrate for missing columns
+    // --- SECTION 3: AUTO-MIGRASI SKEMA DATABASE ---
+    // Mengecek dan membuat tabel/kolom baru secara otomatis jika belum tersedia di database.
     $qKaryawan = @mysqli_query($conn, "SHOW COLUMNS FROM karyawan LIKE 'no_ktp'");
     if ($qKaryawan && mysqli_num_rows($qKaryawan) == 0) {
         @mysqli_query($conn, "ALTER TABLE karyawan ADD no_ktp VARCHAR(20) NULL, ADD no_kk VARCHAR(20) NULL");
     }
+    @mysqli_query($conn, "ALTER TABLE karyawan MODIFY status_karyawan ENUM('Tetap','Kontrak','Resign') NOT NULL");
 
-    // Auto-migrate: buat tabel presensi_harian jika belum ada
+    $qJabatan = @mysqli_query($conn, "SHOW COLUMNS FROM jabatan LIKE 'status_jabatan'");
+    if ($qJabatan && mysqli_num_rows($qJabatan) == 0) {
+        @mysqli_query($conn, "ALTER TABLE jabatan ADD status_jabatan ENUM('Aktif','Tidak Aktif') NOT NULL DEFAULT 'Aktif'");
+    }
+
+    $qPayroll1 = @mysqli_query($conn, "SHOW COLUMNS FROM payroll LIKE 'total_tunjangan'");
+    if ($qPayroll1 && mysqli_num_rows($qPayroll1) == 0) {
+        @mysqli_query($conn, "ALTER TABLE payroll ADD total_tunjangan DECIMAL(12,2) NOT NULL DEFAULT 0 AFTER total_lembur");
+    }
+    $qPayroll2 = @mysqli_query($conn, "SHOW COLUMNS FROM payroll LIKE 'status_validasi'");
+    if ($qPayroll2 && mysqli_num_rows($qPayroll2) == 0) {
+        @mysqli_query($conn, "ALTER TABLE payroll ADD status_validasi ENUM('Menunggu','Disetujui','Ditolak') NOT NULL DEFAULT 'Menunggu' AFTER status_pembayaran");
+    }
+
+    $qAbsensi = @mysqli_query($conn, "SHOW COLUMNS FROM absensi LIKE 'diperbarui_pada'");
+    if ($qAbsensi && mysqli_num_rows($qAbsensi) == 0) {
+        @mysqli_query($conn, "ALTER TABLE absensi ADD diperbarui_pada DATETIME NULL");
+    }
+
+    $qSetting = @mysqli_query($conn, "SELECT id_pengaturan FROM pengaturan_payroll WHERE nama_pengaturan = 'total_hari_kerja'");
+    if ($qSetting && mysqli_num_rows($qSetting) == 0) {
+        @mysqli_query($conn, "INSERT INTO pengaturan_payroll (nama_pengaturan, nilai, keterangan) VALUES ('total_hari_kerja', 26, 'Standar total hari kerja dalam sebulan')");
+    }
+
     $qPresensi = @mysqli_query($conn, "SHOW TABLES LIKE 'presensi_harian'");
     if ($qPresensi && mysqli_num_rows($qPresensi) == 0) {
         @mysqli_query($conn, "CREATE TABLE presensi_harian (
@@ -49,6 +94,20 @@ if ($conn) {
             CONSTRAINT fk_presensi_karyawan FOREIGN KEY (id_karyawan)
                 REFERENCES karyawan(id_karyawan) ON UPDATE CASCADE ON DELETE CASCADE
         ) ENGINE=InnoDB COMMENT='Presensi harian karyawan'");
+    }
+
+    $qLembur = @mysqli_query($conn, "SHOW TABLES LIKE 'lembur'");
+    if ($qLembur && mysqli_num_rows($qLembur) == 0) {
+        @mysqli_query($conn, "CREATE TABLE lembur (
+            id_lembur INT AUTO_INCREMENT PRIMARY KEY,
+            id_karyawan INT NOT NULL,
+            tanggal_lembur DATE NOT NULL,
+            jam_lembur INT NOT NULL DEFAULT 0,
+            dibuat_oleh INT NULL,
+            dibuat_pada DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT fk_lembur_karyawan FOREIGN KEY (id_karyawan) REFERENCES karyawan(id_karyawan) ON UPDATE CASCADE ON DELETE RESTRICT,
+            CONSTRAINT fk_lembur_user FOREIGN KEY (dibuat_oleh) REFERENCES users(id_user) ON UPDATE CASCADE ON DELETE SET NULL
+        ) ENGINE=InnoDB COMMENT='Data lembur harian karyawan'");
     }
 } else {
     die(mysqli_connect_error());
