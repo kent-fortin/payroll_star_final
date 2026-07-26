@@ -236,7 +236,6 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
     <td>
         <div><?= status_badge($row['status_validasi']) ?></div>
         <div class="mt-1"><?= status_badge($row['status_pembayaran']) ?></div>
-        <?php if(!empty($row['tanggal_pembayaran'])): ?><div class="small text-muted mt-1" style="font-size: 0.75rem;"><i class="bi bi-check2-circle me-1"></i><?= e($row['tanggal_pembayaran']) ?></div><?php endif; ?>
     </td>
     <td class="text-center">
         <?php if ($row['status_validasi'] === 'Disetujui'): ?>

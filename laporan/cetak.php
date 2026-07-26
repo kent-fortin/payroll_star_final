@@ -167,7 +167,7 @@ $query = http_build_query(array('filter'=>$filter,'bulan'=>$bulan,'tahun'=>$tahu
                                 <td><strong><?= rupiah($row['total_tunjangan'] ?? 0) ?></strong></td>
                                 <td><?= (int)$row['jumlah_alpha'] ?> hari<br><strong>-<?= rupiah($row['total_potongan_alpha']) ?></strong></td>
                                 <td><strong><?= rupiah($row['total_gaji_bersih']) ?></strong></td>
-                                <td><?= e($row['status_pembayaran']) ?><br><small><?= e(!empty($row['tanggal_pembayaran']) ? $row['tanggal_pembayaran'] : '-') ?></small></td>
+                                <td><?= e($row['status_pembayaran']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>

@@ -389,10 +389,7 @@ $query = http_build_query(array('filter' => $filter, 'bulan' => $bulan, 'tahun' 
                             <td><?= (int) $row['jumlah_alpha'] ?> hari<br><strong
                                     class="text-danger">-<?= rupiah($row['total_potongan_alpha']) ?></strong></td>
                             <td><strong><?= rupiah($row['total_gaji_bersih']) ?></strong></td>
-                            <td><?= status_badge($row['status_pembayaran']) ?>
-                                <div class="small text-muted mt-1">
-                                    <?= e(!empty($row['tanggal_pembayaran']) ? $row['tanggal_pembayaran'] : '-') ?></div>
-                            </td>
+                            <td><?= status_badge($row['status_pembayaran']) ?></td>
                             <td>
                                 <a class="btn btn-sm btn-outline-dark"
                                     href="<?= url('transaksi/cetak_rincian.php?id=' . (int) $row['id_payroll']) ?>">Cetak</a>
