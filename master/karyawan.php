@@ -127,7 +127,7 @@ $data = mysqli_query($conn,'SELECT k.*,j.nama_jabatan FROM karyawan k JOIN jabat
         <td class="fw-bold text-dark"><?= e($row['nama_karyawan']) ?></td>
         <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"><?= e($row['jenis_kelamin']) ?></span></td>
         <td><?= e($row['nama_jabatan']) ?></td>
-        <td class="text-center"><span class="badge <?= $row['status_karyawan'] === 'Resign' ? 'bg-danger' : ($row['status_karyawan'] === 'Kontrak' ? 'bg-info text-dark' : 'bg-success') ?> px-2 py-1"><?= e($row['status_karyawan']) ?></span></td>
+        <td class="text-center"><?= status_badge($row['status_karyawan']) ?></td>
         <td class="small text-muted"><?= e(date('d-m-Y', strtotime($row['tanggal_masuk']))) ?></td>
         <td class="text-center">
           <div class="d-flex justify-content-center gap-1">

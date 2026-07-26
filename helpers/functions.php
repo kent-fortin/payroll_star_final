@@ -257,12 +257,14 @@ function generate_nip(int $id): string
 function status_badge(string $status): string
 {
     $class = match ($status) {
-        'Sudah Dibayar', 'Disetujui' => 'success',
-        'Menunggu' => 'warning',
-        'Ditolak' => 'danger',
+        'Aktif', 'Tetap', 'Sudah Dibayar', 'Disetujui', 'Hadir', 'Lunas', 'Selesai' => 'success',
+        'Menunggu', 'Belum Dibayar', 'Sakit', 'Proses', 'Pending' => 'warning text-dark',
+        'Kontrak', 'Izin', 'Diproses' => 'info text-dark',
+        'Tidak Aktif', 'Nonaktif', 'Resign', 'Ditolak', 'Alpha', 'Batal', 'Gagal' => 'danger',
+        'Draft' => 'secondary',
         default => 'secondary',
     };
-    return '<span class="badge text-bg-' . $class . '">' . e($status) . '</span>';
+    return '<span class="badge bg-' . $class . ' px-3 py-1 rounded-pill">' . e($status) . '</span>';
 }
 
 function filter_period(string $filter, string $bulan, int $tahun): array
