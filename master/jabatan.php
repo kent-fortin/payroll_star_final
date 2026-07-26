@@ -95,9 +95,39 @@ $data = mysqli_query($conn, 'SELECT * FROM jabatan ORDER BY id_jabatan');
   <i class="bi bi-table"></i>
   <h2 class="h5">Daftar Jabatan</h2>
 </div>
-<div class="table-responsive"><table class="table table-striped dt-table" style="width:100%"><thead><tr><th>No</th><th>Kode</th><th>Nama Jabatan</th><th>Gaji Pokok</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
-<?php $no=1; if ($data): while ($row=mysqli_fetch_assoc($data)): $status = $row['status_jabatan'] ?? 'Aktif'; $newStatus = $status === 'Aktif' ? 'Tidak Aktif' : 'Aktif'; ?><tr><td><?= $no++ ?></td><td><?= e($row['kode_jabatan']) ?></td><td><?= e($row['nama_jabatan']) ?></td><td><?= rupiah($row['gaji_pokok']) ?></td><td><span class="badge <?= $status === 'Aktif' ? 'bg-success' : 'bg-secondary' ?>"><?= e($status) ?></span></td><td><a class="btn btn-sm btn-warning" href="?edit=<?= $row['id_jabatan'] ?>">Edit</a> <button type="button" class="btn btn-sm <?= $status === 'Aktif' ? 'btn-danger' : 'btn-success' ?>" onclick="toggleStatusJabatan(<?= $row['id_jabatan'] ?>, <?= htmlspecialchars(json_encode($newStatus), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($row['nama_jabatan']), ENT_QUOTES, 'UTF-8') ?>)"><?= $status === 'Aktif' ? 'Tidak Aktif' : 'Aktifkan' ?></button></td></tr><?php endwhile; endif; ?>
-</tbody></table></div></div>
+<div class="table-responsive">
+  <table class="table table-hover dt-table align-middle" style="width:100%">
+    <thead>
+      <tr>
+        <th style="width: 5%">No</th>
+        <th style="width: 15%">Kode</th>
+        <th style="width: 35%">Nama Jabatan</th>
+        <th style="width: 20%">Gaji Pokok</th>
+        <th style="width: 10%" class="text-center">Status</th>
+        <th style="width: 15%" class="text-center">Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php $no=1; if ($data): while ($row=mysqli_fetch_assoc($data)): $status = $row['status_jabatan'] ?? 'Aktif'; $newStatus = $status === 'Aktif' ? 'Tidak Aktif' : 'Aktif'; ?>
+      <tr>
+        <td><?= $no++ ?></td>
+        <td><span class="badge bg-light text-dark border font-monospace px-2 py-1"><?= e($row['kode_jabatan']) ?></span></td>
+        <td class="fw-bold text-dark"><?= e($row['nama_jabatan']) ?></td>
+        <td class="fw-semibold text-success"><?= rupiah($row['gaji_pokok']) ?></td>
+        <td class="text-center"><?= status_badge($status) ?></td>
+        <td class="text-center">
+          <div class="d-flex justify-content-center gap-1">
+            <a class="btn btn-sm btn-outline-primary px-3 fw-semibold" href="?edit=<?= $row['id_jabatan'] ?>"><i class="bi bi-pencil-square me-1"></i>Edit</a>
+            <button type="button" class="btn btn-sm <?= $status === 'Aktif' ? 'btn-outline-danger' : 'btn-outline-success' ?> px-2 fw-semibold" onclick="toggleStatusJabatan(<?= $row['id_jabatan'] ?>, <?= htmlspecialchars(json_encode($newStatus), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($row['nama_jabatan']), ENT_QUOTES, 'UTF-8') ?>)">
+              <i class="bi <?= $status === 'Aktif' ? 'bi-x-circle' : 'bi-check-circle' ?> me-1"></i><?= $status === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan' ?>
+            </button>
+          </div>
+        </td>
+      </tr>
+    <?php endwhile; endif; ?>
+    </tbody>
+  </table>
+</div></div>
 
 <form id="form_toggle_status" method="post" style="display:none;">
     <input type="hidden" name="id_jabatan" id="id_jabatan_input">

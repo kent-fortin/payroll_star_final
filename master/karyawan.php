@@ -105,7 +105,45 @@ $data = mysqli_query($conn,'SELECT k.*,j.nama_jabatan FROM karyawan k JOIN jabat
   <i class="bi bi-table"></i>
   <h2 class="h5">Daftar Karyawan</h2>
 </div>
-<div class="table-responsive"><table class="table table-striped dt-table" style="width:100%"><thead><tr><th>No</th><th>NIP</th><th>Nama</th><th>JK</th><th>Jabatan</th><th>Status</th><th>Tanggal Masuk</th><th>Aksi</th></tr></thead><tbody>
-<?php $no=1;if($data):while($row=mysqli_fetch_assoc($data)): ?><tr><td><?= $no++ ?></td><td><?= e($row['nip']) ?></td><td><?= e($row['nama_karyawan']) ?></td><td><?= e($row['jenis_kelamin']) ?></td><td><?= e($row['nama_jabatan']) ?></td><td><span class="badge <?= $row['status_karyawan'] === 'Resign' ? 'bg-danger' : ($row['status_karyawan'] === 'Kontrak' ? 'bg-info' : 'bg-success') ?>"><?= e($row['status_karyawan']) ?></span></td><td><?= e($row['tanggal_masuk']) ?></td><td><a class="btn btn-sm btn-warning" href="?edit=<?= $row['id_karyawan'] ?>">Edit</a> <?php if($row['status_karyawan'] !== 'Resign'): ?><form class="d-inline hapus-form" method="post" data-confirm="Apakah Anda yakin karyawan ini telah resign?"><input type="hidden" name="id_karyawan" value="<?= $row['id_karyawan'] ?>"><input type="hidden" name="resign" value="1"><button type="button" class="btn btn-sm btn-danger btn-hapus">Resign</button></form><?php endif; ?></td></tr><?php endwhile;endif; ?>
-</tbody></table></div></div>
+<div class="table-responsive">
+  <table class="table table-hover dt-table align-middle" style="width:100%">
+    <thead>
+      <tr>
+        <th style="width: 5%">No</th>
+        <th style="width: 12%">NIP</th>
+        <th style="width: 25%">Nama</th>
+        <th style="width: 5%" class="text-center">JK</th>
+        <th style="width: 20%">Jabatan</th>
+        <th style="width: 10%" class="text-center">Status</th>
+        <th style="width: 10%">Tanggal Masuk</th>
+        <th style="width: 13%" class="text-center">Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php $no=1;if($data):while($row=mysqli_fetch_assoc($data)): ?>
+      <tr>
+        <td><?= $no++ ?></td>
+        <td><span class="badge bg-light text-dark border font-monospace px-2 py-1"><?= e($row['nip']) ?></span></td>
+        <td class="fw-bold text-dark"><?= e($row['nama_karyawan']) ?></td>
+        <td class="text-center"><span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"><?= e($row['jenis_kelamin']) ?></span></td>
+        <td><?= e($row['nama_jabatan']) ?></td>
+        <td class="text-center"><span class="badge <?= $row['status_karyawan'] === 'Resign' ? 'bg-danger' : ($row['status_karyawan'] === 'Kontrak' ? 'bg-info text-dark' : 'bg-success') ?> px-2 py-1"><?= e($row['status_karyawan']) ?></span></td>
+        <td class="small text-muted"><?= e(date('d-m-Y', strtotime($row['tanggal_masuk']))) ?></td>
+        <td class="text-center">
+          <div class="d-flex justify-content-center gap-1">
+            <a class="btn btn-sm btn-outline-primary px-3 fw-semibold" href="?edit=<?= $row['id_karyawan'] ?>"><i class="bi bi-pencil-square me-1"></i>Edit</a>
+            <?php if($row['status_karyawan'] !== 'Resign'): ?>
+              <form class="d-inline hapus-form" method="post" data-confirm="Apakah Anda yakin karyawan ini telah resign?">
+                <input type="hidden" name="id_karyawan" value="<?= $row['id_karyawan'] ?>">
+                <input type="hidden" name="resign" value="1">
+                <button type="button" class="btn btn-sm btn-outline-danger px-2 fw-semibold btn-hapus"><i class="bi bi-person-x me-1"></i>Resign</button>
+              </form>
+            <?php endif; ?>
+          </div>
+        </td>
+      </tr>
+    <?php endwhile;endif; ?>
+    </tbody>
+  </table>
+</div></div>
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

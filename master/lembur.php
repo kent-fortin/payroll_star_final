@@ -128,38 +128,47 @@ $data = mysqli_query($conn, "SELECT l.*, k.nip, k.nama_karyawan, j.nama_jabatan
   <h2 class="h5">Daftar Lembur Harian</h2>
 </div>
 <div class="table-responsive">
-<table class="table table-striped dt-table" style="width:100%">
-<thead><tr>
-  <th>No</th><th>NIP</th><th>Nama Karyawan</th><th>Jabatan</th>
-  <th>Tanggal Lembur</th><th>Jam</th><th>Nilai Lembur</th><th>Aksi</th>
-</tr></thead>
-<tbody>
-<?php
-$no=1;
-if($data): while($row=mysqli_fetch_assoc($data)):
-  $nilai = (int)$row['jam_lembur'] * $tarifLembur;
-?>
-<tr>
-  <td><?= $no++ ?></td>
-  <td><?= e($row['nip']) ?></td>
-  <td><?= e($row['nama_karyawan']) ?></td>
-  <td><?= e($row['nama_jabatan']) ?></td>
-  <td><?= e(date('d M Y', strtotime($row['tanggal_lembur']))) ?></td>
-  <td><span class="badge bg-info text-dark"><?= (int)$row['jam_lembur'] ?> jam</span></td>
-  <td><strong class="text-success"><?= rupiah($nilai) ?></strong></td>
-  <td>
-    <a class="btn btn-sm btn-warning" href="?edit=<?= $row['id_lembur'] ?>">Edit</a>
-    <form class="d-inline hapus-form" method="post" data-confirm="Hapus data lembur ini?">
-      <input type="hidden" name="id_lembur" value="<?= $row['id_lembur'] ?>">
-      <input type="hidden" name="hapus" value="1">
-      <button type="button" class="btn btn-sm btn-danger btn-hapus">Hapus</button>
-    </form>
-  </td>
-</tr>
-<?php endwhile; endif; ?>
-
-</tbody>
-</table>
+  <table class="table table-hover dt-table align-middle" style="width:100%">
+    <thead>
+      <tr>
+        <th style="width: 5%">No</th>
+        <th style="width: 12%">NIP</th>
+        <th style="width: 25%">Nama Karyawan</th>
+        <th style="width: 18%">Jabatan</th>
+        <th style="width: 12%">Tanggal Lembur</th>
+        <th style="width: 8%" class="text-center">Jam</th>
+        <th style="width: 12%">Nilai Lembur</th>
+        <th style="width: 8%" class="text-center">Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php
+    $no=1;
+    if($data): while($row=mysqli_fetch_assoc($data)):
+      $nilai = (int)$row['jam_lembur'] * $tarifLembur;
+    ?>
+      <tr>
+        <td><?= $no++ ?></td>
+        <td><span class="badge bg-light text-dark border font-monospace px-2 py-1"><?= e($row['nip']) ?></span></td>
+        <td class="fw-bold text-dark"><?= e($row['nama_karyawan']) ?></td>
+        <td><?= e($row['nama_jabatan']) ?></td>
+        <td class="small text-muted"><i class="bi bi-calendar3 me-1"></i><?= e(date('d M Y', strtotime($row['tanggal_lembur']))) ?></td>
+        <td class="text-center"><span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1"><?= (int)$row['jam_lembur'] ?> jam</span></td>
+        <td><strong class="text-success"><?= rupiah($nilai) ?></strong></td>
+        <td class="text-center">
+          <div class="d-flex justify-content-center gap-1">
+            <a class="btn btn-sm btn-outline-primary px-3 fw-semibold" href="?edit=<?= $row['id_lembur'] ?>"><i class="bi bi-pencil-square me-1"></i>Edit</a>
+            <form class="d-inline hapus-form" method="post" data-confirm="Hapus data lembur ini?">
+              <input type="hidden" name="id_lembur" value="<?= $row['id_lembur'] ?>">
+              <input type="hidden" name="hapus" value="1">
+              <button type="button" class="btn btn-sm btn-outline-danger px-2 fw-semibold btn-hapus"><i class="bi bi-trash me-1"></i>Hapus</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    <?php endwhile; endif; ?>
+    </tbody>
+  </table>
 </div>
 </div>
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

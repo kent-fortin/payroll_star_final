@@ -140,14 +140,14 @@ if ($ringkasanQuery) {
   <form method="post">
     <input type="hidden" name="tanggal" value="<?= e($tanggalInput) ?>">
     <div class="table-responsive">
-      <table class="table table-hover align-middle" style="width:100%">
-        <thead class="table-light">
+      <table class="table table-hover dt-table align-middle" style="width:100%">
+        <thead>
           <tr>
-            <th style="width:40px">No</th>
-            <th>NIP</th>
-            <th>Nama Karyawan</th>
-            <th>Jabatan</th>
-            <th style="width:260px">Status Kehadiran</th>
+            <th style="width: 5%">No</th>
+            <th style="width: 15%">NIP</th>
+            <th style="width: 30%">Nama Karyawan</th>
+            <th style="width: 20%">Jabatan</th>
+            <th style="width: 30%" class="text-center">Status Kehadiran</th>
           </tr>
         </thead>
         <tbody>
@@ -159,10 +159,10 @@ if ($ringkasanQuery) {
         ?>
         <tr>
           <td><?= $no++ ?></td>
-          <td><?= e($k['nip']) ?></td>
-          <td><?= e($k['nama_karyawan']) ?></td>
+          <td><span class="badge bg-light text-dark border font-monospace px-2 py-1"><?= e($k['nip']) ?></span></td>
+          <td class="fw-bold text-dark"><?= e($k['nama_karyawan']) ?></td>
           <td><?= e($k['nama_jabatan']) ?></td>
-          <td>
+          <td class="text-center">
             <div class="btn-group shadow-sm" role="group">
               <?php foreach (['Hadir' => 'success', 'Sakit' => 'warning', 'Izin' => 'info', 'Alpha' => 'danger'] as $st => $color): ?>
                 <input type="radio" class="btn-check" 
