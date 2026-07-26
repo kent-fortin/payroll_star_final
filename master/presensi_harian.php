@@ -144,9 +144,10 @@ if ($ringkasanQuery) {
         <thead>
           <tr>
             <th style="width: 5%">No</th>
-            <th style="width: 35%">Karyawan</th>
-            <th style="width: 25%">Jabatan</th>
-            <th style="width: 35%" class="text-center">Status Kehadiran</th>
+            <th style="width: 12%">NIP</th>
+            <th style="width: 30%">Nama Karyawan</th>
+            <th style="width: 23%">Jabatan</th>
+            <th style="width: 30%" class="text-center">Status Kehadiran</th>
           </tr>
         </thead>
         <tbody>
@@ -158,10 +159,8 @@ if ($ringkasanQuery) {
         ?>
         <tr>
           <td><?= $no++ ?></td>
-          <td>
-            <strong class="text-dark d-block"><?= e($k['nama_karyawan']) ?></strong>
-            <span class="badge bg-light text-dark border font-monospace mt-1"><?= e($k['nip']) ?></span>
-          </td>
+          <td><span class="badge bg-light text-dark border font-monospace px-2 py-1"><?= e($k['nip']) ?></span></td>
+          <td class="fw-bold text-dark"><?= e($k['nama_karyawan']) ?></td>
           <td><?= e($k['nama_jabatan']) ?></td>
           <td class="text-center">
             <div class="btn-group shadow-sm" role="group">

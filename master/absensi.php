@@ -199,21 +199,22 @@ function konfirmasiRekap() {
     <thead>
       <tr>
         <th style="width: 5%">No</th>
-        <th style="width: 22%">Karyawan & Periode</th>
-        <th style="width: 26%">Rekap Kehadiran (H / S / I / A)</th>
-        <th style="width: 15%">Potongan Alpha</th>
-        <th style="width: 18%">Status Edit</th>
-        <th style="width: 14%" class="text-center">Aksi</th>
+        <th style="width: 12%">NIP</th>
+        <th style="width: 20%">Karyawan & Periode</th>
+        <th style="width: 25%">Rekap Kehadiran (H / S / I / A)</th>
+        <th style="width: 14%">Potongan Alpha</th>
+        <th style="width: 12%">Status Edit</th>
+        <th style="width: 12%" class="text-center">Aksi</th>
       </tr>
     </thead>
     <tbody>
     <?php $no=1; if($data): while($row=mysqli_fetch_assoc($data)): ?>
       <tr>
         <td><?= $no++ ?></td>
+        <td><span class="badge bg-light text-dark border font-monospace px-2 py-1"><?= e($row['nip']) ?></span></td>
         <td>
           <div class="fw-bold fs-6 text-dark"><?= e($row['nama_karyawan']) ?></div>
-          <div class="small text-muted mb-1">NIP: <strong><?= e($row['nip']) ?></strong></div>
-          <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"><i class="bi bi-calendar3 me-1"></i><?= e($row['bulan'].' '.$row['tahun']) ?></span>
+          <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 mt-1"><i class="bi bi-calendar3 me-1"></i><?= e($row['bulan'].' '.$row['tahun']) ?></span>
         </td>
         <td>
           <div class="d-flex flex-wrap gap-1" style="max-width: 220px;">
@@ -318,9 +319,10 @@ function konfirmasiRekap() {
     <thead>
       <tr>
         <th style="width: 5%">No</th>
-        <th style="width: 25%">Karyawan & Periode</th>
+        <th style="width: 12%">NIP</th>
+        <th style="width: 18%">Karyawan & Periode</th>
         <th style="width: 25%">Usulan Perubahan</th>
-        <th style="width: 25%">Alasan & Tanggal</th>
+        <th style="width: 20%">Alasan & Tanggal</th>
         <th style="width: 20%">Status & Catatan Pimpinan</th>
       </tr>
     </thead>
@@ -337,10 +339,10 @@ function konfirmasiRekap() {
     ?>
       <tr>
         <td><?= $noHist++ ?></td>
+        <td><span class="badge bg-light text-dark border font-monospace px-2 py-1"><?= e($h['nip']) ?></span></td>
         <td>
           <div class="fw-bold fs-6 text-dark"><?= e($h['nama_karyawan']) ?></div>
-          <div class="small text-muted mb-1">NIP: <strong><?= e($h['nip']) ?></strong></div>
-          <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"><i class="bi bi-calendar3 me-1"></i><?= e($h['bulan'].' '.$h['tahun']) ?></span>
+          <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 mt-1"><i class="bi bi-calendar3 me-1"></i><?= e($h['bulan'].' '.$h['tahun']) ?></span>
         </td>
         <td>
           <div class="d-flex flex-wrap gap-1" style="max-width: 200px;">

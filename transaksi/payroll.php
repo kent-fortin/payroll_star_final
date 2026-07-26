@@ -213,13 +213,14 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
   <i class="bi bi-table"></i>
   <h2 class="h5">Daftar Payroll</h2>
 </div>
-<div class="table-responsive"><table class="table table-hover dt-table align-middle" style="width:100%"><thead><tr><th style="width: 5%">No</th><th style="width: 25%">Karyawan & Periode</th><th style="width: 14%">Gaji Pokok</th><th style="width: 16%">Lembur & Tunjangan</th><th style="width: 13%">Potongan Alpha</th><th style="width: 13%">Gaji Bersih</th><th style="width: 14%">Status</th><th style="width: 10%" class="text-center">Aksi</th></tr></thead><tbody>
+<div class="table-responsive"><table class="table table-hover dt-table align-middle" style="width:100%"><thead><tr><th style="width: 4%">No</th><th style="width: 10%">NIP</th><th style="width: 18%">Karyawan & Periode</th><th style="width: 12%">Gaji Pokok</th><th style="width: 15%">Lembur & Tunjangan</th><th style="width: 11%">Potongan Alpha</th><th style="width: 12%">Gaji Bersih</th><th style="width: 10%">Status</th><th style="width: 8%" class="text-center">Aksi</th></tr></thead><tbody>
 <?php $no=1;if($data):while($row=mysqli_fetch_assoc($data)):?>
 <tr>
     <td><?= $no++ ?></td>
+    <td><span class="badge bg-light text-dark border font-monospace px-2 py-1"><?= e($row['nip']) ?></span></td>
     <td>
       <div class="fw-bold fs-6 text-dark"><?= e($row['nama_karyawan']) ?></div>
-      <div class="small text-muted mb-1">NIP: <strong><?= e($row['nip']) ?></strong> | <?= e($row['nama_jabatan']) ?></div>
+      <div class="small text-muted mb-1"><?= e($row['nama_jabatan']) ?></div>
       <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1"><i class="bi bi-calendar3 me-1"></i><?= e($row['bulan'].' '.$row['tahun']) ?></span>
     </td>
     <td><?= rupiah($row['gaji_pokok']) ?></td>
