@@ -1026,6 +1026,71 @@ h6 {
 }
 
 /* ============================================= */
+/*   Universal Responsive Text Wrap & Flex Fix   */
+/* ============================================= */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.app-wrapper, .main-content, .page-content {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.card, .form-card, .content-card, .stat-card, .print-card, .formula-box, .section-desc, .alert, .modal-content, .modal-body {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  white-space: normal !important;
+}
+
+.modal-title, .swal2-title, .swal2-html-container {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.swal2-textarea {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.d-flex, .row {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.alert.d-flex, .d-flex.align-items-center {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.alert > div, .alert > span, .alert.d-flex > div, .d-flex > div, .d-flex > span, .d-flex > p {
+  min-width: 0 !important;
+  flex: 1 1 0% !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+}
+
+.alert i, .alert.d-flex i {
+  flex-shrink: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .modal-dialog, .swal2-popup {
+    max-width: 95vw !important;
+    margin: 1rem auto;
+  }
+}
+
+/* ============================================= */
 /*   Responsive                                  */
 /* ============================================= */
 .sidebar-backdrop {
