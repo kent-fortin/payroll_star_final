@@ -587,7 +587,40 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.875rem;
   white-space: nowrap;
 }
-.table-responsive { border-radius: 12px; overflow-x: auto; overflow-y: hidden; }
+.table-responsive {
+  border-radius: 12px;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  display: block;
+}
+.dt-table {
+  min-width: 850px !important;
+  width: 100% !important;
+}
+.table-responsive .table:not(.dt-table) {
+  min-width: 600px;
+}
+
+/* ============================================= */
+/*   Modals & SweetAlert Dialogs Overflow Fix    */
+/* ============================================= */
+.modal-dialog, .swal2-popup {
+  max-width: 92vw !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+.modal-title, .modal-body, .swal2-title, .swal2-html-container {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+}
+.swal2-textarea {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
 .table tbody tr:last-child td { border-bottom: none; }
 .table tbody tr:hover td { background-color: #f8fafc; }
 .table-striped tbody tr:nth-of-type(odd) td { background-color: #fafafa; }

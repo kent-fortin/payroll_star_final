@@ -356,7 +356,6 @@ function konfirmasiRekap() {
           <div class="p-2 bg-light rounded border-start border-primary border-3 small mb-1 fst-italic" style="max-width: 260px; word-wrap: break-word; white-space: normal;">
             "<?= e($h['alasan_perubahan']) ?>"
           </div>
-          <div class="small text-muted" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= e($h['tanggal_pengajuan']) ?></div>
         </td>
         <td>
           <?= status_badge($h['status']) ?>

@@ -110,8 +110,7 @@ ORDER BY FIELD(p.status,'Menunggu','Disetujui','Ditolak'),p.id_permintaan DESC")
             "<?= e($row['alasan_perubahan']) ?>"
           </div>
           <div class="text-muted" style="font-size: 0.75rem;">
-            <i class="bi bi-person me-1"></i><?= e($row['pengaju']) ?><br>
-            <i class="bi bi-clock me-1"></i><?= e($row['tanggal_pengajuan']) ?>
+            <i class="bi bi-person me-1"></i><?= e($row['pengaju']) ?>
           </div>
         </td>
         <td>

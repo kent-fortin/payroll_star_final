@@ -23,6 +23,7 @@ mysqli_report(MYSQLI_REPORT_OFF);
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+date_default_timezone_set('Asia/Jakarta');
 
 require_once __DIR__ . '/../helpers/functions.php';
 
@@ -33,16 +34,16 @@ require_once __DIR__ . '/../helpers/functions.php';
 // --- VERSI LOCAL ---
 // --- SECTION 1: PARAMETER KONEKSI DATABASE ---
 // Konfigurasi host, user, password, dan nama database MySQL.
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$db = 'db_payroll_star_samudera';
+// $host = 'localhost';
+// $user = 'root';
+// $pass = '';
+// $db = 'db_payroll_star_samudera';
 
 // --- VERSI LIVE ---
-// $host = 'sql312.infinityfree.com';
-// $user = 'if0_42362934';
-// $pass = 'fFQbSZ02B5U';
-// $db = 'if0_42362934_db_payroll_star_samudera';
+$host = 'sql312.infinityfree.com';
+$user = 'if0_42362934';
+$pass = 'fFQbSZ02B5U';
+$db = 'if0_42362934_db_payroll_star_samudera';
 
 
 // --- SECTION 2: PEMBUATAN KONEKSI & ERROR REPORTING ---
@@ -50,6 +51,7 @@ $db = 'db_payroll_star_samudera';
 $conn = mysqli_connect($host, $user, $pass, $db);
 if ($conn) {
     mysqli_set_charset($conn, 'utf8mb4');
+    @mysqli_query($conn, "SET time_zone = '+07:00'");
 
     // --- SECTION 3: AUTO-MIGRASI SKEMA DATABASE ---
     // Mengecek dan membuat tabel/kolom baru secara otomatis jika belum tersedia di database.

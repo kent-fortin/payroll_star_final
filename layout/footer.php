@@ -50,6 +50,11 @@ $(document).ready(function () {
     };
 
     if ($('.dt-table').length > 0) {
+        $('.dt-table').each(function() {
+            if ($(this).parent().hasClass('table-responsive')) {
+                $(this).unwrap();
+            }
+        });
         $('.dt-table').DataTable({
             language: dtLanguage,
             pageLength: 10,
@@ -57,11 +62,11 @@ $(document).ready(function () {
             responsive: false,
             scrollX: false,
             autoWidth: false,
-            dom: '<"dt-top-row"lf>rt<"dt-bottom-row"ip>',
+            dom: '<"dt-top-row"lf><"table-responsive overflow-x-auto"t><"dt-bottom-row"ip>',
             initComplete: function () {
                 // Style the top row
-                $('.dt-top-row').addClass('d-flex justify-content-between align-items-center px-3 py-2');
-                $('.dt-bottom-row').addClass('d-flex justify-content-between align-items-center px-3 py-2');
+                $('.dt-top-row').addClass('d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-2');
+                $('.dt-bottom-row').addClass('d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-2');
             }
         });
     }
