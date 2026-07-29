@@ -148,7 +148,8 @@ $historyEdit = mysqli_query($conn, "SELECT p.*, a.bulan, a.tahun, k.nip, k.nama_
     <h2 class="h5">Rekap Absensi Bulanan (Otomatis)</h2>
   </div>
   <p class="section-desc">Pilih periode lalu klik <strong>Hitung Otomatis</strong>. Sistem akan merekap data dari tabel
-    <strong>Presensi Harian</strong> untuk bulan dan tahun yang dipilih.</p>
+    <strong>Presensi Harian</strong> untuk bulan dan tahun yang dipilih.
+  </p>
   <div class="formula-box mb-3 small">
     <i class="bi bi-info-circle me-1"></i>
     <strong>Catatan:</strong> Pastikan data <strong>Presensi Harian</strong> sudah diinput terlebih dahulu sebelum
@@ -450,7 +451,7 @@ $historyEdit = mysqli_query($conn, "SELECT p.*, a.bulan, a.tahun, k.nip, k.nama_
                 <?php endif; ?>
               </td>
             </tr>
-          <?php
+            <?php
           endwhile;
         endif;
         ?>

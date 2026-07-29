@@ -42,16 +42,19 @@ $rejectedEdits = mysqli_query($conn, "SELECT p.*, k.nama_karyawan, a.bulan, a.ta
     FROM permintaan_edit_absensi p 
     JOIN absensi a ON a.id_absensi = p.id_absensi 
     JOIN karyawan k ON k.id_karyawan = a.id_karyawan 
-    WHERE p.status = 'Ditolak' AND p.id_pengaju = " . (int)($_SESSION['id_user'] ?? 0) . " 
+    WHERE p.status = 'Ditolak' 
+      AND p.id_pengaju = " . (int)($_SESSION['id_user'] ?? 0) . " 
+      AND p.tanggal_keputusan >= DATE_SUB(NOW(), INTERVAL 3 DAY)
     ORDER BY p.tanggal_keputusan DESC LIMIT 3");
 ?>
 <?php if ($rejectedEdits && mysqli_num_rows($rejectedEdits) > 0): ?>
-<div class="alert alert-danger shadow-sm rounded-4 p-3 mb-4 d-flex align-items-center justify-content-between" style="border-left: 5px solid #dc2626;">
+<div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-4 p-3 mb-4 d-flex align-items-center justify-content-between" style="border-left: 5px solid #dc2626; padding-right: 3rem !important;">
   <div>
     <i class="bi bi-exclamation-triangle-fill fs-5 me-2 align-middle text-danger"></i>
     <strong>Perhatian!</strong> Ada pengajuan edit absensi Anda yang <strong>ditolak</strong> oleh Pimpinan. Periksa catatan penolakan.
   </div>
   <a href="<?= url('master/absensi.php') ?>" class="btn btn-sm btn-danger fw-bold px-3">Lihat Riwayat</a>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 <?php endif; ?>
 

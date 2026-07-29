@@ -27,8 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['keputusan'])) {
   $keputusan = $_POST['keputusan'] === 'setujui' ? 'Disetujui' : 'Ditolak';
   $catatan = trim($_POST['catatan_pimpinan'] ?? '');
   if ($keputusan === 'Ditolak' && $catatan === '') {
-    set_flash('danger', 'Catatan Pimpinan wajib diisi jika menolak pengajuan edit absensi.');
-    redirect('approval/absensi.php');
+    // Tidak apa-apa jika kosong (opsional)
   }
   $catatanEsc = mysqli_real_escape_string($conn, $catatan);
   $userId = (int) $_SESSION['id_user'];
@@ -222,25 +221,19 @@ ORDER BY FIELD(p.status,'Menunggu','Disetujui','Ditolak'),p.id_permintaan DESC")
         var form = this.closest('form');
         Swal.fire({
           title: 'Tolak Pengajuan Edit Absensi',
-          text: 'Silakan berikan alasan atau catatan mengapa pengajuan ini ditolak (wajib diisi):',
+          text: 'Silakan berikan alasan mengapa pengajuan ini ditolak (Opsional):',
           input: 'textarea',
-          inputPlaceholder: 'Contoh: Surat keterangan dokter tidak dilampirkan atau alasan tidak sah...',
+          inputPlaceholder: 'Contoh: Surat keterangan dokter tidak dilampirkan (Opsional)',
           inputAttributes: {
-            'aria-label': 'Masukkan alasan penolakan'
+            'aria-label': 'Masukkan alasan penolakan (opsional)',
+            'style': 'width: 90% !important; margin: 10px auto !important; box-sizing: border-box !important; height: 120px !important; align-items: flex-start !important; padding-top: 15px !important;'
           },
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#dc2626',
           cancelButtonColor: '#64748b',
           confirmButtonText: '<i class="bi bi-x-lg me-1"></i> Ya, Tolak Pengajuan',
-          cancelButtonText: 'Batal',
-          preConfirm: (catatan) => {
-            if (!catatan || !catatan.trim()) {
-              Swal.showValidationMessage('Catatan Pimpinan wajib diisi saat menolak pengajuan!');
-              return false;
-            }
-            return catatan.trim();
-          }
+          cancelButtonText: 'Batal'
         }).then((result) => {
           if (result.isConfirmed) {
             var inputCatatan = document.createElement('input');
