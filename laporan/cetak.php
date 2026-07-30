@@ -18,10 +18,7 @@
 require_once __DIR__ . '/../config/koneksi.php';
 // --- SECTION 1: OTENTIKASI PENGGUNA ---
 // Memastikan pengguna sudah login sebelum mencetak laporan resmi.
-require_login();
-if (is_admin()) {
-    redirect('dashboard.php');
-}
+require_pimpinan();
 
 function cetak_bulan_list()
 {

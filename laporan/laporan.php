@@ -18,10 +18,7 @@
 require_once __DIR__ . '/../config/koneksi.php';
 // --- SECTION 1: OTENTIKASI PENGGUNA ---
 // Memastikan pengguna telah masuk ke dalam sistem.
-require_login();
-if (is_admin()) {
-    redirect('dashboard_admin.php');
-}
+require_pimpinan();
 require_once __DIR__ . '/../layout/header.php';
 
 /*
@@ -392,7 +389,7 @@ $query = http_build_query(array('filter' => $filter, 'bulan' => $bulan, 'tahun' 
                             <td><?= status_badge($row['status_pembayaran']) ?></td>
                             <td>
                                 <a class="btn btn-sm btn-outline-dark"
-                                    href="<?= url('transaksi/cetak_rincian.php?id=' . (int) $row['id_payroll']) ?>">Cetak</a>
+                                    href="<?= url('transaksi/slip_gaji.php?id=' . (int) $row['id_payroll']) ?>">Cetak</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

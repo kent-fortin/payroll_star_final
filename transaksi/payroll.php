@@ -240,7 +240,7 @@ $data=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM p
     <td class="text-center">
         <?php if ($row['status_validasi'] === 'Disetujui'): ?>
             <div class="d-flex flex-column gap-1" style="min-width: 130px;">
-                <a class="btn btn-sm btn-dark w-100 fw-bold" href="<?= url('transaksi/cetak_rincian.php?id='.$row['id_payroll']) ?>"><i class="bi bi-printer me-1"></i>Cetak Rincian</a>
+                <a class="btn btn-sm btn-dark w-100 fw-bold" href="<?= url('transaksi/slip_gaji.php?id='.$row['id_payroll']) ?>"><i class="bi bi-printer me-1"></i>Cetak Rincian</a>
                 <form method="post">
                     <input type="hidden" name="id_payroll" value="<?= $row['id_payroll'] ?>">
                     <input type="hidden" name="status" value="<?= $row['status_pembayaran']==='Sudah Dibayar'?'Belum Dibayar':'Sudah Dibayar' ?>">

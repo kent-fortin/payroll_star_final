@@ -42,16 +42,12 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `nama_lengkap` varchar(100) NOT NULL,
   `role` enum('admin','pimpinan') NOT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `no_whatsapp` varchar(30) DEFAULT NULL,
-  `reset_otp` varchar(10) DEFAULT NULL,
-  `reset_otp_expired_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id_user`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `role`, `email`, `no_whatsapp`, `reset_otp`, `reset_otp_expired_at`) VALUES ('1', 'admin', '$2y$12$qOoEq1cYdKjhvFcREUFnEeXxN6YQCY9g6n63CeSk15.h5KjcH4Axy', 'Administrator Payroll', 'admin', 'angelinocttt@gmail.com', '6287738565119', NULL, NULL);
-INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `role`, `email`, `no_whatsapp`, `reset_otp`, `reset_otp_expired_at`) VALUES ('2', 'pimpinan', '$2y$12$cKBHjEPMil4982WxBgAoZuff8wb0ccZcbSNRAHRG82A.5meQlWQWi', 'Pimpinan PT Star Samudera Logistik', 'pimpinan', 'kentfh206@gmail.com', '6281933630535', NULL, NULL);
+INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `role`) VALUES ('1', 'admin', '$2y$12$qOoEq1cYdKjhvFcREUFnEeXxN6YQCY9g6n63CeSk15.h5KjcH4Axy', 'Administrator Payroll', 'admin');
+INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `role`) VALUES ('2', 'pimpinan', '$2y$12$cKBHjEPMil4982WxBgAoZuff8wb0ccZcbSNRAHRG82A.5meQlWQWi', 'Pimpinan PT Star Samudera Logistik', 'pimpinan');
 
 DROP TABLE IF EXISTS `jabatan`;
 CREATE TABLE `jabatan` (

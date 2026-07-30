@@ -22,6 +22,9 @@
 | Tidak membutuhkan Chart.js atau koneksi internet.
 */
 
+require_once __DIR__ . '/../config/koneksi.php';
+require_pimpinan();
+
 if (!isset($conn) || !$conn) {
     echo '<div class="alert alert-warning">Grafik belum dapat ditampilkan karena koneksi database tidak tersedia.</div>';
     return;
