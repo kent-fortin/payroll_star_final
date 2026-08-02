@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['preview'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['simpan_payroll'])) {
+    // [PENCARIAN-FUNGSI: HITUNG RUMUS GAJI] Memanggil helper fungsi untuk kalkulasi total Gaji Pokok + Lembur - Potongan
     $calc=calculate_payroll($conn,$selectedId,$selectedMonth,$selectedYear,$selectedTunjangan);
     if(!$calc){
         set_flash('danger','Payroll gagal disimpan karena rekap absensi belum tersedia.');
@@ -44,10 +45,12 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['simpan_payroll'])) {
             $userId=(int)$_SESSION['id_user'];
             if($existing){
                 $idPayroll=(int)$existing['id_payroll'];
+                // [PENCARIAN-FUNGSI: UPDATE PAYROLL] Menyimpan ulang / mengupdate hasil perhitungan gaji jika sudah ada datanya
                 $stmt=mysqli_prepare($conn,"UPDATE payroll SET gaji_pokok=?,jam_lembur=?,tarif_lembur=?,total_lembur=?,total_tunjangan=?,jumlah_alpha=?,tarif_alpha=?,total_potongan_alpha=?,total_gaji_bersih=?,tanggal_proses=NOW(),diproses_oleh=?,status_validasi='Menunggu' WHERE id_payroll=?");
                 $ok=false;
                 if($stmt){mysqli_stmt_bind_param($stmt,'didddidddii',$calc['gaji_pokok'],$calc['lembur_jam'],$calc['tarif_lembur'],$calc['total_lembur'],$calc['total_tunjangan'],$calc['alpha'],$calc['tarif_alpha'],$calc['potongan_alpha'],$calc['gaji_bersih'],$userId,$idPayroll);$ok=mysqli_stmt_execute($stmt);}
             } else {
+                // [PENCARIAN-FUNGSI: SIMPAN PAYROLL BARU] Menginsert record data penggajian yang benar-benar baru
                 $stmt=mysqli_prepare($conn,'INSERT INTO payroll (id_karyawan,bulan,tahun,gaji_pokok,jam_lembur,tarif_lembur,total_lembur,total_tunjangan,jumlah_alpha,tarif_alpha,total_potongan_alpha,total_gaji_bersih,diproses_oleh) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)');
                 $ok=false;
                 if($stmt){mysqli_stmt_bind_param($stmt,'isididddidddi',$selectedId,$selectedMonth,$selectedYear,$calc['gaji_pokok'],$calc['lembur_jam'],$calc['tarif_lembur'],$calc['total_lembur'],$calc['total_tunjangan'],$calc['alpha'],$calc['tarif_alpha'],$calc['potongan_alpha'],$calc['gaji_bersih'],$userId);$ok=mysqli_stmt_execute($stmt);}

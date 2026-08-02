@@ -15,6 +15,7 @@
  * ============================================================================
  */
 
+// Fungsi untuk mendapatkan root directory project agar path URL dinamis dan tidak error saat diupload ke hosting
 function base_path(): string
 {
     // Determine the base path based on the location of index.php
@@ -33,6 +34,7 @@ function base_path(): string
     return '';
 }
 
+// Fungsi untuk men-generate URL absolut (base url + path), berguna untuk link antar halaman
 function url(string $path = ''): string
 {
     $base = rtrim(base_path(), '/');
@@ -40,6 +42,7 @@ function url(string $path = ''): string
     return $path === '' ? ($base ?: '/') : $base . '/' . $path;
 }
 
+// Fungsi khusus untuk memanggil file statis (CSS/JS/Gambar) yang ada di folder assets
 function asset(string $path): string
 {
     return url('assets/' . ltrim($path, '/'));
@@ -74,17 +77,20 @@ function get_flash(): ?array
     return $flash;
 }
 
+// Fungsi untuk melakukan pindah halaman (redirect) dan langsung menghentikan script (exit) agar aman
 function redirect(string $path): void
 {
     header('Location: ' . url($path));
     exit;
 }
 
+// Mengecek apakah ada user yang sedang login saat ini (berdasarkan session id_user)
 function is_logged_in(): bool
 {
     return isset($_SESSION['id_user']);
 }
 
+// Memaksa user untuk login, jika belum login akan dilempar (redirect) paksa ke halaman login
 function require_login(): void
 {
     if (!is_logged_in()) {
@@ -92,16 +98,19 @@ function require_login(): void
     }
 }
 
+// Mengecek apakah user yang sedang login memiliki hak akses (role) sebagai 'admin'
 function is_admin(): bool
 {
     return ($_SESSION['role'] ?? '') === 'admin';
 }
 
+// Mengecek apakah user yang sedang login memiliki hak akses (role) sebagai 'pimpinan'
 function is_pimpinan(): bool
 {
     return ($_SESSION['role'] ?? '') === 'pimpinan';
 }
 
+// Memaksa bahwa halaman ini HANYA boleh diakses oleh Admin. Jika bukan Admin, redirect dan tolak akses.
 function require_admin(): void
 {
     require_login();
@@ -112,6 +121,7 @@ function require_admin(): void
     }
 }
 
+// Memaksa bahwa halaman ini HANYA boleh diakses oleh Pimpinan. Jika Admin/Guest mencoba masuk, akan dilempar.
 function require_pimpinan(): void
 {
     require_login();
@@ -122,6 +132,7 @@ function require_pimpinan(): void
     }
 }
 
+// Fungsi untuk mencatat aktivitas/error sistem (log) ke dalam file .txt di folder logs/ (berguna untuk debugging)
 function app_log(string $message): void
 {
     $dir = dirname(__DIR__) . '/logs';
@@ -242,6 +253,7 @@ function calculate_payroll(mysqli $conn, int $idKaryawan, string $bulan, int $ta
     ]);
 }
 
+// Membuat Kode Jabatan otomatis (contoh: JBT001, JBT002) serupa dengan konsep generate NIP.
 function generate_jabatan_code(int $id): string
 {
     return 'JBT' . str_pad((string)$id, 3, '0', STR_PAD_LEFT);
@@ -249,6 +261,7 @@ function generate_jabatan_code(int $id): string
 
 // --- SECTION 2: GENERATOR AUTOMATION KODE ---
 // Fungsi otomatis pembuat NIP (mulai SSL001) dan kode Jabatan (JBT...).
+// Membuat NIP otomatis (contoh: SSL001, SSL002). Mengambil angka NIP terakhir dari database dan ditambah 1.
 function generate_nip(int $id): string
 {
     return 'SSL' . str_pad((string)$id, 3, '0', STR_PAD_LEFT);
