@@ -108,6 +108,7 @@ function rpt_load($conn, $filter, $bulan, $tahun)
 {
     list($start, $end) = rpt_period_range($filter, $bulan, $tahun);
 
+    // [PENCARIAN-FUNGSI: AMBIL DATA LENGKAP LAPORAN] Menarik data payroll beserta relasinya untuk ditampilkan di tabel rekapitulasi laporan
     $sql = "SELECT
                 p.id_payroll,
                 p.bulan,

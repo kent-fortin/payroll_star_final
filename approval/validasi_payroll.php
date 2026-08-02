@@ -25,12 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['keputusan'])) {
     $keputusan = $_POST['keputusan'] === 'setujui' ? 'Disetujui' : 'Ditolak';
     
     $statusEsc = mysqli_real_escape_string($conn, $keputusan);
+    // [PENCARIAN-FUNGSI: UBAH STATUS] Memperbarui status validasi payroll menjadi Disetujui / Ditolak
     $ok = mysqli_query($conn, "UPDATE payroll SET status_validasi='$statusEsc' WHERE id_payroll=$id");
     
     set_flash($ok ? 'success' : 'danger', $ok ? 'Validasi payroll berhasil disimpan.' : 'Validasi payroll gagal disimpan.');
     redirect('approval/validasi_payroll.php');
 }
 
+// [PENCARIAN-FUNGSI: AMBIL DATA (SELECT) JOIN] Mengambil daftar payroll yang statusnya 'Menunggu' validasi
 $data = mysqli_query($conn, "SELECT p.*, k.nip, k.nama_karyawan, j.nama_jabatan 
 FROM payroll p 
 JOIN karyawan k ON k.id_karyawan = p.id_karyawan 

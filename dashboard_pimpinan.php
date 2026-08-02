@@ -26,7 +26,9 @@ $currentMonth = current_month_name();
 $currentYear = (int)date('Y');
 $monthEsc = mysqli_real_escape_string($conn, $currentMonth);
 $countAbsensi = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) total FROM absensi WHERE bulan='$monthEsc' AND tahun=$currentYear"))['total'] ?? 0);
+// [PENCARIAN-FUNGSI: AMBIL DATA (SELECT)] Menghitung berapa banyak request edit absensi yang masih 'Menunggu' persetujuan
 $countPending = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) total FROM permintaan_edit_absensi WHERE status='Menunggu'"))['total'] ?? 0);
+// [PENCARIAN-FUNGSI: AMBIL DATA (SELECT)] Menghitung berapa banyak payroll yang statusnya 'Menunggu' divalidasi
 $countValidasi = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) total FROM payroll WHERE status_validasi='Menunggu'"))['total'] ?? 0);
 
 $today = date('Y-m-d');

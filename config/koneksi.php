@@ -47,7 +47,7 @@ $db = 'if0_42362934_db_payroll_star_samudera';
 
 
 // --- SECTION 2: PEMBUATAN KONEKSI & ERROR REPORTING ---
-// Menghubungkan PHP dengan MySQL serta mengatur standar karakter utf8mb4.
+// [PENCARIAN-FUNGSI: KONEKSI DATABASE] Menghubungkan script PHP dengan server MySQL menggunakan mysqli_connect
 $conn = mysqli_connect($host, $user, $pass, $db);
 if ($conn) {
     mysqli_set_charset($conn, 'utf8mb4');

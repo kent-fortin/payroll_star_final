@@ -23,6 +23,7 @@ require_admin();
 // ── HANDLE DELETE ────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hapus'])) {
     $id = (int)($_POST['id_lembur'] ?? 0);
+    // [PENCARIAN-FUNGSI: HAPUS DATA (DELETE)] Menghapus record lembur berdasarkan ID
     $ok = mysqli_query($conn, "DELETE FROM lembur WHERE id_lembur=$id");
     set_flash($ok ? 'success' : 'danger', $ok ? 'Data lembur berhasil dihapus.' : 'Data lembur gagal dihapus.');
     redirect('master/lembur.php');
@@ -46,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     if ($idKaryawan < 1 || $tanggal === '' || $jam < 1) {
         set_flash('danger', 'Data lembur gagal disimpan. Pilih karyawan, isi tanggal dan jumlah jam (min. 1).');
     } elseif ($id > 0) {
-        // Update
+        // [PENCARIAN-FUNGSI: UBAH DATA (UPDATE)] Memperbarui durasi jam lembur yang sudah ada
         $stmt = mysqli_prepare($conn, 'UPDATE lembur SET id_karyawan=?,tanggal_lembur=?,jam_lembur=? WHERE id_lembur=?');
         $ok = false;
         if ($stmt) {

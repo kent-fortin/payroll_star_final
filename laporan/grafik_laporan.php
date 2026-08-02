@@ -56,6 +56,7 @@ $cekStatus = mysqli_query($conn, "SHOW COLUMNS FROM payroll LIKE 'status_pembaya
 $punyaStatus = $cekStatus && mysqli_num_rows($cekStatus) > 0;
 
 if ($punyaStatus) {
+    // [PENCARIAN-FUNGSI: AMBIL DATA GRAFIK] Mengambil data gaji dari database dan dikelompokkan (GROUP BY) berdasarkan tahun dan bulan untuk grafik
     $sql = "
         SELECT
             bulan,

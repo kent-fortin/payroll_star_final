@@ -42,6 +42,7 @@ function cetak_bulan_nomor($bulan)
 function cetak_latest_period($conn)
 {
     $latest = array('bulan' => cetak_bulan_list()[(int)date('n')], 'tahun' => (int)date('Y'));
+    // [PENCARIAN-FUNGSI: PERIODE TERBARU] Mencari data periode payroll teranyar untuk laporan cetak default
     $q = mysqli_query($conn, "SELECT bulan, tahun FROM payroll");
     $latestKey = 0;
     if ($q) {

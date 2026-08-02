@@ -17,7 +17,7 @@
 
 require_once __DIR__ . '/../config/koneksi.php';
 if (is_logged_in() && $conn) {
-    // Redirect ke dashboard spesifik
+    // [PENCARIAN-FUNGSI: BYPASS LOGIN] Redirect langsung ke dashboard jika ternyata user sudah pernah login (memiliki sesi aktif)
     redirect(is_admin() ? 'dashboard_admin.php' : 'dashboard_pimpinan.php');
 }
 $flash = get_flash();

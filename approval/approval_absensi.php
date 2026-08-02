@@ -37,11 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['keputusan'])) {
   $ok = (bool) $req;
   if ($ok && $keputusan === 'Disetujui') {
     $idAbs = (int) $req['id_absensi'];
-    // Update absensi tanpa lembur_jam (sudah dipisah ke tabel lembur)
+    // [PENCARIAN-FUNGSI: UBAH DATA (UPDATE)] Jika Pimpinan menyetujui, maka tabel absensi utama otomatis diperbarui
     $ok = mysqli_query($conn, "UPDATE absensi SET hadir=" . (int) $req['hadir_baru'] . ",sakit=" . (int) $req['sakit_baru'] . ",izin=" . (int) $req['izin_baru'] . ",alpha=" . (int) $req['alpha_baru'] . ",diperbarui_pada=NOW() WHERE id_absensi=$idAbs");
   }
   if ($ok) {
     $statusEsc = mysqli_real_escape_string($conn, $keputusan);
+    // [PENCARIAN-FUNGSI: UBAH STATUS] Update status permintaan menjadi 'Disetujui' atau 'Ditolak'
     $ok = mysqli_query($conn, "UPDATE permintaan_edit_absensi SET status='$statusEsc',id_penyetuju=$userId,tanggal_keputusan=NOW(),catatan_pimpinan='$catatanEsc' WHERE id_permintaan=$id");
   }
   if ($ok) {

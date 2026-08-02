@@ -20,6 +20,7 @@ require_once __DIR__ . '/layout/header.php';
 // Memastikan hanya Admin yang dapat mengakses dashboard utama ini.
 require_admin();
 
+// [PENCARIAN-FUNGSI: AMBIL DATA (SELECT)] Mengambil total jumlah karyawan dari tabel karyawan
 $countKaryawan = (int)(mysqli_fetch_assoc(mysqli_query($conn, 'SELECT COUNT(*) total FROM karyawan'))['total'] ?? 0);
 $countJabatan = (int)(mysqli_fetch_assoc(mysqli_query($conn, 'SELECT COUNT(*) total FROM jabatan'))['total'] ?? 0);
 $currentMonth = current_month_name();
@@ -31,6 +32,7 @@ $paid = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) total,COALESCE(S
 $today = date('Y-m-d');
 // --- SECTION 3: PENGAMBILAN DATA WIDGET PRESENSI HARI INI ---
 // Mengambil daftar absensi karyawan pada tanggal hari ini (CURDATE()) untuk tabel rekap harian.
+// [PENCARIAN-FUNGSI: AMBIL DATA (SELECT) JOIN] Mengambil daftar presensi hari ini lengkap dengan relasi tabel karyawan dan jabatan
 $queryPresensiHariIni = mysqli_query($conn, "SELECT p.*, k.nip, k.nama_karyawan, j.nama_jabatan 
     FROM presensi_harian p 
     JOIN karyawan k ON k.id_karyawan = p.id_karyawan 

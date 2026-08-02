@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hitung_rekap'])) {
   if ($bulanNomor === 0 || $tahun < 2000) {
     set_flash('danger', 'Pilih bulan dan tahun yang valid.');
   } else {
-    // Hitung rekap dari presensi_harian untuk bulan & tahun yang dipilih
+    // [PENCARIAN-FUNGSI: AMBIL DATA (SELECT)] Hitung rekap dari presensi_harian untuk bulan & tahun yang dipilih
     $userId = (int) $_SESSION['id_user'];
     $sql = "SELECT
                     k.id_karyawan,
