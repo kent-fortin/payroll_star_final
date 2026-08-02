@@ -15,10 +15,13 @@
  */
 
 require_once __DIR__ . '/../config/koneksi.php';
+
+// --- SECTION 1: PENGHAPUSAN DAN PENGHANCURAN SESI LOGIN ---
+// [PENCARIAN-FUNGSI: LOGOUT] Menghancurkan seluruh sesi login aktif dan mengalihkan user kembali ke form login
+session_start();
 session_unset();
 session_destroy();
-// --- SECTION 1: PENGHAPUSAN DAN PENGHANCURAN SESI LOGIN ---
-// Membersihkan seluruh variabel session dan menghancurkannya agar keluar dari sistem.
+
 session_start();
 set_flash('success', 'Anda telah logout.');
 redirect('auth/login.php');
