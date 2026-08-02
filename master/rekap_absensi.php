@@ -177,6 +177,7 @@ $historyEdit = mysqli_query($conn, "SELECT p.*, a.bulan, a.tahun, k.nip, k.nama_
   </form>
 
   <script>
+    // [PENCARIAN-FUNGSI: KONFIRMASIREKAP] Logika fungsi konfirmasiRekap
     function konfirmasiRekap() {
       Swal.fire({
         title: 'Konfirmasi',

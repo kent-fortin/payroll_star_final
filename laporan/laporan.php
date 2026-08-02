@@ -26,6 +26,7 @@ require_once __DIR__ . '/../layout/header.php';
  * belum ikut tertimpa saat project disalin ke htdocs.
  */
 
+// [PENCARIAN-FUNGSI: RPT BULAN LIST] Logika fungsi rpt_bulan_list
 function rpt_bulan_list()
 {
     return array(
@@ -44,6 +45,7 @@ function rpt_bulan_list()
     );
 }
 
+// [PENCARIAN-FUNGSI: RPT BULAN NOMOR] Logika fungsi rpt_bulan_nomor
 function rpt_bulan_nomor($bulan)
 {
     foreach (rpt_bulan_list() as $nomor => $nama) {
@@ -54,6 +56,7 @@ function rpt_bulan_nomor($bulan)
     return 0;
 }
 
+// [PENCARIAN-FUNGSI: RPT BULAN OPTIONS] Logika fungsi rpt_bulan_options
 function rpt_bulan_options($selected)
 {
     $html = '';
@@ -64,6 +67,7 @@ function rpt_bulan_options($selected)
     return $html;
 }
 
+// [PENCARIAN-FUNGSI: RPT LATEST PERIOD] Logika fungsi rpt_latest_period
 function rpt_latest_period($conn)
 {
     $latest = array('bulan' => rpt_bulan_list()[(int) date('n')], 'tahun' => (int) date('Y'));
@@ -85,6 +89,7 @@ function rpt_latest_period($conn)
     return $latest;
 }
 
+// [PENCARIAN-FUNGSI: RPT PERIOD RANGE] Logika fungsi rpt_period_range
 function rpt_period_range($filter, $bulan, $tahun)
 {
     $month = rpt_bulan_nomor($bulan);
@@ -104,6 +109,7 @@ function rpt_period_range($filter, $bulan, $tahun)
     return array($start, $end);
 }
 
+// [PENCARIAN-FUNGSI: RPT LOAD] Logika fungsi rpt_load
 function rpt_load($conn, $filter, $bulan, $tahun)
 {
     list($start, $end) = rpt_period_range($filter, $bulan, $tahun);

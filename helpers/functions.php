@@ -16,6 +16,7 @@
  */
 
 // Fungsi untuk mendapatkan root directory project agar path URL dinamis dan tidak error saat diupload ke hosting
+// [PENCARIAN-FUNGSI: BASE PATH] Logika fungsi base_path
 function base_path(): string
 {
     // Determine the base path based on the location of index.php
@@ -35,6 +36,7 @@ function base_path(): string
 }
 
 // Fungsi untuk men-generate URL absolut (base url + path), berguna untuk link antar halaman
+// [PENCARIAN-FUNGSI: URL] Logika fungsi url
 function url(string $path = ''): string
 {
     $base = rtrim(base_path(), '/');
@@ -43,6 +45,7 @@ function url(string $path = ''): string
 }
 
 // Fungsi khusus untuk memanggil file statis (CSS/JS/Gambar) yang ada di folder assets
+// [PENCARIAN-FUNGSI: ASSET] Logika fungsi asset
 function asset(string $path): string
 {
     return url('assets/' . ltrim($path, '/'));
@@ -50,11 +53,13 @@ function asset(string $path): string
 
 // --- SECTION 1: FUNGSI KEAMANAN & FORMATTING ---
 // Fungsi untuk mengamankan string dari serangan XSS serta memformat angka ke rupiah.
+// [PENCARIAN-FUNGSI: E] Logika fungsi e
 function e($value): string
 {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
+// [PENCARIAN-FUNGSI: RUPIAH] Logika fungsi rupiah
 function rupiah($value): string
 {
     return 'Rp ' . number_format((float)$value, 0, ',', '.');
@@ -62,11 +67,13 @@ function rupiah($value): string
 
 // --- SECTION 4: MANAJEMEN PESAN NOTIFIKASI (FLASH MESSAGES) ---
 // Mengatur dan mengambil pesan notifikasi sukses/error untuk ditampilkan via SweetAlert2.
+// [PENCARIAN-FUNGSI: SET FLASH] Logika fungsi set_flash
 function set_flash(string $type, string $message): void
 {
     $_SESSION['flash'] = ['type' => $type, 'message' => $message];
 }
 
+// [PENCARIAN-FUNGSI: GET FLASH] Logika fungsi get_flash
 function get_flash(): ?array
 {
     if (!isset($_SESSION['flash'])) {
@@ -78,6 +85,7 @@ function get_flash(): ?array
 }
 
 // Fungsi untuk melakukan pindah halaman (redirect) dan langsung menghentikan script (exit) agar aman
+// [PENCARIAN-FUNGSI: REDIRECT] Logika fungsi redirect
 function redirect(string $path): void
 {
     header('Location: ' . url($path));
@@ -85,12 +93,14 @@ function redirect(string $path): void
 }
 
 // Mengecek apakah ada user yang sedang login saat ini (berdasarkan session id_user)
+// [PENCARIAN-FUNGSI: IS LOGGED IN] Logika fungsi is_logged_in
 function is_logged_in(): bool
 {
     return isset($_SESSION['id_user']);
 }
 
 // Memaksa user untuk login, jika belum login akan dilempar (redirect) paksa ke halaman login
+// [PENCARIAN-FUNGSI: REQUIRE LOGIN] Logika fungsi require_login
 function require_login(): void
 {
     if (!is_logged_in()) {
@@ -99,18 +109,21 @@ function require_login(): void
 }
 
 // Mengecek apakah user yang sedang login memiliki hak akses (role) sebagai 'admin'
+// [PENCARIAN-FUNGSI: IS ADMIN] Logika fungsi is_admin
 function is_admin(): bool
 {
     return ($_SESSION['role'] ?? '') === 'admin';
 }
 
 // Mengecek apakah user yang sedang login memiliki hak akses (role) sebagai 'pimpinan'
+// [PENCARIAN-FUNGSI: IS PIMPINAN] Logika fungsi is_pimpinan
 function is_pimpinan(): bool
 {
     return ($_SESSION['role'] ?? '') === 'pimpinan';
 }
 
 // Memaksa bahwa halaman ini HANYA boleh diakses oleh Admin. Jika bukan Admin, redirect dan tolak akses.
+// [PENCARIAN-FUNGSI: REQUIRE ADMIN] Logika fungsi require_admin
 function require_admin(): void
 {
     require_login();
@@ -122,6 +135,7 @@ function require_admin(): void
 }
 
 // Memaksa bahwa halaman ini HANYA boleh diakses oleh Pimpinan. Jika Admin/Guest mencoba masuk, akan dilempar.
+// [PENCARIAN-FUNGSI: REQUIRE PIMPINAN] Logika fungsi require_pimpinan
 function require_pimpinan(): void
 {
     require_login();
@@ -133,6 +147,7 @@ function require_pimpinan(): void
 }
 
 // Fungsi untuk mencatat aktivitas/error sistem (log) ke dalam file .txt di folder logs/ (berguna untuk debugging)
+// [PENCARIAN-FUNGSI: APP LOG] Logika fungsi app_log
 function app_log(string $message): void
 {
     $dir = dirname(__DIR__) . '/logs';
@@ -142,6 +157,7 @@ function app_log(string $message): void
     @file_put_contents($dir . '/app.log', '[' . date('Y-m-d H:i:s') . '] ' . $message . PHP_EOL, FILE_APPEND);
 }
 
+// [PENCARIAN-FUNGSI: DB OR REDIRECT] Logika fungsi db_or_redirect
 function db_or_redirect($conn): void
 {
     if (!$conn) {
@@ -150,6 +166,7 @@ function db_or_redirect($conn): void
     }
 }
 
+// [PENCARIAN-FUNGSI: BULAN LIST] Logika fungsi bulan_list
 function bulan_list(): array
 {
     return [
@@ -159,6 +176,7 @@ function bulan_list(): array
     ];
 }
 
+// [PENCARIAN-FUNGSI: BULAN NOMOR] Logika fungsi bulan_nomor
 function bulan_nomor(string $bulan): int
 {
     foreach (bulan_list() as $nomor => $nama) {
@@ -169,6 +187,7 @@ function bulan_nomor(string $bulan): int
     return 0;
 }
 
+// [PENCARIAN-FUNGSI: BULAN OPTIONS] Logika fungsi bulan_options
 function bulan_options(string $selected = ''): string
 {
     $html = '';
@@ -179,11 +198,13 @@ function bulan_options(string $selected = ''): string
     return $html;
 }
 
+// [PENCARIAN-FUNGSI: CURRENT MONTH NAME] Logika fungsi current_month_name
 function current_month_name(): string
 {
     return bulan_list()[(int)date('n')];
 }
 
+// [PENCARIAN-FUNGSI: GET SETTING] Logika fungsi get_setting
 function get_setting(mysqli $conn, string $key, float $default = 0): float
 {
     $keyEsc = mysqli_real_escape_string($conn, $key);
@@ -196,6 +217,7 @@ function get_setting(mysqli $conn, string $key, float $default = 0): float
 
 // --- SECTION 3: RUMUS INTI PERHITUNGAN GAJI (PAYROLL ENGINE) ---
 // Menghitung Gaji Pokok + Lembur + Tunjangan - Potongan Alpha (bersih tanpa potongan BPJS/PPh 21).
+// [PENCARIAN-FUNGSI: CALCULATE PAYROLL] Logika fungsi calculate_payroll
 function calculate_payroll(mysqli $conn, int $idKaryawan, string $bulan, int $tahun, float $tunjangan = 0): ?array
 {
     $bulanEsc = mysqli_real_escape_string($conn, $bulan);
@@ -254,6 +276,7 @@ function calculate_payroll(mysqli $conn, int $idKaryawan, string $bulan, int $ta
 }
 
 // Membuat Kode Jabatan otomatis (contoh: JBT001, JBT002) serupa dengan konsep generate NIP.
+// [PENCARIAN-FUNGSI: GENERATE JABATAN CODE] Logika fungsi generate_jabatan_code
 function generate_jabatan_code(int $id): string
 {
     return 'JBT' . str_pad((string)$id, 3, '0', STR_PAD_LEFT);
@@ -262,11 +285,13 @@ function generate_jabatan_code(int $id): string
 // --- SECTION 2: GENERATOR AUTOMATION KODE ---
 // Fungsi otomatis pembuat NIP (mulai SSL001) dan kode Jabatan (JBT...).
 // Membuat NIP otomatis (contoh: SSL001, SSL002). Mengambil angka NIP terakhir dari database dan ditambah 1.
+// [PENCARIAN-FUNGSI: GENERATE NIP] Logika fungsi generate_nip
 function generate_nip(int $id): string
 {
     return 'SSL' . str_pad((string)$id, 3, '0', STR_PAD_LEFT);
 }
 
+// [PENCARIAN-FUNGSI: STATUS BADGE] Logika fungsi status_badge
 function status_badge(string $status): string
 {
     $class = match ($status) {
@@ -280,6 +305,7 @@ function status_badge(string $status): string
     return '<span class="badge bg-' . $class . ' px-3 py-1 rounded-pill">' . e($status) . '</span>';
 }
 
+// [PENCARIAN-FUNGSI: FILTER PERIOD] Logika fungsi filter_period
 function filter_period(string $filter, string $bulan, int $tahun): array
 {
     $month = bulan_nomor($bulan) ?: (int)date('n');
@@ -294,6 +320,7 @@ function filter_period(string $filter, string $bulan, int $tahun): array
     return [$start, $end];
 }
 
+// [PENCARIAN-FUNGSI: LOAD PAYROLL REPORT] Logika fungsi load_payroll_report
 function load_payroll_report(mysqli $conn, string $filter, string $bulan, int $tahun): array
 {
     [$start, $end] = filter_period($filter, $bulan, $tahun);

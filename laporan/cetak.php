@@ -20,6 +20,7 @@ require_once __DIR__ . '/../config/koneksi.php';
 // Memastikan pengguna sudah login sebelum mencetak laporan resmi.
 require_pimpinan();
 
+// [PENCARIAN-FUNGSI: CETAK BULAN LIST] Logika fungsi cetak_bulan_list
 function cetak_bulan_list()
 {
     return array(
@@ -29,6 +30,7 @@ function cetak_bulan_list()
     );
 }
 
+// [PENCARIAN-FUNGSI: CETAK BULAN NOMOR] Logika fungsi cetak_bulan_nomor
 function cetak_bulan_nomor($bulan)
 {
     foreach (cetak_bulan_list() as $nomor => $nama) {
@@ -39,6 +41,7 @@ function cetak_bulan_nomor($bulan)
     return 0;
 }
 
+// [PENCARIAN-FUNGSI: CETAK LATEST PERIOD] Logika fungsi cetak_latest_period
 function cetak_latest_period($conn)
 {
     $latest = array('bulan' => cetak_bulan_list()[(int)date('n')], 'tahun' => (int)date('Y'));
@@ -58,6 +61,7 @@ function cetak_latest_period($conn)
     return $latest;
 }
 
+// [PENCARIAN-FUNGSI: CETAK RANGE] Logika fungsi cetak_range
 function cetak_range($filter, $bulan, $tahun)
 {
     $m = cetak_bulan_nomor($bulan);

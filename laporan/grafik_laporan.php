@@ -31,6 +31,7 @@ if (!isset($conn) || !$conn) {
 }
 
 if (!function_exists('grafik_h')) {
+    // [PENCARIAN-FUNGSI: GRAFIK H] Logika fungsi grafik_h
     function grafik_h($value)
     {
         return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');

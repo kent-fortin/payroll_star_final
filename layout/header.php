@@ -22,6 +22,7 @@ db_or_redirect($conn);
 $flash = get_flash();
 $currentPath = str_replace('\\', '/', $_SERVER['PHP_SELF'] ?? '');
 
+// [PENCARIAN-FUNGSI: NAV ITEM] Logika fungsi nav_item
 function nav_item(string $label, string $href, string $currentPath, string $icon = 'circle', int $badgeCount = 0): string
 {
     $active = str_contains($currentPath, $href) ? 'active' : '';
@@ -31,6 +32,7 @@ function nav_item(string $label, string $href, string $currentPath, string $icon
          . '</a>';
 }
 
+// [PENCARIAN-FUNGSI: NAV HEADING] Logika fungsi nav_heading
 function nav_heading(string $label): string
 {
     return '<div class="sidebar-heading">' . e($label) . '</div>';

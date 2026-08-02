@@ -139,6 +139,7 @@ $data = mysqli_query($conn, 'SELECT * FROM jabatan ORDER BY id_jabatan');
 </form>
 
 <script>
+// [PENCARIAN-FUNGSI: TOGGLESTATUSJABATAN] Logika fungsi toggleStatusJabatan
 function toggleStatusJabatan(idJabatan, statusBaru, namaJabatan) {
     Swal.fire({
         title: 'Konfirmasi',
