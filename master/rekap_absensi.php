@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hitung_rekap'])) {
       }
     }
   }
-  redirect('master/absensi.php');
+  redirect('master/rekap_absensi.php');
 }
 
 // ── POST: Ajukan Edit Rekap Absensi ─────────────────────────────────────────
@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajukan_edit_absensi']
       set_flash('danger', 'Gagal mengajukan edit absensi: ' . mysqli_error($conn));
     }
   }
-  redirect('master/absensi.php');
+  redirect('master/rekap_absensi.php');
 }
 
 // ── GET: Tampilkan halaman ───────────────────────────────────────────────────

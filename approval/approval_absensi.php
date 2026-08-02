@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['keputusan'])) {
     app_log('Approval absensi: ' . mysqli_error($conn));
     set_flash('danger', 'Keputusan gagal disimpan. Silakan coba kembali.');
   }
-  redirect('approval/absensi.php');
+  redirect('approval/approval_absensi.php');
 }
 
 $data = mysqli_query($conn, "SELECT p.*,a.bulan,a.tahun,k.nip,k.nama_karyawan,u.nama_lengkap pengaju

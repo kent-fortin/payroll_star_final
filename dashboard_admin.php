@@ -53,7 +53,7 @@ $rejectedEdits = mysqli_query($conn, "SELECT p.*, k.nama_karyawan, a.bulan, a.ta
     <i class="bi bi-exclamation-triangle-fill fs-5 me-2 align-middle text-danger"></i>
     <strong>Perhatian!</strong> Ada pengajuan edit absensi Anda yang <strong>ditolak</strong> oleh Pimpinan. Periksa catatan penolakan.
   </div>
-  <a href="<?= url('master/absensi.php') ?>" class="btn btn-sm btn-danger fw-bold px-3">Lihat Riwayat</a>
+  <a href="<?= url('master/rekap_absensi.php') ?>" class="btn btn-sm btn-danger fw-bold px-3">Lihat Riwayat</a>
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 <?php endif; ?>
@@ -82,7 +82,7 @@ $rejectedEdits = mysqli_query($conn, "SELECT p.*, k.nama_karyawan, a.bulan, a.ta
           <i class="bi bi-chevron-double-right fs-4"></i>
         </div>
         <div class="flex-fill">
-          <a class="btn btn-outline-primary w-100 py-3 h-100 d-flex align-items-center justify-content-center flex-column" style="border-radius: 12px; font-size: 0.85rem;" href="<?= url('master/absensi.php') ?>">
+          <a class="btn btn-outline-primary w-100 py-3 h-100 d-flex align-items-center justify-content-center flex-column" style="border-radius: 12px; font-size: 0.85rem;" href="<?= url('master/rekap_absensi.php') ?>">
             <i class="bi bi-2-circle fs-4 mb-2"></i> <span>Rekap Absensi</span>
           </a>
         </div>

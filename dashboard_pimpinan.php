@@ -52,7 +52,7 @@ $todayAlpha = (int)($todayData['alpha'] ?? 0);
 <div class="col-lg-8"><div class="card content-card shadow-sm p-4 h-100"><h2 class="h4 mb-3">Daftar Tugas & Approval</h2>
 <div class="row g-3 h-100 pb-3">
 <div class="col-md-4">
-  <a class="btn btn-outline-primary w-100 py-3 position-relative d-flex flex-column align-items-center justify-content-center h-100" style="border-radius: 12px;" href="<?= url('approval/absensi.php') ?>">
+  <a class="btn btn-outline-primary w-100 py-3 position-relative d-flex flex-column align-items-center justify-content-center h-100" style="border-radius: 12px;" href="<?= url('approval/approval_absensi.php') ?>">
     <i class="bi bi-check2-circle fs-4 mb-2"></i>
     <span style="font-size: 0.9rem;">Edit Absensi</span>
     <?php if ($countPending > 0): ?>

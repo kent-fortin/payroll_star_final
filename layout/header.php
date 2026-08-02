@@ -90,15 +90,19 @@ if (is_logged_in() && is_pimpinan()) {
                 <!-- TRANSAKSI -->
                 <?= nav_heading('Transaksi') ?>
                 <?= nav_item('Presensi Harian', 'master/presensi_harian.php', $currentPath, 'calendar3-week-fill') ?>
-                <?= nav_item('Rekap Absensi', 'master/absensi.php', $currentPath, 'calendar-check-fill') ?>
+                <?= nav_item('Rekap Absensi', 'master/rekap_absensi.php', $currentPath, 'calendar-check-fill') ?>
                 <?= nav_item('Data Lembur', 'master/lembur.php', $currentPath, 'clock-history') ?>
-                <?= nav_item('Proses Payroll', 'transaksi/payroll.php', $currentPath, 'cash-stack') ?>
+                <li class="nav-item mt-3 mb-1">
+                    <span class="nav-link text-uppercase fs-7 fw-bold text-muted ps-3">Transaksi</span>
+                </li>
+                <?= nav_item('Proses Payroll', 'transaksi/payroll.php', $currentPath, 'wallet2') ?>
 
             <?php else: ?>
-
-                <!-- MENU PIMPINAN -->
-                <?= nav_heading('Approval') ?>
-                <?= nav_item('Approval Absensi', 'approval/absensi.php', $currentPath, 'check2-circle', $pendingEditAbsensi) ?>
+                <?= nav_item('Dashboard', 'dashboard_pimpinan.php', $currentPath, 'house-fill') ?>
+                <li class="nav-item mt-3 mb-1">
+                    <span class="nav-link text-uppercase fs-7 fw-bold text-muted ps-3">Approval</span>
+                </li>
+                <?= nav_item('Approval Absensi', 'approval/approval_absensi.php', $currentPath, 'check2-circle', $pendingEditAbsensi) ?>
                 <?= nav_item('Validasi Payroll', 'approval/validasi_payroll.php', $currentPath, 'check2-square', $pendingValidasiPayroll) ?>
 
                 <?= nav_heading('Laporan') ?>
