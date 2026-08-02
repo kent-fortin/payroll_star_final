@@ -21,6 +21,7 @@ require_once __DIR__ . '/../layout/header.php';
 require_admin();
 
 // ── HANDLE DELETE ────────────────────────────────────────────────────────────
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hapus'])) {
     $id = (int)($_POST['id_lembur'] ?? 0);
     // [PENCARIAN-FUNGSI: HAPUS DATA (DELETE)] Menghapus record lembur berdasarkan ID
@@ -31,12 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hapus'])) {
 
 // ── HANDLE SAVE / UPDATE ─────────────────────────────────────────────────────
 $edit = null;
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
     $result = mysqli_query($conn, "SELECT * FROM lembur WHERE id_lembur=$id LIMIT 1");
     $edit = $result ? mysqli_fetch_assoc($result) : null;
 }
 
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     $id           = (int)($_POST['id_lembur'] ?? 0);
     $idKaryawan   = (int)($_POST['id_karyawan'] ?? 0);
@@ -44,27 +47,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     $jam          = max(0, (int)($_POST['jam_lembur'] ?? 0));
     $userId       = (int)$_SESSION['id_user'];
 
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($idKaryawan < 1 || $tanggal === '' || $jam < 1) {
         set_flash('danger', 'Data lembur gagal disimpan. Pilih karyawan, isi tanggal dan jumlah jam (min. 1).');
+    // [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
     } elseif ($id > 0) {
         // [PENCARIAN-FUNGSI: UBAH DATA (UPDATE)] Memperbarui durasi jam lembur yang sudah ada
         $stmt = mysqli_prepare($conn, 'UPDATE lembur SET id_karyawan=?,tanggal_lembur=?,jam_lembur=? WHERE id_lembur=?');
         $ok = false;
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($stmt) {
             mysqli_stmt_bind_param($stmt, 'isii', $idKaryawan, $tanggal, $jam, $id);
             $ok = mysqli_stmt_execute($stmt);
         }
         set_flash($ok ? 'success' : 'danger', $ok ? 'Data lembur berhasil diperbarui.' : 'Data lembur gagal diperbarui. ' . mysqli_error($conn));
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (!$ok) app_log('Update lembur: ' . mysqli_error($conn));
+    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
     } else {
         // Insert
         $stmt = mysqli_prepare($conn, 'INSERT INTO lembur (id_karyawan,tanggal_lembur,jam_lembur,dibuat_oleh) VALUES (?,?,?,?)');
         $ok = false;
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($stmt) {
             mysqli_stmt_bind_param($stmt, 'isii', $idKaryawan, $tanggal, $jam, $userId);
             $ok = mysqli_stmt_execute($stmt);
         }
         set_flash($ok ? 'success' : 'danger', $ok ? 'Data lembur berhasil disimpan.' : 'Data lembur gagal disimpan. ' . mysqli_error($conn));
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (!$ok) app_log('Insert lembur: ' . mysqli_error($conn));
     }
     redirect('master/lembur.php');
@@ -145,6 +155,7 @@ $data = mysqli_query($conn, "SELECT l.*, k.nip, k.nama_karyawan, j.nama_jabatan
     <tbody>
     <?php
     $no=1;
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if($data): while($row=mysqli_fetch_assoc($data)):
       $nilai = (int)$row['jam_lembur'] * $tarifLembur;
     ?>

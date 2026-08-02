@@ -18,6 +18,7 @@
 require_once __DIR__ . '/../config/koneksi.php';
 require_once __DIR__ . '/../helpers/functions.php';
 
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (!$conn) {
     die("Koneksi database gagal: " . mysqli_connect_error() . PHP_EOL);
 }
@@ -29,6 +30,7 @@ echo "=========================================================\n\n";
 echo "[1] Membersihkan data transaksi dan karyawan (Reset NIP ke SSL001)...\n";
 mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 0");
 $tables = ['permintaan_edit_absensi', 'payroll', 'lembur', 'presensi_harian', 'absensi', 'karyawan'];
+// [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
 foreach ($tables as $tbl) {
     mysqli_query($conn, "TRUNCATE TABLE `$tbl`");
     mysqli_query($conn, "ALTER TABLE `$tbl` AUTO_INCREMENT = 1");
@@ -39,6 +41,7 @@ echo "    -> Bersih!\n\n";
 echo "[2] Memastikan Master Jabatan & Pengaturan Payroll ada...\n";
 // Cek jabatan
 $qJab = mysqli_query($conn, "SELECT COUNT(*) c FROM jabatan");
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (mysqli_fetch_assoc($qJab)['c'] == 0) {
     mysqli_query($conn, "INSERT INTO `jabatan` (`id_jabatan`, `kode_jabatan`, `nama_jabatan`, `gaji_pokok`, `status_jabatan`) VALUES
     ('1', 'JBT001', 'Manager Operasional', '8000000.00', 'Tidak Aktif'),
@@ -50,6 +53,7 @@ if (mysqli_fetch_assoc($qJab)['c'] == 0) {
 }
 // Cek pengaturan
 $qPeng = mysqli_query($conn, "SELECT COUNT(*) c FROM pengaturan_payroll");
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (mysqli_fetch_assoc($qPeng)['c'] == 0) {
     mysqli_query($conn, "INSERT INTO `pengaturan_payroll` (`id_pengaturan`, `nama_pengaturan`, `nilai`, `keterangan`) VALUES
     ('1', 'tarif_lembur_per_jam', '15000.00', 'Tarif lembur setiap satu jam'),
@@ -68,6 +72,7 @@ $karyawanList = [
 ];
 
 $idKaryawanMap = [];
+// [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
 foreach ($karyawanList as $idx => $k) {
     $stmt = mysqli_prepare($conn, "INSERT INTO karyawan (nip, nama_karyawan, jenis_kelamin, id_jabatan, status_karyawan, tanggal_masuk, no_ktp, no_kk) VALUES ('TMP', ?, ?, ?, ?, ?, ?, ?)");
     mysqli_stmt_bind_param($stmt, 'ssissss', $k[0], $k[1], $k[2], $k[3], $k[4], $k[5], $k[6]);
@@ -89,6 +94,7 @@ $presensiHariIni = [
     [4, 'Izin'],
     [5, 'Alpha']
 ];
+// [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
 foreach ($presensiHariIni as $pr) {
     $idK = $idKaryawanMap[$pr[0]];
     $st = $pr[1];
@@ -107,6 +113,7 @@ $absensiList = [
     [5, 21, 0, 0, 3]  // Eko (Alpha 3)
 ];
 $idAbsensiMap = [];
+// [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
 foreach ($absensiList as $idx => $ab) {
     $idK = $idKaryawanMap[$ab[0]];
     mysqli_query($conn, "INSERT INTO absensi (id_karyawan, bulan, tahun, hadir, sakit, izin, alpha, dibuat_oleh) VALUES ($idK, '$bulan', $tahun, {$ab[1]}, {$ab[2]}, {$ab[3]}, {$ab[4]}, 1)");
@@ -121,6 +128,7 @@ $lemburList = [
     [2, '2026-07-12', 5], // Siti total 5 jam
     [5, '2026-07-18', 8]  // Eko total 8 jam
 ];
+// [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
 foreach ($lemburList as $lm) {
     $idK = $idKaryawanMap[$lm[0]];
     mysqli_query($conn, "INSERT INTO lembur (id_karyawan, tanggal_lembur, jam_lembur, dibuat_oleh) VALUES ($idK, '{$lm[1]}', {$lm[2]}, 1)");
@@ -130,24 +138,28 @@ echo "    -> 4 catatan lembur berhasil dimasukkan!\n\n";
 echo "[7] Mengkalkulasi dan Memasukkan Data Payroll...\n";
 // Budi (Disetujui & Sudah Dibayar)
 $calc1 = calculate_payroll($conn, $idKaryawanMap[1], $bulan, $tahun, 500000);
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if ($calc1) {
     mysqli_query($conn, "INSERT INTO payroll (id_karyawan, bulan, tahun, gaji_pokok, jam_lembur, tarif_lembur, total_lembur, total_tunjangan, jumlah_alpha, tarif_alpha, total_potongan_alpha, total_gaji_bersih, status_pembayaran, status_validasi, tanggal_pembayaran, diproses_oleh) VALUES ({$idKaryawanMap[1]}, '$bulan', $tahun, {$calc1['gaji_pokok']}, {$calc1['lembur_jam']}, {$calc1['tarif_lembur']}, {$calc1['total_lembur']}, 500000, 0, {$calc1['tarif_alpha']}, 0, {$calc1['gaji_bersih']}, 'Sudah Dibayar', 'Disetujui', CURDATE(), 1)");
     echo "    -> Payroll Budi Santoso (Disetujui & Sudah Dibayar)\n";
 }
 // Siti (Disetujui & Belum Dibayar)
 $calc2 = calculate_payroll($conn, $idKaryawanMap[2], $bulan, $tahun, 250000);
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if ($calc2) {
     mysqli_query($conn, "INSERT INTO payroll (id_karyawan, bulan, tahun, gaji_pokok, jam_lembur, tarif_lembur, total_lembur, total_tunjangan, jumlah_alpha, tarif_alpha, total_potongan_alpha, total_gaji_bersih, status_pembayaran, status_validasi, diproses_oleh) VALUES ({$idKaryawanMap[2]}, '$bulan', $tahun, {$calc2['gaji_pokok']}, {$calc2['lembur_jam']}, {$calc2['tarif_lembur']}, {$calc2['total_lembur']}, 250000, 0, {$calc2['tarif_alpha']}, 0, {$calc2['gaji_bersih']}, 'Belum Dibayar', 'Disetujui', 1)");
     echo "    -> Payroll Siti Aminah (Disetujui & Belum Dibayar)\n";
 }
 // Ahmad (Menunggu - Untuk tes Edit Tunjangan)
 $calc3 = calculate_payroll($conn, $idKaryawanMap[3], $bulan, $tahun, 300000);
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if ($calc3) {
     mysqli_query($conn, "INSERT INTO payroll (id_karyawan, bulan, tahun, gaji_pokok, jam_lembur, tarif_lembur, total_lembur, total_tunjangan, jumlah_alpha, tarif_alpha, total_potongan_alpha, total_gaji_bersih, status_pembayaran, status_validasi, diproses_oleh) VALUES ({$idKaryawanMap[3]}, '$bulan', $tahun, {$calc3['gaji_pokok']}, {$calc3['lembur_jam']}, {$calc3['tarif_lembur']}, {$calc3['total_lembur']}, 300000, 1, {$calc3['tarif_alpha']}, {$calc3['potongan_alpha']}, {$calc3['gaji_bersih']}, 'Belum Dibayar', 'Menunggu', 1)");
     echo "    -> Payroll Ahmad Fauzi (Menunggu Validasi - Bisa Edit Tunjangan)\n";
 }
 // Dewi (Menunggu - Untuk tes Hapus Payroll)
 $calc4 = calculate_payroll($conn, $idKaryawanMap[4], $bulan, $tahun, 150000);
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if ($calc4) {
     mysqli_query($conn, "INSERT INTO payroll (id_karyawan, bulan, tahun, gaji_pokok, jam_lembur, tarif_lembur, total_lembur, total_tunjangan, jumlah_alpha, tarif_alpha, total_potongan_alpha, total_gaji_bersih, status_pembayaran, status_validasi, diproses_oleh) VALUES ({$idKaryawanMap[4]}, '$bulan', $tahun, {$calc4['gaji_pokok']}, {$calc4['lembur_jam']}, {$calc4['tarif_lembur']}, {$calc4['total_lembur']}, 150000, 2, {$calc4['tarif_alpha']}, {$calc4['potongan_alpha']}, {$calc4['gaji_bersih']}, 'Belum Dibayar', 'Menunggu', 1)");
     echo "    -> Payroll Dewi Lestari (Menunggu Validasi)\n";

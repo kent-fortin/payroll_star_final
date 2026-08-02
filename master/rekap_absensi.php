@@ -21,13 +21,16 @@ require_once __DIR__ . '/../layout/header.php';
 require_admin();
 
 // ── POST: Hitung otomatis rekap dari presensi_harian ────────────────────────
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hitung_rekap'])) {
   $bulan = trim($_POST['bulan'] ?? '');
   $tahun = (int) ($_POST['tahun'] ?? date('Y'));
   $bulanNomor = bulan_nomor($bulan);
 
+  // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
   if ($bulanNomor === 0 || $tahun < 2000) {
     set_flash('danger', 'Pilih bulan dan tahun yang valid.');
+  // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
   } else {
     // [PENCARIAN-FUNGSI: AMBIL DATA (SELECT)] Hitung rekap dari presensi_harian untuk bulan & tahun yang dipilih
     $userId = (int) $_SESSION['id_user'];
@@ -43,14 +46,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hitung_rekap'])) {
                   AND k.status_karyawan IN ('Tetap','Kontrak')
                 GROUP BY k.id_karyawan";
     $result = mysqli_query($conn, $sql);
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!$result) {
       set_flash('danger', 'Query rekap gagal: ' . mysqli_error($conn));
       app_log('Rekap absensi query: ' . mysqli_error($conn));
+    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
     } else {
       $bulanEsc = mysqli_real_escape_string($conn, $bulan);
       $berhasil = 0;
       $diperbarui = 0;
       $gagal = 0;
+      // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
       while ($row = mysqli_fetch_assoc($result)) {
         $idK = (int) $row['id_karyawan'];
         $hadir = (int) $row['hadir'];
@@ -63,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hitung_rekap'])) {
                     WHERE id_karyawan=$idK AND bulan='$bulanEsc' AND tahun=$tahun LIMIT 1");
         $cek = $cekRes ? mysqli_fetch_assoc($cekRes) : null;
 
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($cek) {
           // Update rekap yang sudah ada
           $ok = mysqli_query($conn, "UPDATE absensi
@@ -70,21 +77,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hitung_rekap'])) {
                             diperbarui_pada=NOW()
                         WHERE id_absensi={$cek['id_absensi']}");
           $ok ? $diperbarui++ : $gagal++;
+        // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
         } else {
           // Insert rekap baru
           $sqlInsert = "INSERT INTO absensi (id_karyawan, bulan, tahun, hadir, sakit, izin, alpha, dibuat_oleh)
                                   VALUES ($idK, '$bulanEsc', $tahun, $hadir, $sakit, $izin, $alpha, $userId)";
           $ok = mysqli_query($conn, $sqlInsert);
           $ok ? $berhasil++ : $gagal++;
+          // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
           if (!$ok)
             app_log('Insert rekap absensi: ' . mysqli_error($conn));
         }
       }
 
+      // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
       if ($berhasil === 0 && $diperbarui === 0 && $gagal === 0) {
         set_flash('warning', "Tidak ada data presensi harian pada $bulan $tahun untuk direkap.");
+      // [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
       } elseif ($gagal === 0) {
         set_flash('success', "Rekap $bulan $tahun berhasil! Baru: $berhasil, Diperbarui: $diperbarui karyawan.");
+      // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
       } else {
         set_flash('warning', "Rekap selesai. Baru: $berhasil, Diperbarui: $diperbarui, Gagal: $gagal.");
       }
@@ -94,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hitung_rekap'])) {
 }
 
 // ── POST: Ajukan Edit Rekap Absensi ─────────────────────────────────────────
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajukan_edit_absensi'])) {
   $id_absensi = (int) $_POST['id_absensi'];
   $hadir_baru = (int) $_POST['hadir'];
@@ -105,8 +118,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajukan_edit_absensi']
 
   // Cek apakah sedang ada pengajuan menunggu
   $cekPending = mysqli_query($conn, "SELECT id_permintaan FROM permintaan_edit_absensi WHERE id_absensi = $id_absensi AND status = 'Menunggu'");
+  // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
   if (mysqli_num_rows($cekPending) > 0) {
     set_flash('warning', 'Masih ada pengajuan edit yang menunggu persetujuan Pimpinan.');
+  // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
   } else {
     // Ambil data lama
     $resLama = mysqli_query($conn, "SELECT hadir, sakit, izin, alpha FROM absensi WHERE id_absensi = $id_absensi");
@@ -117,8 +132,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajukan_edit_absensi']
     $sql = "INSERT INTO permintaan_edit_absensi (id_absensi, hadir_baru, sakit_baru, izin_baru, alpha_baru, alasan_perubahan, data_lama, id_pengaju, status) 
                 VALUES ($id_absensi, $hadir_baru, $sakit_baru, $izin_baru, $alpha_baru, '$alasanEsc', '$jsonLama', $userId, 'Menunggu')";
 
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (mysqli_query($conn, $sql)) {
       set_flash('success', 'Pengajuan edit absensi berhasil dikirim ke Pimpinan.');
+    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
     } else {
       set_flash('danger', 'Gagal mengajukan edit absensi: ' . mysqli_error($conn));
     }
@@ -189,6 +206,7 @@ $historyEdit = mysqli_query($conn, "SELECT p.*, a.bulan, a.tahun, k.nip, k.nama_
         confirmButtonText: 'Ya, Lanjutkan!',
         cancelButtonText: 'Batal'
       }).then((result) => {
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (result.isConfirmed) {
           document.getElementById('formRekap').submit();
         }
@@ -217,7 +235,9 @@ $historyEdit = mysqli_query($conn, "SELECT p.*, a.bulan, a.tahun, k.nip, k.nama_
       </thead>
       <tbody>
         <?php $no = 1;
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($data):
+          // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
           while ($row = mysqli_fetch_assoc($data)): ?>
             <tr>
               <td>
@@ -389,8 +409,10 @@ $historyEdit = mysqli_query($conn, "SELECT p.*, a.bulan, a.tahun, k.nip, k.nama_
       </thead>
       <tbody>
         <?php
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($historyEdit && mysqli_num_rows($historyEdit) > 0):
           $noHist = 1;
+          // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
           while ($h = mysqli_fetch_assoc($historyEdit)):
             $badge = match ($h['status']) {
               'Disetujui' => 'bg-success',
@@ -478,7 +500,9 @@ $historyEdit = mysqli_query($conn, "SELECT p.*, a.bulan, a.tahun, k.nip, k.nama_
           confirmButtonText: '<i class="bi bi-send me-1"></i> Ya, Kirim Sekarang',
           cancelButtonText: 'Batal'
         }).then((result) => {
+          // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
           if (result.isConfirmed) {
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if (modalInstance) modalInstance.hide();
             form.submit();
           }

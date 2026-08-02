@@ -40,6 +40,7 @@ function nav_heading(string $label): string
 
 $pendingEditAbsensi = 0;
 $pendingValidasiPayroll = 0;
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (is_logged_in() && is_pimpinan()) {
     $q1 = mysqli_query($conn, "SELECT COUNT(*) total FROM permintaan_edit_absensi WHERE status='Menunggu'");
     $pendingEditAbsensi = $q1 ? (int)mysqli_fetch_assoc($q1)['total'] : 0;

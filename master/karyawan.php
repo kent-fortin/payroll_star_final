@@ -22,6 +22,7 @@ require_admin();
 $edit = null;
 // --- SECTION 2: PENGAMBILAN DATA UNTUK FORM EDIT (GET REQUEST) ---
 // Mengecek apakah ada parameter '?edit=ID' di URL untuk mengambil data karyawan yang akan diedit.
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
     $result = mysqli_query($conn, "SELECT * FROM karyawan WHERE id_karyawan=$id LIMIT 1");
@@ -29,6 +30,7 @@ if (isset($_GET['edit'])) {
 }
 // --- SECTION 3: PEMROSESAN FORM SIMPAN / UPDATE DATA (POST REQUEST) ---
 // Menangani pengiriman form saat tombol 'Simpan' ditekan (tambah baru dengan NIP otomatis atau edit data lama).
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     $id = (int)($_POST['id_karyawan'] ?? 0);
     $nama = trim($_POST['nama_karyawan'] ?? '');
@@ -40,29 +42,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     $noKtp = trim($_POST['no_ktp'] ?? '');
     $noKk = trim($_POST['no_kk'] ?? '');
     $today = date('Y-m-d');
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($nama === '' || $jabatan < 1 || $tanggal === '') {
         set_flash('danger', 'Data karyawan gagal disimpan. Lengkapi seluruh data wajib.');
+    // [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
     } elseif ($tanggal > $today) {
         set_flash('danger', 'Data karyawan gagal disimpan. Tanggal masuk tidak boleh lebih dari tanggal hari ini.');
+    // [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
     } elseif ($id > 0) {
         // [PENCARIAN-FUNGSI: UBAH DATA (UPDATE)] Memperbarui biodata karyawan jika datanya sudah ada
         $stmt = mysqli_prepare($conn, 'UPDATE karyawan SET nama_karyawan=?,jenis_kelamin=?,id_jabatan=?,status_karyawan=?,tanggal_masuk=?,no_ktp=?,no_kk=? WHERE id_karyawan=?');
         $ok = false;
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($stmt) {
             mysqli_stmt_bind_param($stmt, 'ssissssi', $nama, $jk, $jabatan, $status, $tanggal, $noKtp, $noKk, $id);
             $ok = mysqli_stmt_execute($stmt);
         }
         set_flash($ok ? 'success':'danger', $ok ? 'Data karyawan berhasil diperbarui.':'Data karyawan gagal diperbarui.');
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (!$ok) app_log('Update karyawan: '.mysqli_error($conn));
+    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
     } else {
         $placeholder = 'TMP' . bin2hex(random_bytes(5));
         // [PENCARIAN-FUNGSI: TAMBAH DATA (INSERT)] Memasukkan data karyawan baru ke database
         $stmt = mysqli_prepare($conn, 'INSERT INTO karyawan (nip,nama_karyawan,jenis_kelamin,id_jabatan,status_karyawan,tanggal_masuk,no_ktp,no_kk) VALUES (?,?,?,?,?,?,?,?)');
         $ok = false;
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($stmt) {
             mysqli_stmt_bind_param($stmt, 'sssissss', $placeholder, $nama, $jk, $jabatan, $status, $tanggal, $noKtp, $noKk);
             $ok = mysqli_stmt_execute($stmt);
         }
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($ok) {
             $newId = mysqli_insert_id($conn);
             $nip = generate_nip($newId);
@@ -70,12 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
             $ok = mysqli_query($conn, "UPDATE karyawan SET nip='$nipEsc' WHERE id_karyawan=$newId");
         }
         set_flash($ok ? 'success':'danger', $ok ? 'Data karyawan berhasil ditambahkan dengan NIP otomatis.':'Data karyawan gagal disimpan.');
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (!$ok) app_log('Insert karyawan: '.mysqli_error($conn));
     }
     redirect('master/karyawan.php');
 }
 // --- SECTION 4: PEMROSESAN AKSI RESIGN / NONAKTIF ---
 // Mengubah status karyawan menjadi 'Resign' tanpa menghapus riwayat datanya di database.
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (isset($_POST['resign'])) {
     $id = (int)($_POST['id_karyawan'] ?? 0);
     // [PENCARIAN-FUNGSI: UBAH STATUS] Mengubah status dari 'Tetap' menjadi 'Resign'

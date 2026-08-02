@@ -33,7 +33,9 @@ function cetak_bulan_list()
 // [PENCARIAN-FUNGSI: CETAK BULAN NOMOR] Logika fungsi cetak_bulan_nomor
 function cetak_bulan_nomor($bulan)
 {
+    // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
     foreach (cetak_bulan_list() as $nomor => $nama) {
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (strcasecmp(trim((string)$bulan), $nama) === 0) {
             return (int)$nomor;
         }
@@ -48,10 +50,13 @@ function cetak_latest_period($conn)
     // [PENCARIAN-FUNGSI: PERIODE TERBARU] Mencari data periode payroll teranyar untuk laporan cetak default
     $q = mysqli_query($conn, "SELECT bulan, tahun FROM payroll");
     $latestKey = 0;
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($q) {
+        // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
         while ($row = mysqli_fetch_assoc($q)) {
             $m = cetak_bulan_nomor($row['bulan']);
             $key = ((int)$row['tahun'] * 100) + $m;
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if ($m > 0 && $key > $latestKey) {
                 $latestKey = $key;
                 $latest = array('bulan' => $row['bulan'], 'tahun' => (int)$row['tahun']);
@@ -65,10 +70,13 @@ function cetak_latest_period($conn)
 function cetak_range($filter, $bulan, $tahun)
 {
     $m = cetak_bulan_nomor($bulan);
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($m < 1) $m = (int)date('n');
     $end = new DateTime(sprintf('%04d-%02d-01', (int)$tahun, $m));
     $start = clone $end;
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($filter === '2bulan') $start->modify('-1 month');
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($filter === '1tahun') $start->modify('-11 months');
     return array($start, $end);
 }
@@ -89,21 +97,29 @@ $rows = array();
 $summary = array('paid_count'=>0,'unpaid_count'=>0,'paid_total'=>0,'unpaid_total'=>0,'grand_total'=>0);
 $error = '';
 
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (!$result) {
     $error = 'Laporan belum dapat dibaca. Jalankan install_or_upgrade.php satu kali.';
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (function_exists('app_log')) app_log('Cetak laporan query gagal: ' . mysqli_error($conn));
+// [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
 } else {
+    // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
     while ($row = mysqli_fetch_assoc($result)) {
         $m = cetak_bulan_nomor($row['bulan']);
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($m < 1) continue;
         $date = new DateTime(sprintf('%04d-%02d-01', (int)$row['tahun'], $m));
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($date < $start || $date > $end) continue;
         $rows[] = $row;
         $amount = (float)$row['total_gaji_bersih'];
         $summary['grand_total'] += $amount;
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($row['status_pembayaran'] === 'Sudah Dibayar') {
             $summary['paid_count']++;
             $summary['paid_total'] += $amount;
+        // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
         } else {
             $summary['unpaid_count']++;
             $summary['unpaid_total'] += $amount;

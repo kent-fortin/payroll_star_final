@@ -20,8 +20,10 @@ require_once __DIR__ . '/config/koneksi.php';
 // [PENCARIAN-FUNGSI: REDIRECT AWAL] Cek status sesi login awal pengunjung
 if (!is_logged_in()) {
     redirect('auth/login.php');
+// [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
 } elseif (is_admin()) {
     redirect('dashboard_admin.php');
+// [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
 } else {
     redirect('dashboard_pimpinan.php');
 }

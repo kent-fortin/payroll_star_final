@@ -25,11 +25,13 @@
 require_once __DIR__ . '/../config/koneksi.php';
 require_pimpinan();
 
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (!isset($conn) || !$conn) {
     echo '<div class="alert alert-warning">Grafik belum dapat ditampilkan karena koneksi database tidak tersedia.</div>';
     return;
 }
 
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (!function_exists('grafik_h')) {
     // [PENCARIAN-FUNGSI: GRAFIK H] Logika fungsi grafik_h
     function grafik_h($value)
@@ -56,6 +58,7 @@ $urutanBulan = [
 $cekStatus = mysqli_query($conn, "SHOW COLUMNS FROM payroll LIKE 'status_pembayaran'");
 $punyaStatus = $cekStatus && mysqli_num_rows($cekStatus) > 0;
 
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if ($punyaStatus) {
     // [PENCARIAN-FUNGSI: AMBIL DATA GRAFIK] Mengambil data gaji dari database dan dikelompokkan (GROUP BY) berdasarkan tahun dan bulan untuk grafik
     $sql = "
@@ -98,6 +101,7 @@ if ($punyaStatus) {
         FROM payroll
         GROUP BY tahun, bulan
     ";
+// [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
 } else {
     $sql = "
         SELECT
@@ -116,11 +120,14 @@ if ($punyaStatus) {
 $query = mysqli_query($conn, $sql);
 $dataGrafik = [];
 
+// [PENJELASAN LOGIKA]: Jika eksekusi query berhasil, masukkan data ke dalam array $dataGrafik secara berulang (looping)
 if ($query) {
     while ($row = mysqli_fetch_assoc($query)) {
+        // [PENJELASAN LOGIKA]: Mendapatkan angka urutan bulan untuk mempermudah penyortiran
         $nomorBulan = $urutanBulan[$row['bulan']] ?? 0;
         $tahun = (int) $row['tahun'];
 
+        // [PENJELASAN LOGIKA]: Menyusun setiap baris data (total gaji, status bayar) ke dalam satu format array yang rapi
         $dataGrafik[] = [
             'bulan' => $row['bulan'],
             'tahun' => $tahun,
@@ -135,10 +142,12 @@ if ($query) {
     }
 }
 
+// [PENJELASAN LOGIKA]: Mengurutkan data grafik berdasarkan urutan bulan dari yang terlama ke terbaru (Ascending)
 usort($dataGrafik, function ($a, $b) {
     return $a['urutan'] <=> $b['urutan'];
 });
 
+// [PENJELASAN LOGIKA]: Mengambil pilihan filter rentang waktu dari URL (GET). Defaultnya adalah 1 tahun (12 bulan terakhir)
 $rentang = $_GET['rentang']
     ?? $_GET['filter']
     ?? $_GET['periode_filter']
@@ -146,14 +155,19 @@ $rentang = $_GET['rentang']
 
 $rentangNormal = strtolower(str_replace([' ', '-', '_'], '', (string) $rentang));
 
+// [PENJELASAN LOGIKA]: Mengambil jumlah bulan yang ingin ditampilkan berdasarkan rentang yang dipilih. 
+// Jika '1bulan' maka ambil 1 data terakhir, jika '2bulan' ambil 2 data terakhir, selain itu ambil 12 data terakhir (1 tahun)
 if (in_array($rentangNormal, ['1bulan', 'bulanini', 'satu bulan'], true)) {
     $dataGrafik = array_slice($dataGrafik, -1);
+// [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
 } elseif (in_array($rentangNormal, ['2bulan', '2bulanterakhir', 'duabulan'], true)) {
     $dataGrafik = array_slice($dataGrafik, -2);
+// [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
 } else {
     $dataGrafik = array_slice($dataGrafik, -12);
 }
 
+// [PENJELASAN LOGIKA]: Inisialisasi variabel untuk menghitung akumulasi total semua gaji, yang sudah dibayar, dan yang belum dibayar
 $totalSemua = 0;
 $totalSudah = 0;
 $totalBelum = 0;
@@ -161,6 +175,7 @@ $jumlahSudah = 0;
 $jumlahBelum = 0;
 $nilaiTerbesar = 0;
 
+// [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
 foreach ($dataGrafik as $item) {
     $totalSemua += $item['total_gaji'];
     $totalSudah += $item['total_dibayar'];
@@ -168,11 +183,13 @@ foreach ($dataGrafik as $item) {
     $jumlahSudah += $item['jumlah_sudah'];
     $jumlahBelum += $item['jumlah_belum'];
 
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($item['total_gaji'] > $nilaiTerbesar) {
         $nilaiTerbesar = $item['total_gaji'];
     }
 }
 
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if ($nilaiTerbesar <= 0) {
     $nilaiTerbesar = 1;
 }

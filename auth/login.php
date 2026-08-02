@@ -16,6 +16,7 @@
  */
 
 require_once __DIR__ . '/../config/koneksi.php';
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (is_logged_in() && $conn) {
     // [PENCARIAN-FUNGSI: BYPASS LOGIN] Redirect langsung ke dashboard jika ternyata user sudah pernah login (memiliki sesi aktif)
     redirect(is_admin() ? 'dashboard_admin.php' : 'dashboard_pimpinan.php');
@@ -72,6 +73,7 @@ $flash = get_flash();
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.27/dist/sweetalert2.all.min.js"></script>
 <script>
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (window.flashMessage) {
         const Toast = Swal.mixin({
             toast: true,

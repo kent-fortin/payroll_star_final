@@ -25,46 +25,68 @@ $selectedMonth=trim($_POST['bulan']??current_month_name());
 $selectedYear=(int)($_POST['tahun']??date('Y'));
 $selectedTunjangan=(float)($_POST['total_tunjangan']??0);
 
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['preview'])) {
     $preview=calculate_payroll($conn,$selectedId,$selectedMonth,$selectedYear,$selectedTunjangan);
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if(!$preview)set_flash('warning','Rekap absensi pada periode tersebut belum tersedia.');
 }
 
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['simpan_payroll'])) {
     // [PENCARIAN-FUNGSI: HITUNG RUMUS GAJI] Memanggil helper fungsi untuk kalkulasi total Gaji Pokok + Lembur - Potongan
+    // [PENJELASAN LOGIKA]: Mengeksekusi rumus penggajian melalui helper calculate_payroll
     $calc=calculate_payroll($conn,$selectedId,$selectedMonth,$selectedYear,$selectedTunjangan);
+    
+    // [PENJELASAN LOGIKA]: Jika kalkulasi gagal (misalnya belum ada rekap absen), tampilkan pesan error
     if(!$calc){
         set_flash('danger','Payroll gagal disimpan karena rekap absensi belum tersedia.');
+    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
     } else {
         $bulanEsc=mysqli_real_escape_string($conn,$selectedMonth);
+        
+        // [PENJELASAN LOGIKA]: Memeriksa apakah gaji karyawan pada bulan dan tahun tersebut sudah pernah diproses sebelumnya
         $existingResult=mysqli_query($conn,"SELECT id_payroll,status_pembayaran FROM payroll WHERE id_karyawan=$selectedId AND bulan='$bulanEsc' AND tahun=$selectedYear LIMIT 1");
         $existing=$existingResult?mysqli_fetch_assoc($existingResult):null;
+        
+        // [PENJELASAN LOGIKA]: Keamanan: Jika gaji sudah diproses DAN sudah dibayar, maka data tidak boleh lagi dihitung ulang / diubah
         if($existing && $existing['status_pembayaran']==='Sudah Dibayar'){
             set_flash('warning','Payroll yang sudah dibayar tidak dapat dihitung ulang.');
+        // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
         } else {
             $userId=(int)$_SESSION['id_user'];
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if($existing){
                 $idPayroll=(int)$existing['id_payroll'];
                 // [PENCARIAN-FUNGSI: UPDATE PAYROLL] Menyimpan ulang / mengupdate hasil perhitungan gaji jika sudah ada datanya
                 $stmt=mysqli_prepare($conn,"UPDATE payroll SET gaji_pokok=?,jam_lembur=?,tarif_lembur=?,total_lembur=?,total_tunjangan=?,jumlah_alpha=?,tarif_alpha=?,total_potongan_alpha=?,total_gaji_bersih=?,tanggal_proses=NOW(),diproses_oleh=?,status_validasi='Menunggu' WHERE id_payroll=?");
                 $ok=false;
+                // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
                 if($stmt){mysqli_stmt_bind_param($stmt,'didddidddii',$calc['gaji_pokok'],$calc['lembur_jam'],$calc['tarif_lembur'],$calc['total_lembur'],$calc['total_tunjangan'],$calc['alpha'],$calc['tarif_alpha'],$calc['potongan_alpha'],$calc['gaji_bersih'],$userId,$idPayroll);$ok=mysqli_stmt_execute($stmt);}
+            // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
             } else {
                 // [PENCARIAN-FUNGSI: SIMPAN PAYROLL BARU] Menginsert record data penggajian yang benar-benar baru
                 $stmt=mysqli_prepare($conn,'INSERT INTO payroll (id_karyawan,bulan,tahun,gaji_pokok,jam_lembur,tarif_lembur,total_lembur,total_tunjangan,jumlah_alpha,tarif_alpha,total_potongan_alpha,total_gaji_bersih,diproses_oleh) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)');
                 $ok=false;
+                // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
                 if($stmt){mysqli_stmt_bind_param($stmt,'isididddidddi',$selectedId,$selectedMonth,$selectedYear,$calc['gaji_pokok'],$calc['lembur_jam'],$calc['tarif_lembur'],$calc['total_lembur'],$calc['total_tunjangan'],$calc['alpha'],$calc['tarif_alpha'],$calc['potongan_alpha'],$calc['gaji_bersih'],$userId);$ok=mysqli_stmt_execute($stmt);}
             }
             set_flash($ok?'success':'danger',$ok?'Payroll berhasil disimpan.':'Payroll gagal disimpan. Silakan coba kembali.');
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if(!$ok)app_log('Save payroll: '.mysqli_error($conn));
         }
     }
     redirect('transaksi/payroll.php');
 }
 
+// [PENJELASAN LOGIKA]: Menangani request ketika tombol 'Tandai Dibayar' atau 'Batalkan Pembayaran' ditekan
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['ubah_status'])) {
     $id=(int)($_POST['id_payroll']??0);
+    
+    // [PENJELASAN LOGIKA]: Menentukan status baru, jika ditekan 'Sudah Dibayar' maka ubah, sebaliknya kembalikan ke 'Belum Dibayar'
     $status=$_POST['status']==='Sudah Dibayar'?'Sudah Dibayar':'Belum Dibayar';
+    
+    // [PENJELASAN LOGIKA]: Jika status berubah jadi 'Sudah Dibayar', maka catat tanggal hari ini (CURDATE), jika batal maka set jadi NULL
     $tanggal=$status==='Sudah Dibayar'?"CURDATE()":"NULL";
     $statusEsc=mysqli_real_escape_string($conn,$status);
     $ok=mysqli_query($conn,"UPDATE payroll SET status_pembayaran='$statusEsc',tanggal_pembayaran=$tanggal WHERE id_payroll=$id");
@@ -72,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['ubah_status'])) {
     redirect('transaksi/payroll.php');
 }
 
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['hapus_payroll'])) {
     $id=(int)($_POST['id_payroll']??0);
     $ok=mysqli_query($conn,"DELETE FROM payroll WHERE id_payroll=$id");
@@ -81,22 +104,29 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['hapus_payroll'])) {
 
 // --- SECTION 4: EDIT TUNJANGAN PADA PAYROLL YANG MENUNGGU VALIDASI ---
 // Memungkinkan Admin mengubah nominal tunjangan dan mengkalkulasi ulang gaji bersih sebelum divalidasi Pimpinan.
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_tunjangan_table'])) {
     $idPayroll = (int)($_POST['id_payroll'] ?? 0);
     $tunjanganBaru = (float)($_POST['tunjangan_baru'] ?? 0);
     $res = mysqli_query($conn, "SELECT id_karyawan, bulan, tahun, status_validasi FROM payroll WHERE id_payroll = $idPayroll LIMIT 1");
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($res && ($row = mysqli_fetch_assoc($res))) {
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($row['status_validasi'] !== 'Menunggu') {
             set_flash('warning', 'Hanya payroll dengan status Menunggu yang dapat diubah tunjangannya.');
+        // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
         } else {
             $calc = calculate_payroll($conn, (int)$row['id_karyawan'], $row['bulan'], (int)$row['tahun'], $tunjanganBaru);
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if ($calc) {
                 $stmt = mysqli_prepare($conn, "UPDATE payroll SET total_tunjangan=?, total_gaji_bersih=?, tanggal_proses=NOW() WHERE id_payroll=?");
+                // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
                 if ($stmt) {
                     mysqli_stmt_bind_param($stmt, 'ddi', $tunjanganBaru, $calc['gaji_bersih'], $idPayroll);
                     $ok = mysqli_stmt_execute($stmt);
                     set_flash($ok ? 'success' : 'danger', $ok ? 'Tunjangan berhasil diperbarui dan gaji bersih telah dihitung ulang.' : 'Gagal memperbarui tunjangan.');
                 }
+            // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
             } else {
                 set_flash('danger', 'Gagal menghitung ulang gaji.');
             }

@@ -49,6 +49,7 @@ $(document).ready(function () {
         }
     };
 
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($('.dt-table').length > 0) {
         $('.dt-table').DataTable({
             language: dtLanguage,
@@ -67,6 +68,7 @@ $(document).ready(function () {
     }
 
     // ── SweetAlert2 Flash Toast ──────────────────────────────────
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (window.flashMessage) {
         const Toast = Swal.mixin({
             toast: true,
@@ -85,11 +87,13 @@ $(document).ready(function () {
     // ── SweetAlert2 Confirm (form onsubmit) ─────────────────────
     $('form').on('submit', function (e) {
         var attr = $(this).attr('onsubmit');
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (attr && attr.includes('confirm(')) {
             e.preventDefault();
             var form = this;
             var msg = 'Apakah Anda yakin ingin melanjutkan?';
             var m = attr.match(/confirm\('([^']+)'\)/);
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if (m) msg = m[1];
             Swal.fire({
                 title: 'Konfirmasi',
@@ -102,6 +106,7 @@ $(document).ready(function () {
                 cancelButtonText: 'Batal',
                 borderRadius: '16px'
             }).then(function (result) {
+                // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
                 if (result.isConfirmed) {
                     $(form).removeAttr('onsubmit');
                     form.submit();
@@ -130,6 +135,7 @@ $(document).ready(function () {
             confirmButtonText: confirmBtn,
             cancelButtonText: 'Batal'
         }).then(function (result) {
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if (result.isConfirmed) {
                 form[0].submit();
             }
@@ -143,6 +149,7 @@ $(document).ready(function () {
         var attr = $(this).attr('onclick');
         var msg = 'Apakah Anda yakin?';
         var m = attr.match(/confirm\('([^']+)'\)/);
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (m) msg = m[1];
         Swal.fire({
             title: 'Konfirmasi',
@@ -154,6 +161,7 @@ $(document).ready(function () {
             confirmButtonText: 'Ya, Lanjutkan!',
             cancelButtonText: 'Batal'
         }).then(function (result) {
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if (result.isConfirmed) window.location.href = link;
         });
     });

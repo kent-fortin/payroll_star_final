@@ -16,6 +16,7 @@
  */
 
 require_once __DIR__ . '/../config/koneksi.php';
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (!$conn) {
     set_flash('danger', 'Login gagal. Silakan coba kembali.');
     redirect('auth/login.php');
@@ -26,6 +27,7 @@ $password = (string)($_POST['password'] ?? '');
 
 // [PENCARIAN-FUNGSI: CEK USERNAME] Mencari apakah username terdaftar di database
 $stmt = mysqli_prepare($conn, 'SELECT id_user, username, password, nama_lengkap, role FROM users WHERE username=? LIMIT 1');
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (!$stmt) {
     app_log('Login prepare failed: ' . mysqli_error($conn));
     set_flash('danger', 'Login gagal. Silakan coba kembali.');
@@ -48,6 +50,7 @@ if ($user && password_verify($password, $user['password'])) {
     // [PENCARIAN-FUNGSI: REDIRECT ROLE] Melempar user ke halaman dashboard sesuai jabatan (admin / pimpinan)
     if ($user['role'] === 'admin') {
         redirect('dashboard_admin.php');
+    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
     } else {
         redirect('dashboard_pimpinan.php');
     }

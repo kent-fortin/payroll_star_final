@@ -22,10 +22,12 @@ require_pimpinan();
 
 // --- SECTION 2: PEMROSESAN PERSETUJUAN ATAU PENOLAKAN EDIT ABSENSI ---
 // Menangani aksi tombol Setujui atau Tolak. Jika ditolak, sistem memvalidasi bahwa kolom Catatan Pimpinan wajib diisi.
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['keputusan'])) {
   $id = (int) ($_POST['id_permintaan'] ?? 0);
   $keputusan = $_POST['keputusan'] === 'setujui' ? 'Disetujui' : 'Ditolak';
   $catatan = trim($_POST['catatan_pimpinan'] ?? '');
+  // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
   if ($keputusan === 'Ditolak' && $catatan === '') {
     // Tidak apa-apa jika kosong (opsional)
   }
@@ -35,19 +37,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['keputusan'])) {
   $result = mysqli_query($conn, "SELECT * FROM permintaan_edit_absensi WHERE id_permintaan=$id AND status='Menunggu' FOR UPDATE");
   $req = $result ? mysqli_fetch_assoc($result) : null;
   $ok = (bool) $req;
+  // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
   if ($ok && $keputusan === 'Disetujui') {
     $idAbs = (int) $req['id_absensi'];
     // [PENCARIAN-FUNGSI: UBAH DATA (UPDATE)] Jika Pimpinan menyetujui, maka tabel absensi utama otomatis diperbarui
     $ok = mysqli_query($conn, "UPDATE absensi SET hadir=" . (int) $req['hadir_baru'] . ",sakit=" . (int) $req['sakit_baru'] . ",izin=" . (int) $req['izin_baru'] . ",alpha=" . (int) $req['alpha_baru'] . ",diperbarui_pada=NOW() WHERE id_absensi=$idAbs");
   }
+  // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
   if ($ok) {
     $statusEsc = mysqli_real_escape_string($conn, $keputusan);
     // [PENCARIAN-FUNGSI: UBAH STATUS] Update status permintaan menjadi 'Disetujui' atau 'Ditolak'
     $ok = mysqli_query($conn, "UPDATE permintaan_edit_absensi SET status='$statusEsc',id_penyetuju=$userId,tanggal_keputusan=NOW(),catatan_pimpinan='$catatanEsc' WHERE id_permintaan=$id");
   }
+  // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
   if ($ok) {
     mysqli_commit($conn);
     set_flash('success', 'Keputusan edit absensi berhasil disimpan.');
+  // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
   } else {
     mysqli_rollback($conn);
     app_log('Approval absensi: ' . mysqli_error($conn));
@@ -82,7 +88,9 @@ ORDER BY FIELD(p.status,'Menunggu','Disetujui','Ditolak'),p.id_permintaan DESC")
       </thead>
       <tbody>
         <?php $no = 1;
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($data):
+          // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
           while ($row = mysqli_fetch_assoc($data)):
             $old = json_decode($row['data_lama'], true) ?: []; ?>
             <tr>
@@ -203,6 +211,7 @@ ORDER BY FIELD(p.status,'Menunggu','Disetujui','Ditolak'),p.id_permintaan DESC")
           confirmButtonText: '<i class="bi bi-check-lg me-1"></i> Ya, Setujui!',
           cancelButtonText: 'Batal'
         }).then((result) => {
+          // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
           if (result.isConfirmed) {
             var input = document.createElement('input');
             input.type = 'hidden';
@@ -236,6 +245,7 @@ ORDER BY FIELD(p.status,'Menunggu','Disetujui','Ditolak'),p.id_permintaan DESC")
           confirmButtonText: '<i class="bi bi-x-lg me-1"></i> Ya, Tolak Pengajuan',
           cancelButtonText: 'Batal'
         }).then((result) => {
+          // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
           if (result.isConfirmed) {
             var inputCatatan = document.createElement('input');
             inputCatatan.type = 'hidden';

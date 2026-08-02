@@ -142,8 +142,10 @@ $rejectedEdits = mysqli_query($conn, "SELECT p.*, k.nama_karyawan, a.bulan, a.ta
           </thead>
           <tbody>
             <?php 
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if ($queryPresensiHariIni && mysqli_num_rows($queryPresensiHariIni) > 0): 
               $no = 1;
+              // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
               while ($pr = mysqli_fetch_assoc($queryPresensiHariIni)): 
                 $badgeClass = match ($pr['status_kehadiran']) {
                     'Hadir' => 'bg-success',

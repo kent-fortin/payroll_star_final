@@ -20,6 +20,7 @@ require_once __DIR__ . '/../layout/header.php';
 // Memastikan hanya Pimpinan yang berhak memvalidasi atau menolak payroll.
 require_pimpinan();
 
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['keputusan'])) {
     $id = (int)($_POST['id_payroll'] ?? 0);
     $keputusan = $_POST['keputusan'] === 'setujui' ? 'Disetujui' : 'Ditolak';
@@ -109,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 confirmButtonText: '<i class="bi bi-check-lg me-1"></i> Ya, Setujui',
                 cancelButtonText: 'Batal'
             }).then((result) => {
+                // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
                 if (result.isConfirmed) {
                     var input = document.createElement('input');
                     input.type = 'hidden';
@@ -135,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 confirmButtonText: '<i class="bi bi-x-lg me-1"></i> Ya, Tolak',
                 cancelButtonText: 'Batal'
             }).then((result) => {
+                // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
                 if (result.isConfirmed) {
                     var input = document.createElement('input');
                     input.type = 'hidden';

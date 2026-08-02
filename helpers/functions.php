@@ -27,6 +27,7 @@ function base_path(): string
     $docRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
     $projRoot = str_replace('\\', '/', dirname(__DIR__));
     
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (strpos($projRoot, $docRoot) === 0) {
         $path = substr($projRoot, strlen($docRoot));
         return $path === '/' ? '' : $path;
@@ -76,6 +77,7 @@ function set_flash(string $type, string $message): void
 // [PENCARIAN-FUNGSI: GET FLASH] Logika fungsi get_flash
 function get_flash(): ?array
 {
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!isset($_SESSION['flash'])) {
         return null;
     }
@@ -103,6 +105,7 @@ function is_logged_in(): bool
 // [PENCARIAN-FUNGSI: REQUIRE LOGIN] Logika fungsi require_login
 function require_login(): void
 {
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!is_logged_in()) {
         redirect('auth/login.php');
     }
@@ -127,6 +130,7 @@ function is_pimpinan(): bool
 function require_admin(): void
 {
     require_login();
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!is_admin()) {
         set_flash('warning', 'Akses ditolak. Menu tersebut hanya dapat diakses oleh admin.');
         // Redirect ke dashboard sesuai role yang login
@@ -139,6 +143,7 @@ function require_admin(): void
 function require_pimpinan(): void
 {
     require_login();
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!is_pimpinan()) {
         set_flash('warning', 'Akses ditolak. Menu tersebut hanya dapat diakses oleh pimpinan.');
         // Redirect ke dashboard sesuai role yang login
@@ -151,6 +156,7 @@ function require_pimpinan(): void
 function app_log(string $message): void
 {
     $dir = dirname(__DIR__) . '/logs';
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!is_dir($dir)) {
         @mkdir($dir, 0777, true);
     }
@@ -160,6 +166,7 @@ function app_log(string $message): void
 // [PENCARIAN-FUNGSI: DB OR REDIRECT] Logika fungsi db_or_redirect
 function db_or_redirect($conn): void
 {
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!$conn) {
         set_flash('danger', 'Aplikasi tidak dapat terhubung ke database.');
         redirect('auth/login.php');
@@ -179,7 +186,9 @@ function bulan_list(): array
 // [PENCARIAN-FUNGSI: BULAN NOMOR] Logika fungsi bulan_nomor
 function bulan_nomor(string $bulan): int
 {
+    // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
     foreach (bulan_list() as $nomor => $nama) {
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (strcasecmp($nama, $bulan) === 0) {
             return $nomor;
         }
@@ -191,6 +200,7 @@ function bulan_nomor(string $bulan): int
 function bulan_options(string $selected = ''): string
 {
     $html = '';
+    // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
     foreach (bulan_list() as $nama) {
         $sel = strcasecmp($selected, $nama) === 0 ? ' selected' : '';
         $html .= '<option value="' . e($nama) . '"' . $sel . '>' . e($nama) . '</option>';
@@ -209,6 +219,7 @@ function get_setting(mysqli $conn, string $key, float $default = 0): float
 {
     $keyEsc = mysqli_real_escape_string($conn, $key);
     $result = mysqli_query($conn, "SELECT nilai FROM pengaturan_payroll WHERE nama_pengaturan='$keyEsc' LIMIT 1");
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($result && ($row = mysqli_fetch_assoc($result))) {
         return (float)$row['nilai'];
     }
@@ -232,11 +243,13 @@ function calculate_payroll(mysqli $conn, int $idKaryawan, string $bulan, int $ta
                 AND a.bulan = '$bulanEsc' AND a.tahun = $tahun
             WHERE k.id_karyawan = $idKaryawan LIMIT 1";
     $result = mysqli_query($conn, $sql);
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!$result) {
         app_log('calculate_payroll query: ' . mysqli_error($conn));
         return null;
     }
     $row = mysqli_fetch_assoc($result);
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!$row || empty($row['id_absensi'])) {
         return null;
     }
@@ -249,6 +262,7 @@ function calculate_payroll(mysqli $conn, int $idKaryawan, string $bulan, int $ta
                     AND YEAR(tanggal_lembur) = $tahun";
     $lemburResult = mysqli_query($conn, $lemburSql);
     $jamLembur = 0;
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($lemburResult) {
         $lr = mysqli_fetch_assoc($lemburResult);
         $jamLembur = (int)($lr['total_jam'] ?? 0);
@@ -310,10 +324,13 @@ function filter_period(string $filter, string $bulan, int $tahun): array
 {
     $month = bulan_nomor($bulan) ?: (int)date('n');
     $end = new DateTime(sprintf('%04d-%02d-01', $tahun, $month));
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($filter === '2bulan') {
         $start = (clone $end)->modify('-1 month');
+    // [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
     } elseif ($filter === '1tahun') {
         $start = (clone $end)->modify('-11 months');
+    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
     } else {
         $start = clone $end;
     }
@@ -332,25 +349,32 @@ function load_payroll_report(mysqli $conn, string $filter, string $bulan, int $t
     $rows = [];
     $groups = [];
     $summary = ['paid_count'=>0,'unpaid_count'=>0,'paid_total'=>0.0,'unpaid_total'=>0.0,'grand_total'=>0.0];
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($result) {
+        // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
         while ($row = mysqli_fetch_assoc($result)) {
             $monthNo = bulan_nomor($row['bulan']);
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if ($monthNo === 0) continue;
             $date = new DateTime(sprintf('%04d-%02d-01', (int)$row['tahun'], $monthNo));
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if ($date < $start || $date > $end) continue;
             $row['_date'] = $date->format('Y-m-d');
             $rows[] = $row;
             $key = $date->format('Y-m');
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if (!isset($groups[$key])) {
                 $groups[$key] = ['label'=>$row['bulan'].' '.$row['tahun'],'paid'=>0.0,'unpaid'=>0.0,'total'=>0.0];
             }
             $amount = (float)$row['total_gaji_bersih'];
             $groups[$key]['total'] += $amount;
             $summary['grand_total'] += $amount;
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if ($row['status_pembayaran'] === 'Sudah Dibayar') {
                 $summary['paid_count']++;
                 $summary['paid_total'] += $amount;
                 $groups[$key]['paid'] += $amount;
+            // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
             } else {
                 $summary['unpaid_count']++;
                 $summary['unpaid_total'] += $amount;

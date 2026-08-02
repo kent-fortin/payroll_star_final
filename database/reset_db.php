@@ -17,6 +17,7 @@
 
 require_once __DIR__ . '/../config/koneksi.php';
 
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (!$conn) {
     die("Koneksi database gagal: " . mysqli_connect_error() . PHP_EOL);
 }
@@ -34,12 +35,16 @@ $tables = [
     'karyawan'
 ];
 
+// [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
 foreach ($tables as $tbl) {
     $q = mysqli_query($conn, "SHOW TABLES LIKE '$tbl'");
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($q && mysqli_num_rows($q) > 0) {
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (mysqli_query($conn, "TRUNCATE TABLE `$tbl`")) {
             echo "- Truncated table: $tbl\n";
             mysqli_query($conn, "ALTER TABLE `$tbl` AUTO_INCREMENT = 1");
+        // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
         } else {
             echo "- Gagal truncate table $tbl: " . mysqli_error($conn) . "\n";
         }

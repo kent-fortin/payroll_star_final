@@ -21,14 +21,18 @@ require_once __DIR__ . '/../layout/header.php';
 require_admin();
 
 // ── POST: Simpan presensi untuk satu tanggal ─────────────────────────────────
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_presensi'])) {
     $tanggal = trim($_POST['tanggal'] ?? '');
     $presensiData = $_POST['presensi'] ?? []; // array [id_karyawan => status]
 
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!$tanggal || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
         set_flash('danger', 'Tanggal tidak valid.');
+    // [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
     } elseif (empty($presensiData)) {
         set_flash('warning', 'Tidak ada data presensi yang diinput.');
+    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
     } else {
         $tanggalEsc = mysqli_real_escape_string($conn, $tanggal);
         $isToday = ($tanggal === date('Y-m-d'));
@@ -36,7 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_presensi'])) {
         // Ambil data yang sudah ada untuk memvalidasi
         $existingQuery = mysqli_query($conn, "SELECT id_karyawan FROM presensi_harian WHERE tanggal='$tanggalEsc'");
         $existingPost = [];
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($existingQuery) {
+            // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
             while ($row = mysqli_fetch_assoc($existingQuery)) {
                 $existingPost[] = (int)$row['id_karyawan'];
             }
@@ -44,30 +50,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_presensi'])) {
 
         $berhasil = 0;
         $gagal = 0;
+        // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
         foreach ($presensiData as $idKaryawan => $status) {
             $idKaryawan = (int)$idKaryawan;
             
             // SECURITY: Jika bukan hari ini dan karyawan ini sudah punya data, tolak perubahan!
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if (!$isToday && in_array($idKaryawan, $existingPost)) {
                 continue;
             }
             
             $allowedStatus = ['Hadir', 'Sakit', 'Izin', 'Alpha'];
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if ($idKaryawan < 1 || !in_array($status, $allowedStatus)) continue;
             $statusEsc = mysqli_real_escape_string($conn, $status);
             // [PENCARIAN-FUNGSI: SIMPAN/UPDATE MASSAL] Menggunakan ON DUPLICATE KEY UPDATE untuk menyimpan massal secara efisien
             $sql = "INSERT INTO presensi_harian (id_karyawan, tanggal, status_kehadiran)
                     VALUES ($idKaryawan, '$tanggalEsc', '$statusEsc')
                     ON DUPLICATE KEY UPDATE status_kehadiran = '$statusEsc'";
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if (mysqli_query($conn, $sql)) {
                 $berhasil++;
+            // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
             } else {
                 $gagal++;
                 app_log('Insert presensi_harian: ' . mysqli_error($conn));
             }
         }
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($gagal === 0) {
             set_flash('success', "Presensi tanggal $tanggal berhasil disimpan ($berhasil karyawan).");
+        // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
         } else {
             set_flash('warning', "Disimpan $berhasil karyawan, $gagal gagal. Cek log untuk detail.");
         }
@@ -79,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_presensi'])) {
 
 // ── GET: Tampilkan form ──────────────────────────────────────────────────────
 $tanggalInput = trim($_GET['tanggal'] ?? date('Y-m-d'));
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggalInput)) {
     $tanggalInput = date('Y-m-d');
 }
@@ -94,7 +108,9 @@ $karyawanQuery = mysqli_query($conn, "SELECT k.id_karyawan, k.nip, k.nama_karyaw
 // Ambil presensi yang sudah ada untuk tanggal tersebut
 $existingQuery = mysqli_query($conn, "SELECT id_karyawan, status_kehadiran FROM presensi_harian WHERE tanggal='$tanggalEsc'");
 $existing = [];
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if ($existingQuery) {
+    // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
     while ($row = mysqli_fetch_assoc($existingQuery)) {
         $existing[(int)$row['id_karyawan']] = $row['status_kehadiran'];
     }
@@ -104,7 +120,9 @@ $isToday = ($tanggalInput === date('Y-m-d'));
 // Hitung ringkasan
 $ringkasanQuery = mysqli_query($conn, "SELECT status_kehadiran, COUNT(*) total FROM presensi_harian WHERE tanggal='$tanggalEsc' GROUP BY status_kehadiran");
 $ringkasan = ['Hadir' => 0, 'Sakit' => 0, 'Izin' => 0, 'Alpha' => 0];
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if ($ringkasanQuery) {
+    // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
     while ($r = mysqli_fetch_assoc($ringkasanQuery)) {
         $ringkasan[$r['status_kehadiran']] = (int)$r['total'];
     }
@@ -156,6 +174,7 @@ if ($ringkasanQuery) {
             $hasData = isset($existing[(int)$k['id_karyawan']]);
             $currentStatus = $hasData ? $existing[(int)$k['id_karyawan']] : 'Hadir';
             $isLocked = !$isToday && $hasData;
+            // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if (!$isLocked) $adaYangBisaDisimpan = true;
         ?>
         <tr>

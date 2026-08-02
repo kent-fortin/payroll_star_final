@@ -22,35 +22,44 @@ require_admin();
 $edit = null;
 // --- SECTION 2: PENGAMBILAN DATA JABATAN UNTUK FORM EDIT ---
 // Mengambil data jabatan dari database jika admin mengklik tombol edit pada tabel.
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
     $result = mysqli_query($conn, "SELECT * FROM jabatan WHERE id_jabatan=$id LIMIT 1");
     $edit = $result ? mysqli_fetch_assoc($result) : null;
 }
+// [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['toggle_status'])) {
     $id = (int)($_POST['id_jabatan'] ?? 0);
     $nama = trim($_POST['nama_jabatan'] ?? '');
     $gaji = (float)($_POST['gaji_pokok'] ?? 0);
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($nama === '' || $gaji <= 0) {
         set_flash('danger', 'Data jabatan gagal disimpan. Lengkapi nama jabatan dan gaji pokok.');
+    // [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
     } elseif ($id > 0) {
         // [PENCARIAN-FUNGSI: UBAH DATA (UPDATE)] Memperbarui data jabatan yang sudah ada di database
         $stmt = mysqli_prepare($conn, 'UPDATE jabatan SET nama_jabatan=?,gaji_pokok=? WHERE id_jabatan=?');
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($stmt) {
             mysqli_stmt_bind_param($stmt, 'sdi', $nama, $gaji, $id);
             $ok = mysqli_stmt_execute($stmt);
         } else $ok = false;
         set_flash($ok ? 'success' : 'danger', $ok ? 'Data jabatan berhasil diperbarui.' : 'Data jabatan gagal diperbarui.');
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (!$ok) app_log('Update jabatan: ' . mysqli_error($conn));
+    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
     } else {
         $placeholder = 'TMP' . bin2hex(random_bytes(5));
         // [PENCARIAN-FUNGSI: TAMBAH DATA (INSERT)] Menyimpan data jabatan baru ke dalam database
         $stmt = mysqli_prepare($conn, 'INSERT INTO jabatan (kode_jabatan,nama_jabatan,gaji_pokok) VALUES (?,?,?)');
         $ok = false;
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($stmt) {
             mysqli_stmt_bind_param($stmt, 'ssd', $placeholder, $nama, $gaji);
             $ok = mysqli_stmt_execute($stmt);
         }
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($ok) {
             $newId = mysqli_insert_id($conn);
             $code = generate_jabatan_code($newId);
@@ -58,20 +67,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['toggle_status'])) {
             $ok = mysqli_query($conn, "UPDATE jabatan SET kode_jabatan='$codeEsc' WHERE id_jabatan=$newId");
         }
         set_flash($ok ? 'success' : 'danger', $ok ? 'Data jabatan berhasil ditambahkan dengan kode otomatis.' : 'Data jabatan gagal disimpan.');
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (!$ok) app_log('Insert jabatan: ' . mysqli_error($conn));
     }
     redirect('master/jabatan.php');
 }
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if (isset($_POST['toggle_status'])) {
     $id = (int)($_POST['id_jabatan'] ?? 0);
     $status = $_POST['status_baru'] ?? 'Aktif';
     $allowedStatus = ['Aktif', 'Tidak Aktif'];
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($id > 0 && in_array($status, $allowedStatus)) {
         $statusEsc = mysqli_real_escape_string($conn, $status);
         // [PENCARIAN-FUNGSI: UBAH STATUS] Menonaktifkan atau mengaktifkan kembali jabatan
         $ok = mysqli_query($conn, "UPDATE jabatan SET status_jabatan='$statusEsc' WHERE id_jabatan=$id");
         set_flash($ok ? 'success' : 'danger', $ok ? 'Status jabatan berhasil diperbarui.' : 'Status jabatan gagal diperbarui.');
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (!$ok) app_log('Toggle jabatan status: ' . mysqli_error($conn));
+    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
     } else {
         set_flash('danger', 'Data tidak valid.');
     }
@@ -151,6 +165,7 @@ function toggleStatusJabatan(idJabatan, statusBaru, namaJabatan) {
         confirmButtonText: 'Ya, Lanjutkan!',
         cancelButtonText: 'Batal'
     }).then((result) => {
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (result.isConfirmed) {
             document.getElementById('id_jabatan_input').value = idJabatan;
             document.getElementById('status_baru_input').value = statusBaru;

@@ -48,7 +48,9 @@ function rpt_bulan_list()
 // [PENCARIAN-FUNGSI: RPT BULAN NOMOR] Logika fungsi rpt_bulan_nomor
 function rpt_bulan_nomor($bulan)
 {
+    // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
     foreach (rpt_bulan_list() as $nomor => $nama) {
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (strcasecmp(trim((string) $bulan), $nama) === 0) {
             return (int) $nomor;
         }
@@ -60,6 +62,7 @@ function rpt_bulan_nomor($bulan)
 function rpt_bulan_options($selected)
 {
     $html = '';
+    // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
     foreach (rpt_bulan_list() as $nama) {
         $sel = strcasecmp((string) $selected, $nama) === 0 ? ' selected' : '';
         $html .= '<option value="' . e($nama) . '"' . $sel . '>' . e($nama) . '</option>';
@@ -72,15 +75,18 @@ function rpt_latest_period($conn)
 {
     $latest = array('bulan' => rpt_bulan_list()[(int) date('n')], 'tahun' => (int) date('Y'));
     $q = mysqli_query($conn, "SELECT bulan, tahun FROM payroll");
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!$q) {
         return $latest;
     }
 
     $latestKey = 0;
+    // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
     while ($row = mysqli_fetch_assoc($q)) {
         $m = rpt_bulan_nomor($row['bulan']);
         $y = (int) $row['tahun'];
         $key = ($y * 100) + $m;
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($m > 0 && $key > $latestKey) {
             $latestKey = $key;
             $latest = array('bulan' => $row['bulan'], 'tahun' => $y);
@@ -93,6 +99,7 @@ function rpt_latest_period($conn)
 function rpt_period_range($filter, $bulan, $tahun)
 {
     $month = rpt_bulan_nomor($bulan);
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($month < 1) {
         $month = (int) date('n');
     }
@@ -100,8 +107,10 @@ function rpt_period_range($filter, $bulan, $tahun)
     $end = new DateTime(sprintf('%04d-%02d-01', (int) $tahun, $month));
     $start = clone $end;
 
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($filter === '2bulan') {
         $start->modify('-1 month');
+    // [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
     } elseif ($filter === '1tahun') {
         $start->modify('-11 months');
     }
@@ -151,8 +160,10 @@ function rpt_load($conn, $filter, $bulan, $tahun)
     );
     $error = '';
 
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if (!$result) {
         $error = 'Data laporan belum dapat dibaca. Jalankan install_or_upgrade.php satu kali, lalu muat ulang halaman.';
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (function_exists('app_log')) {
             app_log('Laporan gaji query gagal: ' . mysqli_error($conn));
         }
@@ -166,13 +177,16 @@ function rpt_load($conn, $filter, $bulan, $tahun)
         );
     }
 
+    // [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk menarik data baris demi baris dari database
     while ($row = mysqli_fetch_assoc($result)) {
         $monthNo = rpt_bulan_nomor($row['bulan']);
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($monthNo < 1) {
             continue;
         }
 
         $date = new DateTime(sprintf('%04d-%02d-01', (int) $row['tahun'], $monthNo));
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($date < $start || $date > $end) {
             continue;
         }
@@ -181,6 +195,7 @@ function rpt_load($conn, $filter, $bulan, $tahun)
         $rows[] = $row;
 
         $key = $date->format('Y-m');
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if (!isset($groups[$key])) {
             $groups[$key] = array(
                 'label' => $row['bulan'] . ' ' . $row['tahun'],
@@ -194,10 +209,12 @@ function rpt_load($conn, $filter, $bulan, $tahun)
         $groups[$key]['total'] += $amount;
         $summary['grand_total'] += $amount;
 
+        // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
         if ($row['status_pembayaran'] === 'Sudah Dibayar') {
             $summary['paid_count']++;
             $summary['paid_total'] += $amount;
             $groups[$key]['paid'] += $amount;
+        // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
         } else {
             $summary['unpaid_count']++;
             $summary['unpaid_total'] += $amount;
@@ -234,7 +251,9 @@ $summary = $report['summary'];
 $groups = $report['groups'];
 $rows = $report['rows'];
 $max = 0;
+// [PENJELASAN LOGIKA]: Melakukan perulangan (looping) untuk memproses setiap isi array secara bergantian
 foreach ($groups as $group) {
+    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
     if ($group['total'] > $max) {
         $max = $group['total'];
     }

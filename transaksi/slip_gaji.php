@@ -19,10 +19,12 @@ require_once __DIR__ . '/../config/koneksi.php';
 // --- SECTION 1: OTENTIKASI & PENGAMBILAN ID PAYROLL ---
 // Mengecek login dan mengambil ID payroll yang diminta untuk dicetak.
 require_login();
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if(!$conn)die('Data tidak dapat ditampilkan.');
 $id=(int)($_GET['id']??0);
 $result=mysqli_query($conn,"SELECT p.*,k.nip,k.nama_karyawan,j.nama_jabatan FROM payroll p JOIN karyawan k ON k.id_karyawan=p.id_karyawan JOIN jabatan j ON j.id_jabatan=k.id_jabatan WHERE p.id_payroll=$id LIMIT 1");
 $row=$result?mysqli_fetch_assoc($result):null;
+// [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
 if(!$row){set_flash('warning','Rincian gaji tidak ditemukan.');redirect('transaksi/payroll.php');}
 ?>
 <!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rincian Gaji</title><link rel="icon" type="image/png" href="<?= asset('img/favicon.png') ?>"><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link href="<?= asset('css/style.css') ?>" rel="stylesheet"></head><body><div class="container py-4"><div class="text-end mb-3 no-print"><button onclick="window.print()" class="btn btn-dark">Cetak</button> <a href="<?= url('transaksi/payroll.php') ?>" class="btn btn-secondary">Kembali</a></div><div class="card print-card shadow-sm p-4"><div class="text-center mb-4"><img src="<?= asset('img/logo.png') ?>" style="height:80px" alt="Logo"><h1 class="h3 mt-3">SLIP GAJI</h1><div>PT Star Samudera Logistik</div><div class="text-muted">Periode <?= e($row['bulan'].' '.$row['tahun']) ?></div></div>
