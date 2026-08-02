@@ -55,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_presensi'])) {
             $allowedStatus = ['Hadir', 'Sakit', 'Izin', 'Alpha'];
             if ($idKaryawan < 1 || !in_array($status, $allowedStatus)) continue;
             $statusEsc = mysqli_real_escape_string($conn, $status);
+            // [PENCARIAN-FUNGSI: SIMPAN/UPDATE MASSAL] Menggunakan ON DUPLICATE KEY UPDATE untuk menyimpan massal secara efisien
             $sql = "INSERT INTO presensi_harian (id_karyawan, tanggal, status_kehadiran)
                     VALUES ($idKaryawan, '$tanggalEsc', '$statusEsc')
                     ON DUPLICATE KEY UPDATE status_kehadiran = '$statusEsc'";

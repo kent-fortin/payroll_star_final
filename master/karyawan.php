@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     } elseif ($tanggal > $today) {
         set_flash('danger', 'Data karyawan gagal disimpan. Tanggal masuk tidak boleh lebih dari tanggal hari ini.');
     } elseif ($id > 0) {
+        // [PENCARIAN-FUNGSI: UBAH DATA (UPDATE)] Memperbarui biodata karyawan jika datanya sudah ada
         $stmt = mysqli_prepare($conn, 'UPDATE karyawan SET nama_karyawan=?,jenis_kelamin=?,id_jabatan=?,status_karyawan=?,tanggal_masuk=?,no_ktp=?,no_kk=? WHERE id_karyawan=?');
         $ok = false;
         if ($stmt) {
@@ -55,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
         if (!$ok) app_log('Update karyawan: '.mysqli_error($conn));
     } else {
         $placeholder = 'TMP' . bin2hex(random_bytes(5));
+        // [PENCARIAN-FUNGSI: TAMBAH DATA (INSERT)] Memasukkan data karyawan baru ke database
         $stmt = mysqli_prepare($conn, 'INSERT INTO karyawan (nip,nama_karyawan,jenis_kelamin,id_jabatan,status_karyawan,tanggal_masuk,no_ktp,no_kk) VALUES (?,?,?,?,?,?,?,?)');
         $ok = false;
         if ($stmt) {
@@ -76,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
 // Mengubah status karyawan menjadi 'Resign' tanpa menghapus riwayat datanya di database.
 if (isset($_POST['resign'])) {
     $id = (int)($_POST['id_karyawan'] ?? 0);
+    // [PENCARIAN-FUNGSI: UBAH STATUS] Mengubah status dari 'Tetap' menjadi 'Resign'
     $ok = mysqli_query($conn, "UPDATE karyawan SET status_karyawan='Resign' WHERE id_karyawan=$id");
     set_flash($ok ? 'success' : 'danger', $ok ? 'Status karyawan berhasil diubah menjadi Resign.' : 'Status karyawan gagal diperbarui.');
     redirect('master/karyawan.php');

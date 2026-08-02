@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['toggle_status'])) {
     if ($nama === '' || $gaji <= 0) {
         set_flash('danger', 'Data jabatan gagal disimpan. Lengkapi nama jabatan dan gaji pokok.');
     } elseif ($id > 0) {
+        // [PENCARIAN-FUNGSI: UBAH DATA (UPDATE)] Memperbarui data jabatan yang sudah ada di database
         $stmt = mysqli_prepare($conn, 'UPDATE jabatan SET nama_jabatan=?,gaji_pokok=? WHERE id_jabatan=?');
         if ($stmt) {
             mysqli_stmt_bind_param($stmt, 'sdi', $nama, $gaji, $id);
@@ -43,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['toggle_status'])) {
         if (!$ok) app_log('Update jabatan: ' . mysqli_error($conn));
     } else {
         $placeholder = 'TMP' . bin2hex(random_bytes(5));
+        // [PENCARIAN-FUNGSI: TAMBAH DATA (INSERT)] Menyimpan data jabatan baru ke dalam database
         $stmt = mysqli_prepare($conn, 'INSERT INTO jabatan (kode_jabatan,nama_jabatan,gaji_pokok) VALUES (?,?,?)');
         $ok = false;
         if ($stmt) {
@@ -66,6 +68,7 @@ if (isset($_POST['toggle_status'])) {
     $allowedStatus = ['Aktif', 'Tidak Aktif'];
     if ($id > 0 && in_array($status, $allowedStatus)) {
         $statusEsc = mysqli_real_escape_string($conn, $status);
+        // [PENCARIAN-FUNGSI: UBAH STATUS] Menonaktifkan atau mengaktifkan kembali jabatan
         $ok = mysqli_query($conn, "UPDATE jabatan SET status_jabatan='$statusEsc' WHERE id_jabatan=$id");
         set_flash($ok ? 'success' : 'danger', $ok ? 'Status jabatan berhasil diperbarui.' : 'Status jabatan gagal diperbarui.');
         if (!$ok) app_log('Toggle jabatan status: ' . mysqli_error($conn));
