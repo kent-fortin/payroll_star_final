@@ -47,8 +47,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan'])) {
     $jam          = max(0, (int)($_POST['jam_lembur'] ?? 0));
     $userId       = (int)$_SESSION['id_user'];
 
+    // --- VALIDASI BLOKIR LEMBUR JIKA SUDAH DIBAYAR ---
+    $isValid = true;
+    if ($idKaryawan > 0 && $tanggal !== '') {
+        $bulanNomor = (int)date('n', strtotime($tanggal));
+        $tahunLembur = (int)date('Y', strtotime($tanggal));
+        $namaBulan = bulan_list()[$bulanNomor];
+        $namaBulanEsc = mysqli_real_escape_string($conn, $namaBulan);
+        
+        $cekPayroll = mysqli_query($conn, "SELECT status_pembayaran FROM payroll WHERE id_karyawan=$idKaryawan AND bulan='$namaBulanEsc' AND tahun=$tahunLembur LIMIT 1");
+        $rowPayroll = $cekPayroll ? mysqli_fetch_assoc($cekPayroll) : null;
+        
+        if ($rowPayroll && $rowPayroll['status_pembayaran'] === 'Sudah Dibayar') {
+            set_flash('danger', "Gagal: Gaji bulan $namaBulan $tahunLembur sudah dibayar. Tidak dapat menambah/mengubah lembur di periode ini.");
+            $isValid = false;
+        }
+    }
+
     // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
-    if ($idKaryawan < 1 || $tanggal === '' || $jam < 1) {
+    if (!$isValid) {
+        // flash dipasang di atas
+    } elseif ($idKaryawan < 1 || $tanggal === '' || $jam < 1) {
         set_flash('danger', 'Data lembur gagal disimpan. Pilih karyawan, isi tanggal dan jumlah jam (min. 1).');
     // [PENJELASAN LOGIKA]: Pemeriksaan kondisi alternatif (Else-If) jika kondisi sebelumnya tidak terpenuhi
     } elseif ($id > 0) {
