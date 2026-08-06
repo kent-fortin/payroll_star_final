@@ -25,24 +25,50 @@ $selectedMonth=trim($_POST['bulan']??current_month_name());
 $selectedYear=(int)($_POST['tahun']??date('Y'));
 $selectedTunjangan=(float)($_POST['total_tunjangan']??0);
 
+// --- VALIDASI ABSENSI LENGKAP ---
+$isDataLengkap = false;
+$msgIncomplete = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['preview']) || isset($_POST['simpan_payroll']))) {
+    $bulanEsc = mysqli_real_escape_string($conn, $selectedMonth);
+    $cekRes = mysqli_query($conn, "SELECT (hadir + sakit + izin + alpha) as total_hari FROM absensi WHERE id_karyawan = $selectedId AND bulan = '$bulanEsc' AND tahun = $selectedYear LIMIT 1");
+    $cekAbsen = $cekRes ? mysqli_fetch_assoc($cekRes) : null;
+    
+    $standarHari = (int)get_setting($conn, 'total_hari_kerja', 26);
+    $totalHari = $cekAbsen ? (int)$cekAbsen['total_hari'] : 0;
+    
+    if (!$cekAbsen) {
+        $msgIncomplete = 'Rekap absensi pada periode tersebut belum tersedia.';
+    } elseif ($totalHari < $standarHari) {
+        $msgIncomplete = "Gagal: Data rekap absensi tidak lengkap (hanya tercatat $totalHari dari $standarHari hari kerja). Silakan lengkapi absensi terlebih dahulu.";
+    } else {
+        $isDataLengkap = true;
+    }
+}
+
 // [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['preview'])) {
-    $preview=calculate_payroll($conn,$selectedId,$selectedMonth,$selectedYear,$selectedTunjangan);
-    // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
-    if(!$preview)set_flash('warning','Rekap absensi pada periode tersebut belum tersedia.');
+    if (!$isDataLengkap) {
+        set_flash('warning', $msgIncomplete);
+    } else {
+        $preview=calculate_payroll($conn,$selectedId,$selectedMonth,$selectedYear,$selectedTunjangan);
+        if(!$preview)set_flash('warning','Terjadi kesalahan saat menghitung payroll.');
+    }
 }
 
 // [PENJELASAN LOGIKA]: Memeriksa apakah ada form yang dikirimkan (metode POST) oleh pengguna
 if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['simpan_payroll'])) {
-    // [PENCARIAN-FUNGSI: HITUNG RUMUS GAJI] Memanggil helper fungsi untuk kalkulasi total Gaji Pokok + Lembur - Potongan
-    // [PENJELASAN LOGIKA]: Mengeksekusi rumus penggajian melalui helper calculate_payroll
-    $calc=calculate_payroll($conn,$selectedId,$selectedMonth,$selectedYear,$selectedTunjangan);
-    
-    // [PENJELASAN LOGIKA]: Jika kalkulasi gagal (misalnya belum ada rekap absen), tampilkan pesan error
-    if(!$calc){
-        set_flash('danger','Payroll gagal disimpan karena rekap absensi belum tersedia.');
-    // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
+    if (!$isDataLengkap) {
+        set_flash('danger', $msgIncomplete);
     } else {
+        // [PENCARIAN-FUNGSI: HITUNG RUMUS GAJI] Memanggil helper fungsi untuk kalkulasi total Gaji Pokok + Lembur - Potongan
+        // [PENJELASAN LOGIKA]: Mengeksekusi rumus penggajian melalui helper calculate_payroll
+        $calc=calculate_payroll($conn,$selectedId,$selectedMonth,$selectedYear,$selectedTunjangan);
+        
+        // [PENJELASAN LOGIKA]: Jika kalkulasi gagal (misalnya belum ada rekap absen), tampilkan pesan error
+        if(!$calc){
+            set_flash('danger','Payroll gagal disimpan karena terjadi kesalahan perhitungan.');
+        // [PENJELASAN LOGIKA]: Menjalankan blok perintah default (Else) karena semua kondisi di atasnya tidak terpenuhi
+        } else {
         $bulanEsc=mysqli_real_escape_string($conn,$selectedMonth);
         
         // [PENJELASAN LOGIKA]: Memeriksa apakah gaji karyawan pada bulan dan tahun tersebut sudah pernah diproses sebelumnya
@@ -75,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['simpan_payroll'])) {
             // [PENJELASAN LOGIKA]: Melakukan pengecekan kondisi (If) untuk menentukan alur program yang akan dijalankan
             if(!$ok)app_log('Save payroll: '.mysqli_error($conn));
         }
+    }
     }
     redirect('transaksi/payroll.php');
 }
